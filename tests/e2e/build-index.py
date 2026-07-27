@@ -361,8 +361,11 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .failed-clear {{ background: #1e293b; border: none; color: #cbd5e1; padding: 6px 12px;
                    border-radius: 8px; font-size: 12px; cursor: pointer; }}
   .failed-clear:hover {{ background: #334155; }}
-  .failed-clear.confirming {{ background: #7f1d1d; color: #fca5a5; border: 1px solid #b91c1c; }}
-  .failed-clear.confirming:hover {{ background: #991b1b; color: #fee2e2; }}
+  .failed-reset-group {{ display: inline-flex; gap: 6px; align-items: center; }}
+  .failed-reset-group.confirming #failedCopyModeReset {{ background: #7f1d1d; color: #fca5a5; border: 1px solid #b91c1c; }}
+  .failed-reset-group.confirming #failedCopyModeReset:hover {{ background: #991b1b; color: #fee2e2; }}
+  .failed-reset-cancel {{ background: #1e293b; border: 1px solid #334155; color: #cbd5e1; display: none; }}
+  .failed-reset-cancel:hover {{ background: #334155; color: #e2e8f0; }}
   .failed-export {{ background: #052e1a; color: #4ade80; }}
   .failed-export:hover {{ background: #064e2c; }}
   .failed-copy-matches-global {{ background: #0c1a33; color: #93c5fd; border: 1px dashed #1e3a8a; }}
