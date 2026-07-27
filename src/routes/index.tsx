@@ -503,10 +503,10 @@ function FAQ() {
         "Sim. Nos planos Pro e Premium você pode alterar cores, tipografia, logotipo e ícone. No Premium também é possível usar domínio próprio e configurações white label completas.",
     },
     {
-      id: "teste",
-      question: "Tem teste grátis?",
+      id: "cancelamento",
+      question: "Posso cancelar a assinatura a qualquer momento?",
       answer:
-        "Sim. Você pode começar a testar gratuitamente e só assinar quando estiver pronto para publicar seu catálogo. Não é necessário cartão de crédito para começar.",
+        "Sim. A assinatura é mensal e pode ser cancelada quando você quiser, sem taxas extras. Você mantém o acesso até o final do período já pago.",
     },
   ];
 
