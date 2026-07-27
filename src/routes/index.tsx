@@ -193,14 +193,9 @@ function DownloadApp() {
                 Não precisa de loja, login complicado ou configuração técnica.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <a
-                  href={APK_DOWNLOAD_URL}
-                  className="btn-primary"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Download className="w-4 h-4" />
-                  Baixar .apk para Android
+                <a href="#planos" className="btn-primary">
+                  <Lock className="w-4 h-4" />
+                  Assinar para receber o .apk
                 </a>
                 <button
                   type="button"
@@ -210,6 +205,9 @@ function DownloadApp() {
                   Como instalar
                 </button>
               </div>
+              <p className="mt-3 text-xs text-muted-foreground">
+                O download do arquivo .apk é liberado somente após a confirmação da compra na Hotmart.
+              </p>
             </div>
 
             <div className="hidden lg:flex items-center gap-4">
