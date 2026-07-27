@@ -192,11 +192,45 @@ function AccessPage() {
 
         {state === "missing" && (
           <>
-            <AlertCircle className="w-12 h-12 mx-auto text-amber-500" />
-            <h1 className="text-2xl font-bold mt-4">Falta o email</h1>
+            <Mail className="w-12 h-12 mx-auto text-primary" />
+            <h1 className="text-2xl font-bold mt-4">Confirme seu email da compra</h1>
             <p className="text-muted-foreground mt-2">
-              Este link precisa vir com o email da compra. Use o botão no email de confirmação da
-              Hotmart.
+              Digite o mesmo email usado no checkout da Hotmart para liberar seu acesso
+              automaticamente.
+            </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const form = e.currentTarget as HTMLFormElement;
+                const value = (form.elements.namedItem("email") as HTMLInputElement).value
+                  .trim()
+                  .toLowerCase();
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return;
+                window.location.href = `/acesso?email=${encodeURIComponent(value)}`;
+              }}
+              className="mt-6 space-y-3 text-left"
+            >
+              <input
+                name="email"
+                type="email"
+                required
+                autoFocus
+                placeholder="seu@email.com"
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base outline-none ring-primary/40 transition focus:ring-2"
+              />
+              <button
+                type="submit"
+                className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-primary text-primary-foreground font-semibold hover:bg-primary/90"
+              >
+                Liberar meu acesso
+              </button>
+            </form>
+            <p className="text-xs text-muted-foreground mt-4">
+              Também pode conferir o status em{" "}
+              <Link to="/entrega" className="text-primary hover:underline">
+                /entrega
+              </Link>
+              .
             </p>
           </>
         )}
