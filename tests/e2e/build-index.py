@@ -76,8 +76,16 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
                 ' title="Show error"><span class="chev">▸</span> error</button>'
                 if err_raw else ""
             )
+            copy_btn = (
+                '<button type="button" class="err-copy" title="Copy full error stack">'
+                '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">'
+                '<rect x="2" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/>'
+                '<path d="M5 2h9v9" fill="none" stroke="currentColor" stroke-width="1.5"/>'
+                '</svg> copy</button>'
+                if err_raw else ""
+            )
             err_block = (
-                f'{err_toggle}<pre class="err-text" hidden>{err_preview}</pre>'
+                f'{err_toggle}{copy_btn}<pre class="err-text" hidden>{err_preview}</pre>'
                 if err_raw else ""
             )
             rows.append(
