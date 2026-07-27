@@ -71,8 +71,14 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
                 links.append(f'<a class="inline-link video" href="{video_href}" download title="Download video.webm">video</a>')
             links_html = f' <span class="inline-links">{" ".join(links)}</span>' if links else ""
             err_preview = _html.escape(err_raw) if err_raw else ""
+            err_toggle = (
+                '<button type="button" class="err-toggle" aria-expanded="false"'
+                ' title="Show error"><span class="chev">▸</span> error</button>'
+                if err_raw else ""
+            )
             err_block = (
-                f'<pre class="err-text" hidden>{err_preview}</pre>' if err_raw else ""
+                f'{err_toggle}<pre class="err-text" hidden>{err_preview}</pre>'
+                if err_raw else ""
             )
             rows.append(
                 f'<tr data-engine="{engine}" data-name="{name.lower()}" data-duration="{dur}"'
@@ -83,6 +89,7 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
                 f'<td class="sc"><span class="scn">{name}</span>{links_html}{err_block}</td>'
                 f'<td class="dur">{dur} ms</td></tr>'
             )
+
 
     if not rows:
         return ""
@@ -114,6 +121,10 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
       <label class="failed-check" title="Show only failures with an error message/stack">
         <input type="checkbox" id="failedHasError"> with error only
       </label>
+      <label class="failed-check" title="Automatically expand error details for rows matching the error term">
+        <input type="checkbox" id="failedAutoExpand" checked> auto-expand matches
+      </label>
+
       <span class="failed-count muted" id="failedCount"></span>
       <button type="button" id="failedExport" class="failed-clear failed-export" title="Export filtered failures to CSV">Export CSV ↓</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
@@ -331,6 +342,16 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
                     color: #cbd5e1; cursor: pointer; user-select: none; }}
   .failed-check input {{ accent-color: #38bdf8; }}
   .failed-table tr.hidden {{ display: none; }}
+  .err-toggle {{ margin: 8px 0 0; display: inline-flex; align-items: center; gap: 4px;
+                 background: transparent; border: 1px solid #1f2937; color: #94a3b8;
+                 border-radius: 6px; padding: 2px 8px; font-size: 10.5px;
+                 text-transform: uppercase; letter-spacing: .05em; cursor: pointer; }}
+  .err-toggle:hover {{ color: #e2e8f0; border-color: #334155; }}
+  .err-toggle .chev {{ display: inline-block; transition: transform .15s ease; font-size: 9px; }}
+  .err-toggle[aria-expanded="true"] {{ color: #fca5a5; border-color: #7f1d1d; }}
+  .err-toggle[aria-expanded="true"] .chev {{ transform: rotate(90deg); }}
+  .err-toggle.auto {{ border-style: dashed; }}
+
   .err-text {{ margin: 8px 0 0; padding: 8px 10px; background: #0b1120;
                border: 1px solid #1f2937; border-left: 3px solid #7f1d1d;
                border-radius: 6px; color: #cbd5e1; font-size: 11.5px;
@@ -511,6 +532,8 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   const fAssets = document.getElementById('failedAssets');
   const fError = document.getElementById('failedError');
   const fHasError = document.getElementById('failedHasError');
+  const fAutoExpand = document.getElementById('failedAutoExpand');
+
   const fClear = document.getElementById('failedClear');
   const fCount = document.getElementById('failedCount');
   const fEmpty = document.getElementById('failedEmpty');
@@ -537,12 +560,24 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         default:      return true;
       }}
     }}
+    // Per-row manual expand state: WeakSet of rows the user explicitly toggled open.
+    const manualOpen = new WeakSet();
+    fBody.addEventListener('click', (e) => {{
+      const btn = e.target.closest('.err-toggle');
+      if (!btn) return;
+      const r = btn.closest('tr');
+      if (!r) return;
+      if (manualOpen.has(r)) manualOpen.delete(r); else manualOpen.add(r);
+      applyFilters();
+    }});
+
     function applyFilters() {{
       const q = (fSearch.value || '').trim().toLowerCase();
       const eng = fEngine.value || '';
       const assets = fAssets.value || '';
       const errTerm = (fError.value || '').trim().toLowerCase();
       const hasErrOnly = fHasError.checked;
+      const autoExpand = fAutoExpand.checked;
       let visible = 0;
       const re = q ? new RegExp('(' + escapeRe(q) + ')', 'ig') : null;
       const reErr = errTerm ? new RegExp('(' + escapeRe(errTerm) + ')', 'ig') : null;
@@ -569,18 +604,28 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
             : original;
         }}
         const et = r.querySelector('.err-text');
+        const toggle = r.querySelector('.err-toggle');
         if (et) {{
-          const showErr = match && errRaw && (errTerm || hasErrOnly);
-          if (showErr) {{
+          const autoOpen = autoExpand && !!errTerm && err.includes(errTerm);
+          const manual = manualOpen.has(r);
+          const open = match && errRaw && (autoOpen || manual);
+          if (open) {{
             const esc = escHtml(errRaw);
             et.innerHTML = reErr ? esc.replace(reErr, '<mark class="hl-err">$1</mark>') : esc;
             et.hidden = false;
           }} else {{
             et.hidden = true;
           }}
+          if (toggle) {{
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            toggle.classList.toggle('auto', open && autoOpen && !manual);
+            toggle.title = open ? 'Hide error' : 'Show error';
+          }}
         }}
         if (match) visible++;
       }});
+
+
 
       fCount.textContent = visible + ' of ' + totalRows + ' failure' + (totalRows === 1 ? '' : 's');
       fEmpty.style.display = visible === 0 ? '' : 'none';
@@ -590,11 +635,13 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     fAssets.addEventListener('change', applyFilters);
     fError.addEventListener('input', applyFilters);
     fHasError.addEventListener('change', applyFilters);
+    fAutoExpand.addEventListener('change', applyFilters);
     fClear.addEventListener('click', () => {{
       fSearch.value = ''; fEngine.value = ''; fAssets.value = '';
-      fError.value = ''; fHasError.checked = false;
+      fError.value = ''; fHasError.checked = false; fAutoExpand.checked = true;
       applyFilters(); fSearch.focus();
     }});
+
     applyFilters();
 
     // Export filtered failures to CSV
