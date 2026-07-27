@@ -1,9 +1,10 @@
-import { createFileRoute, redirect, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { useEffect, useState, useRef } from "react";
-import { Loader2, Mail, AlertCircle, CheckCircle, RefreshCw, ArrowLeft } from "lucide-react";
+import { Loader2, Mail, AlertCircle, CheckCircle, RefreshCw } from "lucide-react";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { findUserByEmail, logDelivery } from "@/lib/hotmart.server";
+
 
 
 
@@ -189,12 +190,10 @@ function AccessPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-6 py-12">
       <div className="max-w-lg w-full rounded-2xl border border-border/50 bg-card p-8 md:p-10 text-center shadow-2xl">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" /> Página inicial
-        </Link>
+        <div className="mb-6 text-sm font-semibold tracking-wide text-primary">
+          Vende Fácil Pro
+        </div>
+
 
         {state === "missing" && (
           <>
