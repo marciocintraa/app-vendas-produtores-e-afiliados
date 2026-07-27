@@ -190,12 +190,10 @@ function AccessPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-6 py-12">
       <div className="max-w-lg w-full rounded-2xl border border-border/50 bg-card p-8 md:p-10 text-center shadow-2xl">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" /> Página inicial
-        </Link>
+        <div className="mb-6 text-sm font-semibold tracking-wide text-primary">
+          Vende Fácil Pro
+        </div>
+
 
         {state === "missing" && (
           <>
