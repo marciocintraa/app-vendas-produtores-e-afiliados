@@ -106,7 +106,7 @@ function Hero() {
         <div>
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-3 py-1 text-xs font-medium text-muted-foreground">
             <Sparkles className="w-3.5 h-3.5 text-accent" />
-            App Builder para Produtos Digitais
+            App Android para Produtos Digitais
           </span>
           <h1 className="mt-6 text-4xl md:text-6xl font-bold leading-[1.05]">
             Seu catálogo de infoprodutos em um app profissional com o{" "}
