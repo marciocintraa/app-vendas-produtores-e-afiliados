@@ -883,32 +883,40 @@ function AdminProductsPage() {
                 {confirm.description}
               </p>
               {confirm.candidates.length > 0 ? (
-                <div className="mt-5 w-full rounded-xl border border-border/60 bg-surface/60 p-3 text-left">
-                  <p className="mb-2 text-xs font-medium text-muted-foreground">
-                    Selecione a nova capa:
-                  </p>
-                  <div className="grid grid-cols-4 gap-2">
-                    {confirm.candidates.map((src) => (
-                      <button
-                        key={src}
-                        type="button"
-                        onClick={() =>
-                          setConfirm((prev) => ({ ...prev, selectedNext: src }))
-                        }
-                        className={`relative aspect-[4/3] overflow-hidden rounded-lg border-2 transition-all ${
-                          confirm.selectedNext === src
-                            ? "border-primary ring-2 ring-primary/40"
-                            : "border-border/60 hover:border-primary/50"
-                        }`}
-                      >
-                        <img src={src} alt="" className="h-full w-full object-cover" />
-                        {confirm.selectedNext === src && (
-                          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-primary/90 px-1 py-0.5 text-center text-[10px] font-semibold text-primary-foreground">
-                            NOVA CAPA
-                          </div>
-                        )}
-                      </button>
-                    ))}
+                <div className="mt-5 grid w-full gap-5 text-left sm:grid-cols-[1fr_220px]">
+                  <div className="rounded-xl border border-border/60 bg-surface/60 p-3">
+                    <p className="mb-2 text-xs font-medium text-muted-foreground">
+                      Selecione a nova capa:
+                    </p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {confirm.candidates.map((src) => (
+                        <button
+                          key={src}
+                          type="button"
+                          onClick={() =>
+                            setConfirm((prev) => ({ ...prev, selectedNext: src }))
+                          }
+                          className={`relative aspect-[4/3] overflow-hidden rounded-lg border-2 transition-all ${
+                            confirm.selectedNext === src
+                              ? "border-primary ring-2 ring-primary/40"
+                              : "border-border/60 hover:border-primary/50"
+                          }`}
+                        >
+                          <img src={src} alt="" className="h-full w-full object-cover" />
+                          {confirm.selectedNext === src && (
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-primary/90 px-1 py-0.5 text-center text-[10px] font-semibold text-primary-foreground">
+                              NOVA CAPA
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-border/60 bg-surface/60 p-3">
+                    <p className="mb-2 text-xs font-medium text-muted-foreground">
+                      Prévia no catálogo:
+                    </p>
+                    <CoverPreviewCard cover={confirm.selectedNext} {...confirm.preview} />
                   </div>
                 </div>
               ) : (
