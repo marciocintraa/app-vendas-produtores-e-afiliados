@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatalogoProductIdRouteImport } from './routes/catalogo.$productId'
 import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
+import { Route as ApiPublicHotmartWebhookRouteImport } from './routes/api/public/hotmart/webhook'
 
 const CatalogoRoute = CatalogoRouteImport.update({
   id: '/catalogo',
@@ -46,6 +47,11 @@ const AuthenticatedPainelProdutosRoute =
     path: '/painel/produtos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicHotmartWebhookRoute = ApiPublicHotmartWebhookRouteImport.update({
+  id: '/api/public/hotmart/webhook',
+  path: '/api/public/hotmart/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/catalogo': typeof CatalogoRouteWithChildren
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/catalogo': typeof CatalogoRouteWithChildren
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/catalogo': typeof CatalogoRouteWithChildren
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -78,8 +87,15 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/catalogo/$productId'
     | '/painel/produtos'
+    | '/api/public/hotmart/webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/catalogo' | '/catalogo/$productId' | '/painel/produtos'
+  to:
+    | '/'
+    | '/auth'
+    | '/catalogo'
+    | '/catalogo/$productId'
+    | '/painel/produtos'
+    | '/api/public/hotmart/webhook'
   id:
     | '__root__'
     | '/'
@@ -88,6 +104,7 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/catalogo/$productId'
     | '/_authenticated/painel/produtos'
+    | '/api/public/hotmart/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,6 +112,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CatalogoRoute: typeof CatalogoRouteWithChildren
+  ApiPublicHotmartWebhookRoute: typeof ApiPublicHotmartWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -141,6 +159,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelProdutosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/hotmart/webhook': {
+      id: '/api/public/hotmart/webhook'
+      path: '/api/public/hotmart/webhook'
+      fullPath: '/api/public/hotmart/webhook'
+      preLoaderRoute: typeof ApiPublicHotmartWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -172,6 +197,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CatalogoRoute: CatalogoRouteWithChildren,
+  ApiPublicHotmartWebhookRoute: ApiPublicHotmartWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
