@@ -16,6 +16,7 @@ import asyncio
 import base64
 import io
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -326,8 +327,14 @@ async def scenario_shortcuts_after_close(page: Page) -> None:
 
 
 async def main() -> int:
+    browser_name = os.environ.get("PLAYWRIGHT_BROWSER", "chromium").lower()
+    if browser_name not in {"chromium", "firefox", "webkit"}:
+        print(f"Unknown PLAYWRIGHT_BROWSER={browser_name!r}; falling back to chromium")
+        browser_name = "chromium"
+    print(f"Running suite on {browser_name}")
     async with async_playwright() as pw:
-        browser = await pw.chromium.launch(headless=True)
+        browser_type = getattr(pw, browser_name)
+        browser = await browser_type.launch(headless=True)
         context = await browser.new_context(viewport={"width": 1280, "height": 1800})
         page = await context.new_page()
 
