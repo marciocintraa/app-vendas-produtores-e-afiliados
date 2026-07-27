@@ -511,28 +511,68 @@ function AdminProductsPage() {
                 <div className="space-y-3">
                   {editing.gallery.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                      {editing.gallery.map((src, i) => (
-                        <div
-                          key={`${i}-${src.slice(0, 24)}`}
-                          className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-border/60 bg-surface/60"
-                        >
-                          <img src={src} alt="" className="h-full w-full object-cover" />
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setEditing((prev) =>
-                                prev
-                                  ? { ...prev, gallery: prev.gallery.filter((_, j) => j !== i) }
-                                  : prev,
-                              )
-                            }
-                            className="absolute right-1 top-1 rounded-md bg-background/80 p-1 text-muted-foreground opacity-0 backdrop-blur transition-opacity hover:text-destructive group-hover:opacity-100"
-                            aria-label="Remover imagem"
+                      {editing.gallery.map((src, i) => {
+                        const isDragging = dragIndex === i;
+                        const isOver = dragOverIndex === i && dragIndex !== null && dragIndex !== i;
+                        return (
+                          <div
+                            key={`${i}-${src.slice(0, 24)}`}
+                            draggable
+                            onDragStart={(e) => {
+                              setDragIndex(i);
+                              e.dataTransfer.effectAllowed = "move";
+                              e.dataTransfer.setData("text/plain", String(i));
+                            }}
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              e.dataTransfer.dropEffect = "move";
+                              if (dragOverIndex !== i) setDragOverIndex(i);
+                            }}
+                            onDragLeave={() => {
+                              if (dragOverIndex === i) setDragOverIndex(null);
+                            }}
+                            onDrop={(e) => {
+                              e.preventDefault();
+                              const from = dragIndex ?? Number(e.dataTransfer.getData("text/plain"));
+                              if (Number.isFinite(from)) reorderGallery(from, i);
+                              setDragIndex(null);
+                              setDragOverIndex(null);
+                            }}
+                            onDragEnd={() => {
+                              setDragIndex(null);
+                              setDragOverIndex(null);
+                            }}
+                            className={`group relative aspect-[4/3] cursor-move overflow-hidden rounded-lg border bg-surface/60 transition-all ${
+                              isOver
+                                ? "border-primary ring-2 ring-primary/40"
+                                : "border-border/60"
+                            } ${isDragging ? "opacity-40" : ""}`}
+                            title="Arraste para reordenar"
                           >
-                            <X className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      ))}
+                            <img src={src} alt="" className="h-full w-full object-cover pointer-events-none" />
+                            <div className="pointer-events-none absolute left-1 top-1 rounded-md bg-background/80 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground backdrop-blur">
+                              {i + 1}
+                            </div>
+                            <div className="pointer-events-none absolute bottom-1 left-1 rounded-md bg-background/80 p-1 text-muted-foreground backdrop-blur">
+                              <GripVertical className="h-3.5 w-3.5" />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setEditing((prev) =>
+                                  prev
+                                    ? { ...prev, gallery: prev.gallery.filter((_, j) => j !== i) }
+                                    : prev,
+                                )
+                              }
+                              className="absolute right-1 top-1 rounded-md bg-background/80 p-1 text-muted-foreground opacity-0 backdrop-blur transition-opacity hover:text-destructive group-hover:opacity-100"
+                              aria-label="Remover imagem"
+                            >
+                              <X className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                   <label
