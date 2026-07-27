@@ -1541,10 +1541,12 @@ function AdminProductsPage() {
           <button
             type="button"
             onClick={requestFinalConfirm}
+            title="Confirmar troca de capa (Enter)"
             className="fixed bottom-24 right-6 z-[80] inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-3 text-sm font-semibold text-destructive-foreground shadow-2xl shadow-destructive/40 ring-1 ring-destructive/60 transition-transform hover:scale-[1.03] sm:bottom-28 sm:right-10"
-            aria-label="Confirmar troca de capa"
+            aria-label="Confirmar troca de capa (Enter)"
           >
-            <Check className="h-4 w-4" /> Confirmar troca de capa
+            <Check className="h-4 w-4" /> Confirmar troca de capa{" "}
+            <span className="hidden text-[10px] opacity-70 sm:inline">Enter</span>
           </button>
 
           <div className="border-t border-border/60 bg-surface/60 px-6 py-4">
