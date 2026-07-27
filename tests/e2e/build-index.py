@@ -100,6 +100,7 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
         <option value="none">Without assets</option>
       </select>
       <span class="failed-count muted" id="failedCount"></span>
+      <button type="button" id="failedExport" class="failed-clear failed-export" title="Export filtered failures to CSV">Export CSV ↓</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
     </div>
     <table class="failed-table">
