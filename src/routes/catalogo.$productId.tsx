@@ -100,7 +100,7 @@ function ProductPage() {
             <section className="mt-8">
               <h2 className="font-display text-xl font-semibold">O que está incluso</h2>
               <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-                {product.highlights.map((h) => (
+                {product.highlights.map((h: string) => (
                   <li
                     key={h}
                     className="flex items-start gap-2 rounded-xl border border-border/60 bg-surface/60 p-3 text-sm"
@@ -115,7 +115,7 @@ function ProductPage() {
             <section className="mt-8">
               <h2 className="font-display text-xl font-semibold">Conteúdo do curso</h2>
               <div className="mt-4 divide-y divide-border/60 overflow-hidden rounded-2xl border border-border/60 bg-surface/40">
-                {product.modules.map((m, i) => (
+                {product.modules.map((m: Product["modules"][number], i: number) => (
                   <div key={m.title} className="flex items-center justify-between px-4 py-3">
                     <div className="flex items-center gap-3">
                       <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-sm font-semibold text-primary">
