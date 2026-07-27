@@ -229,18 +229,13 @@ async def scenario_invalid_then_valid(page: Page) -> None:
     await wait_for_validation(page, "enabled")
     await clear_toasts(page)
     await press(page, "Enter")
-    await page.wait_for_selector("text=Comparar capas antes de salvar",
+    await page.wait_for_selector("text=Confirmação final da troca de capa",
                                  timeout=4000)
     check(await final_modal_is_open(page),
           "Enter opens final-confirm step when cover is valid")
 
-    # Close the final-confirm and the modal, cleanup for next scenario.
-    await page.keyboard.press("Escape")  # may or may not close; fall back:
-    cancel = page.locator("button:has-text('Cancelar')")
-    if await cancel.count() > 0:
-        await cancel.first.click()
-    if await modal_is_open(page):
-        await page.locator("button:has-text('Cancelar')").first.click()
+    await close_editor(page)
+
 
 
 async def scenario_ctrl_z_restores_original(page: Page) -> None:
