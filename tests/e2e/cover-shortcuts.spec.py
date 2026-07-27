@@ -337,17 +337,16 @@ async def main() -> int:
                 await sc(page)
             except (TestFailure, PWTimeoutError, AssertionError) as exc:
                 failures.append(f"{sc.__name__}: {exc}")
-                await page.screenshot(path=str(SCREENSHOTS / f"fail_{i}_{sc.__name__}.png"))
-                # Try to recover between scenarios.
-                for _ in range(3):
-                    cancel = page.locator("button:has-text('Cancelar')")
-                    if await cancel.count() == 0:
-                        break
-                    try:
-                        await cancel.first.click(timeout=1000)
-                    except Exception:
-                        break
-                    await page.wait_for_timeout(150)
+                try:
+                    await page.screenshot(path=str(SCREENSHOTS / f"fail_{i}_{sc.__name__}.png"))
+                except Exception:
+                    pass
+            # Nuclear reset between scenarios: reload page to guaranteed clean state.
+            if i < len(scenarios):
+                await page.goto(f"{BASE_URL}/painel/produtos", wait_until="domcontentloaded")
+                await page.wait_for_selector("text=E2E Shortcut Test", timeout=8000)
+                await install_toast_capture(page)
+
 
         await context.close()
         await browser.close()
