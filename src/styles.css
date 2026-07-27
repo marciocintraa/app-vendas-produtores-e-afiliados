@@ -175,10 +175,14 @@
   color: var(--foreground);
   outline: none;
   transition: border-color 150ms ease, box-shadow 150ms ease;
-}
-@utility input {
+
   &::placeholder { color: var(--muted-foreground); }
-  &:focus { border-color: color-mix(in oklab, var(--primary) 60%, transparent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 20%, transparent); }
+  &:focus {
+    border-color: color-mix(in oklab, var(--primary) 60%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 20%, transparent);
+  }
   textarea& { height: auto; padding: 0.625rem 0.75rem; line-height: 1.4; }
+  select& { padding-right: 2rem; }
 }
+
 
