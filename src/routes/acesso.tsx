@@ -4,6 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import { Loader2, Mail, AlertCircle, CheckCircle, RefreshCw, ArrowLeft } from "lucide-react";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { findUserByEmail, logDelivery } from "@/lib/hotmart.server";
+import { logAccessEvent } from "@/lib/access-journey";
+
 
 /**
  * Rota de acesso automático a partir do email da Hotmart.
@@ -128,12 +130,25 @@ function AccessPage() {
   const [checking, setChecking] = useState(false);
   const pollRef = useRef<number | null>(null);
 
+  useEffect(() => {
+    logAccessEvent({
+      route: "/acesso",
+      state: initialState,
+      email: email || undefined,
+      detail:
+        initialState === "missing"
+          ? "email ausente — mostrando formulário"
+          : `estado inicial do loader: ${initialState}`,
+    });
+  }, [initialState, email]);
+
   // Se o estado inicial for "no_purchase", faz polling por até ~30s.
   // Isso cobre o caso em que o comprador clica no email da Hotmart antes
   // do webhook chegar no nosso servidor.
   useEffect(() => {
     if (initialState !== "no_purchase") return;
     setPolling(true);
+
 
     let count = 0;
     const run = async () => {

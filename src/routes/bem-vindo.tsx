@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, ArrowRight, Mail, Sparkles, ShieldCheck } from "lucide-react";
+import { logAccessEvent } from "@/lib/access-journey";
+
 
 export const Route = createFileRoute("/bem-vindo")({
   head: () => ({
@@ -58,16 +60,30 @@ function BemVindoPage() {
   const hasEmail = initialEmail.length > 0 && !editing;
   const accessHref = hasEmail ? `/acesso?email=${encodeURIComponent(initialEmail)}` : "/acesso";
 
+  useEffect(() => {
+    logAccessEvent({
+      route: "/bem-vindo",
+      state: initialEmail ? "visited" : "missing_email",
+      email: initialEmail || undefined,
+      detail: initialEmail
+        ? "email válido detectado na URL"
+        : "URL sem email válido — pedindo digitação manual",
+    });
+  }, [initialEmail]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const clean = email.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) {
       setError("Digite um email válido (o mesmo usado na compra).");
+      logAccessEvent({ route: "/bem-vindo", state: "invalid_email", email: clean });
       return;
     }
     setError(null);
+    logAccessEvent({ route: "/bem-vindo", state: "submit", email: clean, detail: "indo para /acesso" });
     navigate({ to: "/acesso", search: { email: clean } });
   };
+
 
   const handleEdit = () => {
     setEditing(true);

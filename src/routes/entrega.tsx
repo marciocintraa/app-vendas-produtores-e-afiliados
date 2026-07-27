@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Loader2,
   Search,
@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { findUserByEmail } from "@/lib/hotmart.server";
+import { logAccessEvent } from "@/lib/access-journey";
+
 
 /**
  * Página pública de status da entrega.
@@ -78,13 +80,24 @@ function DeliveryPage() {
   const [result, setResult] = useState<{ email?: string; plan?: string } | null>(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    logAccessEvent({ route: "/entrega", state: "visited", detail: "página aberta" });
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setStatus("checking");
+    const clean = email.trim().toLowerCase();
     try {
-      const res = await checkDelivery({ data: { email: email.trim().toLowerCase() } });
+      const res = await checkDelivery({ data: { email: clean } });
       setResult({ email: res.email, plan: res.plan });
+      logAccessEvent({
+        route: "/entrega",
+        state: res.status,
+        email: clean,
+        detail: `plano=${res.plan ?? "—"}`,
+      });
       switch (res.status) {
         case "found":
           setStatus("found");
@@ -98,12 +111,19 @@ function DeliveryPage() {
         default:
           setStatus("error");
       }
-    } catch {
+    } catch (err) {
+      logAccessEvent({
+        route: "/entrega",
+        state: "error",
+        email: clean,
+        detail: err instanceof Error ? err.message : String(err),
+      });
       setStatus("error");
     } finally {
       setLoading(false);
     }
   };
+
 
   const planLabel = (plan?: string) => {
     if (plan === "starter_monthly") return "Starter";
