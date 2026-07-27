@@ -573,7 +573,8 @@ function Pricing() {
         "Tema padrão",
         "Estatísticas básicas",
       ],
-      cta: "Começar",
+      cta: "Assinar Starter",
+      priceId: "starter_monthly",
       highlight: false,
     },
     {
@@ -589,6 +590,7 @@ function Pricing() {
         "Estatísticas completas",
       ],
       cta: "Assinar Pro",
+      priceId: "pro_monthly",
       highlight: true,
     },
     {
@@ -604,7 +606,8 @@ function Pricing() {
         "Exportação de dados",
         "Suporte prioritário",
       ],
-      cta: "Falar com vendas",
+      cta: "Assinar Premium",
+      priceId: "premium_monthly",
       highlight: false,
     },
   ];
