@@ -422,11 +422,15 @@ function AdminProductsPage() {
 
 
   function openConfirm(opts: Omit<ConfirmState, "open">) {
+    coverHistoryRef.current = [];
+    setCanUndoCover(false);
     setConfirm({ open: true, ...opts });
   }
 
   function closeConfirm() {
     setFullPreview(false);
+    coverHistoryRef.current = [];
+    setCanUndoCover(false);
     setConfirm((prev) => ({ ...prev, open: false }));
   }
 
