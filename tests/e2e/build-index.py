@@ -70,15 +70,20 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
             if video_href:
                 links.append(f'<a class="inline-link video" href="{video_href}" download title="Download video.webm">video</a>')
             links_html = f' <span class="inline-links">{" ".join(links)}</span>' if links else ""
+            err_preview = _html.escape(err_raw) if err_raw else ""
+            err_block = (
+                f'<pre class="err-text" hidden>{err_preview}</pre>' if err_raw else ""
+            )
             rows.append(
                 f'<tr data-engine="{engine}" data-name="{name.lower()}" data-duration="{dur}"'
                 f' data-trace="{"1" if trace_href else "0"}" data-video="{"1" if video_href else "0"}"'
                 f' data-trace-href="{trace_href or ""}" data-video-href="{video_href or ""}"'
                 f' data-error="{err_attr}">'
                 f'<td class="eng">{engine}</td>'
-                f'<td class="sc"><span class="scn">{name}</span>{links_html}</td>'
+                f'<td class="sc"><span class="scn">{name}</span>{links_html}{err_block}</td>'
                 f'<td class="dur">{dur} ms</td></tr>'
             )
+
     if not rows:
         return ""
     engines_with_failures = [
