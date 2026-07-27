@@ -103,6 +103,12 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
         <option value="both">With trace and video</option>
         <option value="none">Without assets</option>
       </select>
+      <input type="search" id="failedError" class="failed-input failed-error-input"
+             placeholder="Error contains…" autocomplete="off" spellcheck="false"
+             aria-label="Filter by error message">
+      <label class="failed-check" title="Show only failures with an error message/stack">
+        <input type="checkbox" id="failedHasError"> with error only
+      </label>
       <span class="failed-count muted" id="failedCount"></span>
       <button type="button" id="failedExport" class="failed-clear failed-export" title="Export filtered failures to CSV">Export CSV ↓</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
@@ -315,6 +321,10 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .failed-clear:hover {{ background: #334155; }}
   .failed-export {{ background: #052e1a; color: #4ade80; }}
   .failed-export:hover {{ background: #064e2c; }}
+  .failed-error-input {{ flex: 0 1 200px; min-width: 160px; }}
+  .failed-check {{ display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+                    color: #cbd5e1; cursor: pointer; user-select: none; }}
+  .failed-check input {{ accent-color: #38bdf8; }}
   .failed-table tr.hidden {{ display: none; }}
   mark.hl {{ background: #fbbf24; color: #0b1120; padding: 0 2px; border-radius: 2px; }}
   th.sortable {{ cursor: pointer; user-select: none; }}
@@ -485,6 +495,8 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   const fSearch = document.getElementById('failedSearch');
   const fEngine = document.getElementById('failedEngine');
   const fAssets = document.getElementById('failedAssets');
+  const fError = document.getElementById('failedError');
+  const fHasError = document.getElementById('failedHasError');
   const fClear = document.getElementById('failedClear');
   const fCount = document.getElementById('failedCount');
   const fEmpty = document.getElementById('failedEmpty');
@@ -515,14 +527,20 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
       const q = (fSearch.value || '').trim().toLowerCase();
       const eng = fEngine.value || '';
       const assets = fAssets.value || '';
+      const errTerm = (fError.value || '').trim().toLowerCase();
+      const hasErrOnly = fHasError.checked;
       let visible = 0;
       const re = q ? new RegExp('(' + escapeRe(q) + ')', 'ig') : null;
       rows.forEach(r => {{
         const name = r.dataset.name || '';
         const engine = r.dataset.engine || '';
+        const err = (r.dataset.error || '').toLowerCase();
+        const errorOk = (!hasErrOnly || err.length > 0)
+          && (!errTerm || err.includes(errTerm));
         const match = (!eng || engine === eng)
           && (!q || name.includes(q))
-          && assetMatch(r, assets);
+          && assetMatch(r, assets)
+          && errorOk;
         r.classList.toggle('hidden', !match);
         const scn = r.querySelector('.scn');
         if (scn) {{
@@ -539,8 +557,11 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     fSearch.addEventListener('input', applyFilters);
     fEngine.addEventListener('change', applyFilters);
     fAssets.addEventListener('change', applyFilters);
+    fError.addEventListener('input', applyFilters);
+    fHasError.addEventListener('change', applyFilters);
     fClear.addEventListener('click', () => {{
       fSearch.value = ''; fEngine.value = ''; fAssets.value = '';
+      fError.value = ''; fHasError.checked = false;
       applyFilters(); fSearch.focus();
     }});
     applyFilters();
