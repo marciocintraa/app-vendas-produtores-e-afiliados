@@ -82,6 +82,12 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
                 '<rect x="2" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/>'
                 '<path d="M5 2h9v9" fill="none" stroke="currentColor" stroke-width="1.5"/>'
                 '</svg> copy</button>'
+                '<button type="button" class="err-copy-matches" hidden'
+                ' title="Copy only stack lines matching the current error filter">'
+                '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">'
+                '<path d="M2 8l3 3 5-7" fill="none" stroke="currentColor" stroke-width="1.5"/>'
+                '<path d="M8 12h6" fill="none" stroke="currentColor" stroke-width="1.5"/>'
+                '</svg> copy matches</button>'
                 if err_raw else ""
             )
             err_block = (
@@ -369,6 +375,14 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .err-copy:hover {{ color: #e2e8f0; border-color: #334155; background: #1e293b; }}
   .err-copy.copied {{ color: #34d399; border-color: #14532d; background: #052e1a; }}
   .err-copy svg {{ vertical-align: middle; }}
+  .err-copy-matches {{ margin: 8px 0 0 8px; display: inline-flex; align-items: center; gap: 4px;
+                       background: transparent; border: 1px dashed #1e3a8a; color: #93c5fd;
+                       border-radius: 6px; padding: 2px 8px; font-size: 10.5px;
+                       text-transform: uppercase; letter-spacing: .05em; cursor: pointer;
+                       transition: color .15s ease, border-color .15s ease, background .15s ease; }}
+  .err-copy-matches:hover {{ color: #e0f2fe; border-color: #38bdf8; background: #0c1a33; }}
+  .err-copy-matches.copied {{ color: #34d399; border-color: #14532d; background: #052e1a; }}
+  .err-copy-matches svg {{ vertical-align: middle; }}
 
   .err-text {{ margin: 8px 0 0; padding: 8px 10px; background: #0b1120;
                border: 1px solid #1f2937; border-left: 3px solid #7f1d1d;
@@ -591,6 +605,31 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         applyFilters();
         return;
       }}
+      const copyMatchesBtn = e.target.closest('.err-copy-matches');
+      if (copyMatchesBtn) {{
+        const r = copyMatchesBtn.closest('tr');
+        const err = r ? (r.dataset.error || '') : '';
+        const term = (fError.value || '').trim();
+        if (!err || !term) return;
+        const termLower = term.toLowerCase();
+        const matches = err.split(/\\r?\\n/).filter(line => line.toLowerCase().includes(termLower));
+        if (!matches.length) {{
+          copyMatchesBtn.title = 'No matching lines';
+          return;
+        }}
+        navigator.clipboard.writeText(matches.join('\\n')).then(() => {{
+          copyMatchesBtn.classList.add('copied');
+          const original = copyMatchesBtn.innerHTML;
+          copyMatchesBtn.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M2 9l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg> copied ' + matches.length;
+          setTimeout(() => {{
+            copyMatchesBtn.classList.remove('copied');
+            copyMatchesBtn.innerHTML = original;
+          }}, 1500);
+        }}).catch(() => {{
+          copyMatchesBtn.title = 'Unable to copy';
+        }});
+        return;
+      }}
       const copyBtn = e.target.closest('.err-copy');
       if (copyBtn) {{
         const r = copyBtn.closest('tr');
@@ -661,6 +700,11 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
             toggle.classList.toggle('auto', open && autoOpen && !manual);
             toggle.title = open ? 'Hide error' : 'Show error';
           }}
+        }}
+        const copyMatches = r.querySelector('.err-copy-matches');
+        if (copyMatches) {{
+          const show = !!errTerm && errRaw && err.includes(errTerm);
+          copyMatches.hidden = !show;
         }}
         if (match) visible++;
       }});
