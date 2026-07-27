@@ -415,13 +415,74 @@ function AdminProductsPage() {
                   placeholder="https://hotmart.com/…"
                 />
               </Field>
-              <Field label="URL da capa (opcional)" className="sm:col-span-2">
-                <input
-                  value={editing.cover}
-                  onChange={(e) => setEditing({ ...editing, cover: e.target.value })}
-                  className="input"
-                  placeholder="https://…/capa.jpg (deixe em branco para gerar automaticamente)"
-                />
+              <Field
+                label="Imagem de capa"
+                className="sm:col-span-2"
+                hint="Envie um arquivo (JPG, PNG ou WebP até 3 MB) ou cole uma URL. Em branco = capa gerada automaticamente."
+              >
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                  <div className="flex h-28 w-40 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-surface/60">
+                    {editing.cover ? (
+                      <img
+                        src={editing.cover}
+                        alt="Prévia da capa"
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="px-2 text-center text-[11px] text-muted-foreground">
+                        Sem imagem
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-sm font-medium transition-colors hover:bg-surface-2">
+                        <Plus className="h-4 w-4" />
+                        {editing.cover ? "Trocar imagem" : "Enviar imagem"}
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            e.target.value = "";
+                            if (!file) return;
+                            if (file.size > 3 * 1024 * 1024) {
+                              setError("A imagem deve ter no máximo 3 MB.");
+                              return;
+                            }
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                              const result = reader.result;
+                              if (typeof result === "string") {
+                                setError(null);
+                                setEditing((prev) =>
+                                  prev ? { ...prev, cover: result } : prev,
+                                );
+                              }
+                            };
+                            reader.readAsDataURL(file);
+                          }}
+                        />
+                      </label>
+                      {editing.cover && (
+                        <button
+                          type="button"
+                          onClick={() => setEditing({ ...editing, cover: "" })}
+                          className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" /> Remover
+                        </button>
+                      )}
+                    </div>
+                    <input
+                      value={editing.cover.startsWith("data:") ? "" : editing.cover}
+                      onChange={(e) => setEditing({ ...editing, cover: e.target.value })}
+                      className="input"
+                      placeholder="ou cole uma URL: https://…/capa.jpg"
+                    />
+                  </div>
+                </div>
               </Field>
               <Field label="Descrição" className="sm:col-span-2">
                 <textarea
