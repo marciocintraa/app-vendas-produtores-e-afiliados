@@ -121,6 +121,7 @@ function AdminProductsPage() {
   const [error, setError] = useState<string | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [fullPreview, setFullPreview] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmState>({
     open: false,
     title: "",
