@@ -463,8 +463,8 @@ function AdminProductsPage() {
 
 
   function openConfirm(opts: Omit<ConfirmState, "open">) {
-    coverHistoryRef.current = [];
-    setCanUndoCover(false);
+    coverHistoryRef.current = [editing?.cover ?? ""];
+    setCanUndoCover(true);
     setConfirm({ open: true, ...opts });
   }
 
