@@ -17,6 +17,7 @@ import {
   Users,
   HelpCircle,
   ChevronDown,
+  Quote,
 } from "lucide-react";
 import { useState } from "react";
 import heroImg from "@/assets/hero-app.jpg";
@@ -52,6 +53,7 @@ function Landing() {
         <SocialProof />
         <Features />
         <Audience />
+        <Testimonials />
         <Pricing />
         <FAQ />
         <FinalCTA />
@@ -74,6 +76,7 @@ function Nav() {
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <a href="#recursos" className="hover:text-foreground transition-colors">Recursos</a>
           <a href="#publico" className="hover:text-foreground transition-colors">Para quem</a>
+          <a href="#depoimentos" className="hover:text-foreground transition-colors">Depoimentos</a>
           <a href="#planos" className="hover:text-foreground transition-colors">Planos</a>
           <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
         </nav>
@@ -262,6 +265,93 @@ function Audience() {
               <Check className="w-4 h-4 text-accent shrink-0" />
               {g}
             </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Testimonials() {
+  const testimonials = [
+    {
+      name: "Ana Paula Ribeiro",
+      role: "Produtora de cursos",
+      initials: "AR",
+      quote:
+        "Consegui centralizar todos os meus cursos em um único app. Meus alunos acham profissional e minhas conversões aumentaram desde o primeiro mês.",
+      metric: "+34% de conversão",
+    },
+    {
+      name: "Bruno Costa",
+      role: "Afiliado Hotmart",
+      initials: "BC",
+      quote:
+        "Antes eu mandava vários links diferentes. Agora envio um único catálogo com todos os produtos e acompanho quem clicou no que.",
+      metric: "3x mais cliques",
+    },
+    {
+      name: "Camila Mendes",
+      role: "Mentora e criadora de conteúdo",
+      initials: "CM",
+      quote:
+        "A IA de marketing me economiza horas toda semana. Escrevo descrições e anúncios em minutos, com a minha voz de marca.",
+      metric: "6h economizadas/semana",
+    },
+  ];
+
+  return (
+    <section id="depoimentos" className="py-24">
+      <div className="container-page">
+        <div className="max-w-2xl mx-auto text-center">
+          <span className="text-xs uppercase tracking-widest text-accent font-semibold">
+            Depoimentos
+          </span>
+          <h2 className="mt-3 text-3xl md:text-5xl font-bold">
+            Quem usa, <span className="text-gradient">recomenda</span>.
+          </h2>
+          <p className="mt-4 text-muted-foreground text-lg">
+            Produtores, afiliados e criadores que transformaram seus catálogos em apps de vendas.
+          </p>
+        </div>
+
+        <div className="mt-14 grid md:grid-cols-3 gap-5">
+          {testimonials.map((t) => (
+            <div
+              key={t.name}
+              className="card-glass p-6 flex flex-col transition-transform hover:-translate-y-1"
+            >
+              <Quote className="w-8 h-8 text-accent/60" aria-hidden="true" />
+              <blockquote className="mt-4 text-foreground/90 leading-relaxed flex-1">
+                “{t.quote}”
+              </blockquote>
+              <div className="mt-6 pt-6 border-t border-border flex items-center gap-4">
+                <span
+                  className="grid place-items-center w-11 h-11 rounded-full bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border text-sm font-bold text-accent"
+                  aria-hidden="true"
+                >
+                  {t.initials}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-foreground truncate">{t.name}</p>
+                  <p className="text-sm text-muted-foreground truncate">{t.role}</p>
+                </div>
+                <span className="hidden sm:inline-flex items-center rounded-full border border-accent/20 bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
+                  {t.metric}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-8 opacity-70">
+          {["Hotmart", "Kiwify", "Eduzz", "Monetizze", "PerfectPay", "Kirvano"].map((brand) => (
+            <span
+              key={brand}
+              className="text-sm font-semibold text-muted-foreground/80 tracking-tight"
+            >
+              {brand}
+            </span>
           ))}
         </div>
       </div>
