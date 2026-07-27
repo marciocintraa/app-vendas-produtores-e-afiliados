@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { ArrowLeft, Check, ExternalLink, Sparkles, Star, BookOpen, Share2 } from "lucide-react";
 import { type Product } from "@/lib/catalog-data";
 import { useProduct, useProducts } from "@/lib/catalog-store";
