@@ -132,6 +132,8 @@ import {
   AlertTriangle,
   Check,
   Loader2,
+  Upload,
+  Image as ImageIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -255,6 +257,45 @@ function AdminProductsPage() {
     meta?: CoverMeta;
   }>({ src: "", status: "idle" });
   const validationCtrlRef = useRef<AbortController | null>(null);
+  const [coverDropActive, setCoverDropActive] = useState(false);
+  const [coverDropError, setCoverDropError] = useState<string | null>(null);
+
+  function handleCoverFileDrop(files: FileList | File[]) {
+    setCoverDropError(null);
+    const list = Array.from(files);
+    const file = list.find((f) => f.type.startsWith("image/"));
+    if (!file) {
+      setCoverDropError("Arquivo inválido. Envie uma imagem (JPEG, PNG, WebP, GIF ou AVIF).");
+      toast.error("Formato não suportado", { description: "Solte um arquivo de imagem." });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setCoverDropError("A imagem excede 5 MB.");
+      toast.error("Imagem muito grande", { description: "Tamanho máximo permitido: 5 MB." });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onerror = () => {
+      setCoverDropError("Não foi possível ler o arquivo.");
+      toast.error("Falha ao ler o arquivo");
+    };
+    reader.onload = () => {
+      const url = typeof reader.result === "string" ? reader.result : null;
+      if (!url) return;
+      setEditing((prev) =>
+        prev && !prev.gallery.includes(url)
+          ? { ...prev, gallery: [url, ...prev.gallery].slice(0, MAX_GALLERY) }
+          : prev,
+      );
+      setConfirm((prev) => ({
+        ...prev,
+        candidates: prev.candidates.includes(url) ? prev.candidates : [url, ...prev.candidates],
+        selectedNext: url,
+      }));
+      toast.message("Imagem recebida", { description: "Validando automaticamente…" });
+    };
+    reader.readAsDataURL(file);
+  }
 
   function requestFinalConfirm() {
     if (coverValidation.status !== "valid" || coverValidation.src !== confirm.selectedNext) {
@@ -1102,50 +1143,148 @@ function AdminProductsPage() {
                 {confirm.description}
               </p>
               {confirm.candidates.length > 0 ? (
-                <div className="mt-5 grid w-full gap-5 text-left sm:grid-cols-[1fr_220px]">
-                  <div className="rounded-xl border border-border/60 bg-surface/60 p-3">
-                    <p className="mb-2 text-xs font-medium text-muted-foreground">
-                      Selecione a nova capa:
-                    </p>
-                    <div className="grid grid-cols-4 gap-2">
-                      {confirm.candidates.map((src) => (
-                        <button
-                          key={src}
-                          type="button"
-                          onClick={() =>
-                            setConfirm((prev) => ({ ...prev, selectedNext: src }))
-                          }
-                          className={`relative aspect-[4/3] overflow-hidden rounded-lg border-2 transition-all ${
-                            confirm.selectedNext === src
-                              ? "border-primary ring-2 ring-primary/40"
-                              : "border-border/60 hover:border-primary/50"
-                          }`}
-                        >
-                          <img src={src} alt="" className="h-full w-full object-cover" />
-                          {confirm.selectedNext === src && (
-                            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-primary/90 px-1 py-0.5 text-center text-[10px] font-semibold text-primary-foreground">
-                              NOVA CAPA
-                            </div>
-                          )}
-                        </button>
-                      ))}
+                <div className="mt-5 w-full space-y-3 text-left">
+                  <div className="grid w-full gap-5 sm:grid-cols-[1fr_220px]">
+                    <div className="rounded-xl border border-border/60 bg-surface/60 p-3">
+                      <p className="mb-2 text-xs font-medium text-muted-foreground">
+                        Selecione a nova capa:
+                      </p>
+                      <div className="grid grid-cols-4 gap-2">
+                        {confirm.candidates.map((src) => (
+                          <button
+                            key={src}
+                            type="button"
+                            onClick={() =>
+                              setConfirm((prev) => ({ ...prev, selectedNext: src }))
+                            }
+                            className={`relative aspect-[4/3] overflow-hidden rounded-lg border-2 transition-all ${
+                              confirm.selectedNext === src
+                                ? "border-primary ring-2 ring-primary/40"
+                                : "border-border/60 hover:border-primary/50"
+                            }`}
+                          >
+                            <img src={src} alt="" className="h-full w-full object-cover" />
+                            {confirm.selectedNext === src && (
+                              <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-primary/90 px-1 py-0.5 text-center text-[10px] font-semibold text-primary-foreground">
+                                NOVA CAPA
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="rounded-xl border border-border/60 bg-surface/60 p-3">
+                      <p className="mb-2 text-xs font-medium text-muted-foreground">
+                        Prévia no catálogo:
+                      </p>
+                      <CoverPreviewCard cover={confirm.selectedNext} {...confirm.preview} />
+                      <ValidationBadge
+                        state={coverValidation}
+                        selected={confirm.selectedNext}
+                      />
                     </div>
                   </div>
-                  <div className="rounded-xl border border-border/60 bg-surface/60 p-3">
-                    <p className="mb-2 text-xs font-medium text-muted-foreground">
-                      Prévia no catálogo:
+                  <div
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      if (!coverDropActive) setCoverDropActive(true);
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      setCoverDropActive(false);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setCoverDropActive(false);
+                      if (e.dataTransfer.files?.length) {
+                        handleCoverFileDrop(e.dataTransfer.files);
+                      }
+                    }}
+                    className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-6 text-center transition-all ${
+                      coverDropActive
+                        ? "border-primary bg-primary/10"
+                        : "border-border/70 bg-surface/40 hover:border-primary/50"
+                    }`}
+                  >
+                    <ImageIcon className="mb-2 h-6 w-6 text-muted-foreground" />
+                    <p className="text-sm font-medium">
+                      Arraste e solte uma imagem aqui
                     </p>
-                    <CoverPreviewCard cover={confirm.selectedNext} {...confirm.preview} />
-                    <ValidationBadge
-                      state={coverValidation}
-                      selected={confirm.selectedNext}
-                    />
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      JPEG, PNG, WebP, GIF ou AVIF · até 5 MB · validação automática
+                    </p>
+                    <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border/70 bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-2">
+                      <Upload className="h-3.5 w-3.5" />
+                      Selecionar arquivo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          if (e.target.files?.length) handleCoverFileDrop(e.target.files);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    {coverDropError && (
+                      <p className="mt-2 text-xs text-destructive">{coverDropError}</p>
+                    )}
                   </div>
+                  {confirm.candidates.length === 0 && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Nenhuma imagem restante na galeria. Solte uma imagem acima para definir como nova capa.
+                    </p>
+                  )}
                 </div>
               ) : (
-                <p className="mt-4 text-xs text-muted-foreground">
-                  Nenhuma imagem restante na galeria. A capa ficará vazia.
-                </p>
+                <div className="mt-5 w-full text-left">
+                  <div
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      if (!coverDropActive) setCoverDropActive(true);
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      setCoverDropActive(false);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setCoverDropActive(false);
+                      if (e.dataTransfer.files?.length) {
+                        handleCoverFileDrop(e.dataTransfer.files);
+                      }
+                    }}
+                    className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 text-center transition-all ${
+                      coverDropActive
+                        ? "border-primary bg-primary/10"
+                        : "border-border/70 bg-surface/40 hover:border-primary/50"
+                    }`}
+                  >
+                    <ImageIcon className="mb-2 h-6 w-6 text-muted-foreground" />
+                    <p className="text-sm font-medium">
+                      Arraste e solte uma imagem para definir como nova capa
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      JPEG, PNG, WebP, GIF ou AVIF · até 5 MB · validação automática
+                    </p>
+                    <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border/70 bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-2">
+                      <Upload className="h-3.5 w-3.5" />
+                      Selecionar arquivo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          if (e.target.files?.length) handleCoverFileDrop(e.target.files);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    {coverDropError && (
+                      <p className="mt-2 text-xs text-destructive">{coverDropError}</p>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
             <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
