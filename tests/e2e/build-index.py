@@ -69,7 +69,7 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
                 links.append(f'<a class="inline-link video" href="{video_href}" download title="Download video.webm">video</a>')
             links_html = f' <span class="inline-links">{" ".join(links)}</span>' if links else ""
             rows.append(
-                f'<tr data-engine="{engine}" data-name="{name.lower()}">'
+                f'<tr data-engine="{engine}" data-name="{name.lower()}" data-duration="{dur}">'
                 f'<td class="eng">{engine}</td>'
                 f'<td class="sc"><span class="scn">{name}</span>{links_html}</td>'
                 f'<td class="dur">{dur} ms</td></tr>'
