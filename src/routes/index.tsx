@@ -654,13 +654,14 @@ function Pricing() {
                   </li>
                 ))}
               </ul>
-              <Link
-                to="/checkout/$plan"
-                params={{ plan: p.priceId }}
-                className={`mt-8 w-full ${p.highlight ? "btn-primary" : "btn-ghost"}`}
+              <a
+                href={HOTMART_CHECKOUT_URLS[p.priceId as PlanId]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`mt-8 w-full inline-block text-center ${p.highlight ? "btn-primary" : "btn-ghost"}`}
               >
                 {p.cta}
-              </Link>
+              </a>
             </div>
           ))}
         </div>
