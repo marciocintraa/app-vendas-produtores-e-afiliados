@@ -27,12 +27,18 @@ export const Route = createFileRoute("/catalogo")({
 });
 
 function CatalogPage() {
+  const allProducts = useProducts();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
 
+  const categories = useMemo(
+    () => Array.from(new Set(allProducts.map((p) => p.category))),
+    [allProducts],
+  );
+
   const products = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return PRODUCTS.filter((p) => {
+    return allProducts.filter((p) => {
       if (category && p.category !== category) return false;
       if (!q) return true;
       return (
@@ -41,7 +47,8 @@ function CatalogPage() {
         p.category.toLowerCase().includes(q)
       );
     });
-  }, [query, category]);
+  }, [allProducts, query, category]);
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
