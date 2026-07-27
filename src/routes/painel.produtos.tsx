@@ -248,8 +248,24 @@ function AdminProductsPage() {
   }>({ open: false, currentCover: "", nextCover: "" });
   const [savingCover, setSavingCover] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [coverValidation, setCoverValidation] = useState<{
+    src: string;
+    status: "idle" | "validating" | "valid" | "invalid";
+    message?: string;
+    meta?: CoverMeta;
+  }>({ src: "", status: "idle" });
+  const validationCtrlRef = useRef<AbortController | null>(null);
 
   function requestFinalConfirm() {
+    if (coverValidation.status !== "valid" || coverValidation.src !== confirm.selectedNext) {
+      toast.error("Aguarde a validação da nova capa", {
+        description:
+          coverValidation.status === "invalid"
+            ? coverValidation.message
+            : "A imagem ainda está sendo validada.",
+      });
+      return;
+    }
     setSaveError(null);
     setFinalConfirm({
       open: true,
@@ -268,146 +284,29 @@ function AdminProductsPage() {
       return;
     }
     setSavingCover(true);
-    const toastId = toast.loading("Validando nova capa…", {
-      description: "Verificando formato, tamanho e acessibilidade.",
+    const toastId = toast.loading("Salvando nova capa…", {
+      description: "Atualizando a vitrine.",
     });
     try {
-      // 1) Formato: data URL de imagem ou URL http(s)
-      const isDataUrl = next.startsWith("data:");
-      const isHttpUrl = /^https?:\/\//i.test(next);
-      if (!isDataUrl && !isHttpUrl) {
-        throw new Error(
-          "Formato de origem inválido. Use um upload local ou uma URL http(s) pública.",
-        );
-      }
-
-      const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
-      const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
-      const MIN_DIM = 200;
-      const MAX_DIM = 4000;
-      let detectedBytes: number | null = null;
-      let detectedMime: string | null = null;
-
-      if (isDataUrl) {
-        const match = /^data:([^;,]+)(;base64)?,(.*)$/i.exec(next);
-        if (!match) throw new Error("Data URL malformada.");
-        detectedMime = match[1].toLowerCase();
-        if (!ALLOWED_MIME.includes(detectedMime)) {
-          throw new Error(
-            `Formato "${detectedMime}" não suportado. Use JPEG, PNG, WebP, GIF ou AVIF.`,
-          );
-        }
-        const isB64 = !!match[2];
-        const payload = match[3];
-        detectedBytes = isB64
-          ? Math.floor((payload.length * 3) / 4) -
-            (payload.endsWith("==") ? 2 : payload.endsWith("=") ? 1 : 0)
-          : new Blob([decodeURIComponent(payload)]).size;
-        if (detectedBytes > MAX_BYTES) {
-          throw new Error(
-            `Imagem muito grande (${(detectedBytes / 1024 / 1024).toFixed(2)} MB). Limite: 5 MB.`,
-          );
-        }
+      let meta: CoverMeta;
+      if (coverValidation.status === "valid" && coverValidation.src === next && coverValidation.meta) {
+        meta = coverValidation.meta;
       } else {
-        // 2) Acessibilidade da URL remota via HEAD (com fallback silencioso p/ CORS)
-        try {
-          const ctrl = new AbortController();
-          const to = setTimeout(() => ctrl.abort(), 8000);
-          const res = await fetch(next, { method: "HEAD", signal: ctrl.signal, mode: "cors" });
-          clearTimeout(to);
-          if (res.ok) {
-            const ct = res.headers.get("content-type");
-            const cl = res.headers.get("content-length");
-            if (ct) {
-              detectedMime = ct.split(";")[0].trim().toLowerCase();
-              if (!detectedMime.startsWith("image/")) {
-                throw new Error(`A URL não retorna uma imagem (content-type: ${detectedMime}).`);
-              }
-              if (!ALLOWED_MIME.includes(detectedMime)) {
-                throw new Error(
-                  `Formato "${detectedMime}" não suportado. Use JPEG, PNG, WebP, GIF ou AVIF.`,
-                );
-              }
-            }
-            if (cl) {
-              detectedBytes = parseInt(cl, 10);
-              if (Number.isFinite(detectedBytes) && detectedBytes > MAX_BYTES) {
-                throw new Error(
-                  `Imagem muito grande (${(detectedBytes / 1024 / 1024).toFixed(2)} MB). Limite: 5 MB.`,
-                );
-              }
-            }
-          } else if (res.status >= 400) {
-            throw new Error(`URL inacessível (HTTP ${res.status}).`);
-          }
-        } catch (headErr) {
-          // Se falhou por CORS/rede sem status, seguimos para checagem via <img>.
-          if (headErr instanceof Error && /HTTP \d|não retorna|não suportado|muito grande/i.test(headErr.message)) {
-            throw headErr;
-          }
-        }
+        meta = await validateCoverImage(next);
       }
-
-      // 3) Carregamento + dimensões
-      const { width, height } = await new Promise<{ width: number; height: number }>(
-        (resolve, reject) => {
-          const img = new Image();
-          const timer = setTimeout(() => {
-            reject(new Error("Tempo esgotado ao carregar a imagem (10s)."));
-          }, 10000);
-          img.onload = () => {
-            clearTimeout(timer);
-            resolve({ width: img.naturalWidth, height: img.naturalHeight });
-          };
-          img.onerror = () => {
-            clearTimeout(timer);
-            reject(
-              new Error(
-                "A imagem selecionada não pôde ser carregada. Verifique se o arquivo é válido ou se a URL está acessível.",
-              ),
-            );
-          };
-          img.src = next;
-        },
-      );
-
-      if (!width || !height) {
-        throw new Error("Não foi possível determinar as dimensões da imagem.");
-      }
-      if (width < MIN_DIM || height < MIN_DIM) {
-        throw new Error(
-          `Resolução muito baixa (${width}×${height}). Mínimo recomendado: ${MIN_DIM}×${MIN_DIM}.`,
-        );
-      }
-      if (width > MAX_DIM || height > MAX_DIM) {
-        throw new Error(
-          `Resolução muito alta (${width}×${height}). Máximo suportado: ${MAX_DIM}×${MAX_DIM}.`,
-        );
-      }
-
-      toast.loading("Salvando nova capa…", {
-        id: toastId,
-        description: "Atualizando a vitrine.",
-      });
       await new Promise((r) => setTimeout(r, 400));
       confirm.onConfirm(next);
       setFinalConfirm({ open: false, currentCover: "", nextCover: "" });
       setFullPreview(false);
-      const sizeInfo = detectedBytes
-        ? ` · ${(detectedBytes / 1024).toFixed(0)} KB`
-        : "";
+      const sizeInfo = meta.bytes ? ` · ${(meta.bytes / 1024).toFixed(0)} KB` : "";
       toast.success("Nova capa salva com sucesso", {
         id: toastId,
-        description: `${width}×${height}${detectedMime ? ` · ${detectedMime}` : ""}${sizeInfo}`,
+        description: `${meta.width}×${meta.height}${meta.mime ? ` · ${meta.mime}` : ""}${sizeInfo}`,
       });
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Erro desconhecido ao salvar a capa.";
+      const message = err instanceof Error ? err.message : "Erro desconhecido ao salvar a capa.";
       setSaveError(message);
-      toast.error("Falha ao salvar a nova capa", {
-        id: toastId,
-        description: message,
-      });
+      toast.error("Falha ao salvar a nova capa", { id: toastId, description: message });
     } finally {
       setSavingCover(false);
     }
@@ -434,6 +333,31 @@ function AdminProductsPage() {
     },
     onConfirm: () => {},
   });
+
+  // Auto-validate the selected new cover as soon as it changes.
+  useEffect(() => {
+    const src = confirm.selectedNext;
+    validationCtrlRef.current?.abort();
+    if (!confirm.open || !src) {
+      setCoverValidation({ src: "", status: "idle" });
+      return;
+    }
+    const ctrl = new AbortController();
+    validationCtrlRef.current = ctrl;
+    setCoverValidation({ src, status: "validating" });
+    validateCoverImage(src, ctrl.signal)
+      .then((meta) => {
+        if (ctrl.signal.aborted) return;
+        setCoverValidation({ src, status: "valid", meta });
+      })
+      .catch((err: unknown) => {
+        if (ctrl.signal.aborted) return;
+        const message = err instanceof Error ? err.message : "Falha na validação da imagem.";
+        setCoverValidation({ src, status: "invalid", message });
+      });
+    return () => ctrl.abort();
+  }, [confirm.selectedNext, confirm.open]);
+
 
   function openConfirm(opts: Omit<ConfirmState, "open">) {
     setConfirm({ open: true, ...opts });
