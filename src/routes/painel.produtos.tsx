@@ -294,8 +294,8 @@ function AdminProductsPage() {
       setConfirm((prev) => ({
         ...prev,
         candidates: prev.candidates.includes(url) ? prev.candidates : [url, ...prev.candidates],
-        selectedNext: url,
       }));
+      selectNextCover(url);
       toast.message("Imagem recebida", { description: "Validando automaticamente…" });
     };
     reader.readAsDataURL(file);
