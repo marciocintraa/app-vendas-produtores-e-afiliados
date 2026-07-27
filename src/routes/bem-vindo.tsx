@@ -1,0 +1,106 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { CheckCircle2, ArrowRight, Mail, Sparkles, ShieldCheck } from "lucide-react";
+
+export const Route = createFileRoute("/bem-vindo")({
+  head: () => ({
+    meta: [
+      { title: "Bem-vindo ao Vende Fácil Pro" },
+      {
+        name: "description",
+        content:
+          "Sua compra foi aprovada. Acesse agora o Vende Fácil Pro e comece a montar seu catálogo digital.",
+      },
+      { property: "og:title", content: "Bem-vindo ao Vende Fácil Pro" },
+      {
+        property: "og:description",
+        content: "Sua compra foi aprovada. Comece agora a montar seu catálogo digital.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: BemVindoPage,
+});
+
+function BemVindoPage() {
+  const search = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const email = search?.get("email") ?? "";
+  const accessHref = email ? `/acesso?email=${encodeURIComponent(email)}` : "/acesso";
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 px-4 py-16">
+      <div className="mx-auto max-w-2xl">
+        <div className="mb-8 flex items-center justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
+            <CheckCircle2 className="h-8 w-8 text-primary" />
+          </div>
+        </div>
+
+        <h1 className="mb-4 text-center text-4xl font-bold tracking-tight sm:text-5xl">
+          Sua compra foi aprovada!
+        </h1>
+        <p className="mb-10 text-center text-lg text-muted-foreground">
+          Bem-vindo ao <span className="font-semibold text-foreground">Vende Fácil Pro</span>. Seu
+          acesso já está liberado — é só clicar no botão abaixo para entrar.
+        </p>
+
+        <div className="rounded-2xl border border-border/60 bg-card/60 p-6 shadow-lg backdrop-blur sm:p-8">
+          <div className="mb-6 space-y-4">
+            <FeatureRow
+              icon={<Sparkles className="h-5 w-5" />}
+              title="Monte seu catálogo em minutos"
+              text="Cadastre produtos, links de afiliado e personalize sua vitrine."
+            />
+            <FeatureRow
+              icon={<ShieldCheck className="h-5 w-5" />}
+              title="Acesso vitalício ao seu plano"
+              text="Enquanto sua assinatura estiver ativa, tudo continua liberado."
+            />
+            <FeatureRow
+              icon={<Mail className="h-5 w-5" />}
+              title="Login automático por email"
+              text={
+                email
+                  ? `Vamos te logar automaticamente como ${email}.`
+                  : "Basta informar o email usado na compra."
+              }
+            />
+          </div>
+
+          <Link
+            to={accessHref}
+            className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90"
+          >
+            Acessar o Vende Fácil Pro
+            <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
+          </Link>
+
+          <p className="mt-4 text-center text-sm text-muted-foreground">
+            Problemas para entrar?{" "}
+            <Link to="/entrega" className="font-medium text-primary hover:underline">
+              Verifique o status da entrega
+            </Link>
+          </p>
+        </div>
+
+        <p className="mt-8 text-center text-xs text-muted-foreground">
+          Guarde esta página nos favoritos para acesso rápido.
+        </p>
+      </div>
+    </main>
+  );
+}
+
+function FeatureRow({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+  return (
+    <div className="flex gap-3">
+      <div className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+        {icon}
+      </div>
+      <div>
+        <div className="font-medium">{title}</div>
+        <div className="text-sm text-muted-foreground">{text}</div>
+      </div>
+    </div>
+  );
+}
