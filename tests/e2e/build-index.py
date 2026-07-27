@@ -268,6 +268,38 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .inline-link.video:hover {{ background: #115e59; }}
   .failed-table-wrap + p.muted {{ padding: 0 14px; }}
 
+  /* Asset modal */
+  .modal-backdrop {{ position: fixed; inset: 0; background: rgba(2, 6, 23, .82);
+                     backdrop-filter: blur(6px); display: none; align-items: center;
+                     justify-content: center; z-index: 9999; padding: 24px; }}
+  .modal-backdrop.open {{ display: flex; }}
+  .modal {{ background: #0f172a; border: 1px solid #1f2937; border-radius: 14px;
+            width: min(1200px, 100%); height: min(85vh, 900px); display: flex;
+            flex-direction: column; overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,.6); }}
+  .modal-head {{ display: flex; justify-content: space-between; align-items: center;
+                 padding: 14px 18px; border-bottom: 1px solid #1e293b; gap: 12px; }}
+  .modal-title {{ font-size: 14px; font-weight: 600; color: #e2e8f0;
+                  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }}
+  .modal-title .badge {{ font-size: 10px; padding: 2px 8px; border-radius: 999px;
+                         text-transform: uppercase; letter-spacing: .05em;
+                         background: #1e293b; color: #94a3b8; }}
+  .modal-title .badge.trace {{ background: #1e1b4b; color: #c4b5fd; }}
+  .modal-title .badge.video {{ background: #134e4a; color: #5eead4; }}
+  .modal-actions {{ display: flex; gap: 8px; align-items: center; }}
+  .modal-close {{ background: transparent; color: #94a3b8; border: 1px solid #1f2937;
+                  border-radius: 8px; width: 32px; height: 32px; cursor: pointer;
+                  font-size: 18px; line-height: 1; }}
+  .modal-close:hover {{ color: #e2e8f0; background: #1e293b; }}
+  .modal-body {{ flex: 1; overflow: hidden; background: #020617;
+                 display: flex; align-items: center; justify-content: center; }}
+  .modal-body iframe {{ width: 100%; height: 100%; border: none; background: #020617; }}
+  .modal-body video {{ max-width: 100%; max-height: 100%; background: #000; }}
+  .modal-hint {{ padding: 10px 18px; background: #0b1120; border-top: 1px solid #1e293b;
+                 color: #64748b; font-size: 11px; }}
+  .modal-hint code {{ background: #1e293b; color: #cbd5e1; padding: 1px 6px;
+                      border-radius: 4px; font-size: 10px; }}
+
 </style></head><body>
 <header>
   <h1>E2E consolidated report — cover-shortcuts</h1>
