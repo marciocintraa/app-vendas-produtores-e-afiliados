@@ -48,7 +48,7 @@ function isActive(sub: { status: string; current_period_end: string | null } | n
 }
 
 const buildAccessLink = createServerFn({ method: 'GET' })
-  .inputValidator((d: { email: string }) => d)
+  .validator((d: { email: string }) => d)
   .handler(async ({ data }): Promise<AccessResult> => {
     const email = data.email.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {

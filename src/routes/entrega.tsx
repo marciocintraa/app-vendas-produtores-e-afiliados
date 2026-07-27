@@ -15,7 +15,7 @@ import { findUserByEmail } from '@/lib/hotmart.server';
 type DeliveryStatus = 'idle' | 'checking' | 'found' | 'not_found' | 'inactive' | 'error';
 
 const checkDelivery = createServerFn({ method: 'GET' })
-  .inputValidator((d: { email: string }) => d)
+  .validator((d: { email: string }) => d)
   .handler(async ({ data }) => {
     const email = data.email.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
