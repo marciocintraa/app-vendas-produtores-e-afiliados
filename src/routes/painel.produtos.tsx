@@ -151,7 +151,7 @@ import {
 export const Route = createFileRoute("/painel/produtos")({
   head: () => ({
     meta: [
-      { title: "Meus produtos — Digital Store Pro" },
+      { title: "Meus produtos — Vende Fácil Pro" },
       {
         name: "description",
         content: "Crie, edite e publique produtos do seu catálogo digital.",
@@ -639,7 +639,7 @@ function AdminProductsPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <Link to="/" className="flex items-center gap-2 font-display text-lg font-semibold">
             <Sparkles className="h-5 w-5 text-primary" />
-            Digital Store Pro
+            Vende Fácil Pro
           </Link>
           <Link
             to="/catalogo"
