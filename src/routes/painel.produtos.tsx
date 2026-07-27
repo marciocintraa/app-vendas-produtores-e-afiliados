@@ -488,7 +488,16 @@ function AdminProductsPage() {
                       {editing.cover && (
                         <button
                           type="button"
-                          onClick={() => setEditing({ ...editing, cover: "" })}
+                          onClick={() => {
+                            if (editing.gallery.some((g) => g === editing.cover)) {
+                              setError(
+                                "Escolha outra imagem da galeria como capa antes de remover a atual.",
+                              );
+                              return;
+                            }
+                            setError(null);
+                            setEditing({ ...editing, cover: "" });
+                          }}
                           className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                         >
                           <Trash2 className="h-3.5 w-3.5" /> Remover
@@ -590,13 +599,20 @@ function AdminProductsPage() {
                               </button>
                               <button
                                 type="button"
-                                onClick={() =>
+                                onClick={() => {
+                                  if (editing.cover === src) {
+                                    setError(
+                                      "Esta é a imagem de capa. Escolha outra capa da galeria (botão de estrela) antes de removê-la.",
+                                    );
+                                    return;
+                                  }
+                                  setError(null);
                                   setEditing((prev) =>
                                     prev
                                       ? { ...prev, gallery: prev.gallery.filter((_, j) => j !== i) }
                                       : prev,
-                                  )
-                                }
+                                  );
+                                }}
                                 className="rounded-md bg-background/80 p-1 text-muted-foreground backdrop-blur transition-colors hover:text-destructive"
                                 aria-label="Remover imagem"
                               >
