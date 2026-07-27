@@ -513,17 +513,23 @@ function AdminProductsPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            if (
-                              typeof window !== "undefined" &&
-                              !window.confirm(
-                                "Esta imagem é a capa principal do produto. Removê-la trocará a capa automaticamente. Deseja continuar?",
-                              )
-                            ) {
+                            const next = editing.gallery.find((g) => g !== editing.cover) ?? "";
+                            if (!next) {
+                              setError(null);
+                              setEditing({ ...editing, cover: "" });
                               return;
                             }
-                            const next = editing.gallery.find((g) => g !== editing.cover) ?? "";
-                            setError(null);
-                            setEditing({ ...editing, cover: next });
+                            openConfirm({
+                              title: "Trocar capa principal?",
+                              description:
+                                "A imagem atual é a capa do produto. Removê-la promoverá automaticamente a próxima imagem da galeria como nova capa.",
+                              actionLabel: "Sim, trocar capa",
+                              onConfirm: () => {
+                                setError(null);
+                                setEditing({ ...editing, cover: next });
+                                closeConfirm();
+                              },
+                            });
                           }}
                           className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                           title={
