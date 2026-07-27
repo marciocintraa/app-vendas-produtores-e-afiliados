@@ -1,37 +1,28 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, Check, ExternalLink, Sparkles, Star, BookOpen, Share2 } from "lucide-react";
-import { getProduct, PRODUCTS, type Product } from "@/lib/catalog-data";
+import { type Product } from "@/lib/catalog-data";
+import { useProduct, useProducts } from "@/lib/catalog-store";
 
 export const Route = createFileRoute("/catalogo/$productId")({
-  loader: ({ params }) => {
-    const product = getProduct(params.productId);
-    if (!product) throw notFound();
-    return { product } as const;
-  },
-  head: ({ loaderData }) => {
-    if (!loaderData) {
-      return {
-        meta: [
-          { title: "Produto não encontrado — Digital Store Pro" },
-          { name: "robots", content: "noindex" },
-        ],
-      };
-    }
-    const { product } = loaderData;
-    const title = `${product.title} — Digital Store Pro`;
+  head: ({ params }) => {
+    const title = `Produto — Digital Store Pro`;
     return {
       meta: [
         { title },
-        { name: "description", content: product.tagline },
+        { name: "description", content: "Detalhes do produto no catálogo Digital Store Pro." },
         { property: "og:title", content: title },
-        { property: "og:description", content: product.tagline },
         { property: "og:type", content: "product" },
         { name: "twitter:card", content: "summary_large_image" },
+        { name: "x-product-id", content: params.productId },
       ],
     };
   },
   component: ProductPage,
-  notFoundComponent: () => (
+  notFoundComponent: NotFoundBlock,
+});
+
+function NotFoundBlock() {
+  return (
     <div className="flex min-h-screen items-center justify-center bg-background text-center">
       <div>
         <h1 className="font-display text-2xl font-semibold">Produto não encontrado</h1>
@@ -44,14 +35,18 @@ export const Route = createFileRoute("/catalogo/$productId")({
         </Link>
       </div>
     </div>
-  ),
-});
+  );
+}
 
 function ProductPage() {
-  const { product } = Route.useLoaderData();
-  const related = PRODUCTS.filter(
-    (p) => p.id !== product.id && p.category === product.category,
-  ).slice(0, 3);
+  const { productId } = Route.useParams();
+  const product = useProduct(productId);
+  const allProducts = useProducts();
+  if (!product) return <NotFoundBlock />;
+  const related = allProducts
+    .filter((p) => p.id !== product.id && p.category === product.category)
+    .slice(0, 3);
+
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : 0;
