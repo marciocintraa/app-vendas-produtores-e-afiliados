@@ -93,12 +93,35 @@ function productToDraft(p: Product): Draft {
   };
 }
 
+type ConfirmState = {
+  open: boolean;
+  title: string;
+  description: string;
+  actionLabel: string;
+  onConfirm: () => void;
+};
+
 function AdminProductsPage() {
   const products = useProducts();
   const [editing, setEditing] = useState<Draft | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [confirm, setConfirm] = useState<ConfirmState>({
+    open: false,
+    title: "",
+    description: "",
+    actionLabel: "",
+    onConfirm: () => {},
+  });
+
+  function openConfirm(opts: Omit<ConfirmState, "open">) {
+    setConfirm({ open: true, ...opts });
+  }
+
+  function closeConfirm() {
+    setConfirm((prev) => ({ ...prev, open: false }));
+  }
 
   function reorderGallery(from: number, to: number) {
     if (from === to) return;
