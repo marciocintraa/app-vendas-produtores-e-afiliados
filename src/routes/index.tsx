@@ -20,6 +20,7 @@ import {
   ChevronDown,
   Quote,
   Download,
+  Lock,
   X,
 } from "lucide-react";
 import { useState } from "react";
