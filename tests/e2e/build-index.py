@@ -643,7 +643,18 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     fClear.addEventListener('click', () => {{
       fSearch.value = ''; fEngine.value = ''; fAssets.value = '';
       fError.value = ''; fHasError.checked = false; fAutoExpand.checked = true;
+      rows.forEach(r => manualOpen.delete(r));
       applyFilters(); fSearch.focus();
+    }});
+
+    fExpandAll.addEventListener('click', () => {{
+      rows.forEach(r => {{ if (!r.classList.contains('hidden')) manualOpen.add(r); }});
+      applyFilters();
+    }});
+
+    fCollapseAll.addEventListener('click', () => {{
+      rows.forEach(r => manualOpen.delete(r));
+      applyFilters();
     }});
 
     applyFilters();
