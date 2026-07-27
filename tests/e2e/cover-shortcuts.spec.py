@@ -335,7 +335,17 @@ async def main() -> int:
     async with async_playwright() as pw:
         browser_type = getattr(pw, browser_name)
         browser = await browser_type.launch(headless=True)
-        context = await browser.new_context(viewport={"width": 1280, "height": 1800})
+
+        video_enabled = os.environ.get("PLAYWRIGHT_VIDEO", "1") != "0"
+        video_tmp_dir = SCREENSHOTS / f"_video_tmp_{browser_name}"
+        if video_enabled:
+            video_tmp_dir.mkdir(parents=True, exist_ok=True)
+
+        context_kwargs = {"viewport": {"width": 1280, "height": 1800}}
+        if video_enabled:
+            context_kwargs["record_video_dir"] = str(video_tmp_dir)
+            context_kwargs["record_video_size"] = {"width": 1280, "height": 800}
+        context = await browser.new_context(**context_kwargs)
 
         trace_enabled = os.environ.get("PLAYWRIGHT_TRACE", "1") != "0"
         trace_path = SCREENSHOTS / f"trace-{browser_name}.zip"
@@ -385,8 +395,32 @@ async def main() -> int:
             else:
                 await context.tracing.stop()
 
+        # Video is finalized on context.close(). Capture the video path first.
+        video_src_path = None
+        if video_enabled:
+            try:
+                video_src_path = await page.video.path() if page.video else None
+            except Exception:
+                video_src_path = None
+
         await context.close()
         await browser.close()
+
+        if video_enabled:
+            if failures and video_src_path:
+                dest = SCREENSHOTS / f"video-{browser_name}.webm"
+                try:
+                    Path(video_src_path).replace(dest)
+                    print(f"video saved: {dest}")
+                except Exception as exc:
+                    print(f"failed to persist video: {exc}")
+            # Cleanup temp dir (any leftover videos when suite passed).
+            try:
+                for leftover in video_tmp_dir.glob("*"):
+                    leftover.unlink()
+                video_tmp_dir.rmdir()
+            except Exception:
+                pass
 
         print("")
         if failures:
