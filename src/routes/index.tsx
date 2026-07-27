@@ -127,10 +127,10 @@ function Hero() {
           </div>
           <div className="mt-10 flex items-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-accent" /> Sem cartão
+              <ShieldCheck className="w-4 h-4 text-accent" /> Pagamento na Hotmart
             </div>
             <div className="flex items-center gap-2">
-              <Smartphone className="w-4 h-4 text-accent" /> Android, iOS e Web
+              <Smartphone className="w-4 h-4 text-accent" /> App para Android
             </div>
           </div>
         </div>
