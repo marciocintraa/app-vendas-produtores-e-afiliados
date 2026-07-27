@@ -509,6 +509,32 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
       fSearch.value = ''; fEngine.value = ''; applyFilters(); fSearch.focus();
     }});
     applyFilters();
+
+    // Sort by duration
+    const sortDur = document.getElementById('failedSortDur');
+    let sortDir = null; // null | 'asc' | 'desc'
+    function applySort() {{
+      if (!sortDir) {{
+        sortDur.setAttribute('aria-sort', 'none');
+        rows.forEach(r => fBody.appendChild(r)); // restore original DOM order
+        return;
+      }}
+      sortDur.setAttribute('aria-sort', sortDir === 'asc' ? 'ascending' : 'descending');
+      const sorted = rows.slice().sort((a, b) => {{
+        const da = parseInt(a.dataset.duration || '0', 10);
+        const db = parseInt(b.dataset.duration || '0', 10);
+        return sortDir === 'asc' ? da - db : db - da;
+      }});
+      sorted.forEach(r => fBody.appendChild(r));
+    }}
+    function cycleSort() {{
+      sortDir = sortDir === null ? 'desc' : sortDir === 'desc' ? 'asc' : null;
+      applySort();
+    }}
+    sortDur.addEventListener('click', cycleSort);
+    sortDur.addEventListener('keydown', (e) => {{
+      if (e.key === 'Enter' || e.key === ' ') {{ e.preventDefault(); cycleSort(); }}
+    }});
   }}
 </script>
 </body></html>"""
