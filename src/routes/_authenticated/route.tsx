@@ -23,7 +23,6 @@ function AuthenticatedLayout() {
       .from('subscriptions')
       .select('status,current_period_end,cancel_at_period_end')
       .eq('user_id', user.id)
-      .eq('environment', 'hotmart')
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
