@@ -69,7 +69,7 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
                 links.append(f'<a class="inline-link video" href="{video_href}" download title="Download video.webm">video</a>')
             links_html = f' <span class="inline-links">{" ".join(links)}</span>' if links else ""
             rows.append(
-                f'<tr data-engine="{engine}" data-name="{name.lower()}">'
+                f'<tr data-engine="{engine}" data-name="{name.lower()}" data-duration="{dur}">'
                 f'<td class="eng">{engine}</td>'
                 f'<td class="sc"><span class="scn">{name}</span>{links_html}</td>'
                 f'<td class="dur">{dur} ms</td></tr>'
@@ -94,7 +94,9 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
     </div>
     <table class="failed-table">
-      <thead><tr><th>Engine</th><th>Scenario</th><th>Duration</th></tr></thead>
+      <thead><tr><th>Engine</th><th>Scenario</th>
+        <th id="failedSortDur" class="sortable" role="button" tabindex="0"
+            aria-sort="none" title="Sort by duration">Duration <span class="sort-arrow">⇅</span></th></tr></thead>
       <tbody id="failedTbody">{''.join(rows)}</tbody>
       <tfoot><tr id="failedEmpty" style="display:none"><td colspan="3" class="muted"
         style="text-align:center;padding:18px">No failures match the current filters.</td></tr></tfoot>
@@ -299,6 +301,12 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .failed-clear:hover {{ background: #334155; }}
   .failed-table tr.hidden {{ display: none; }}
   mark.hl {{ background: #fbbf24; color: #0b1120; padding: 0 2px; border-radius: 2px; }}
+  th.sortable {{ cursor: pointer; user-select: none; }}
+  th.sortable:hover {{ color: #e2e8f0; }}
+  th.sortable:focus {{ outline: 2px solid #38bdf8; outline-offset: -2px; }}
+  th.sortable .sort-arrow {{ color: #475569; font-size: 11px; margin-left: 4px; }}
+  th.sortable[aria-sort="ascending"] .sort-arrow,
+  th.sortable[aria-sort="descending"] .sort-arrow {{ color: #38bdf8; }}
 
   /* Asset modal */
   .modal-backdrop {{ position: fixed; inset: 0; background: rgba(2, 6, 23, .82);
@@ -501,6 +509,32 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
       fSearch.value = ''; fEngine.value = ''; applyFilters(); fSearch.focus();
     }});
     applyFilters();
+
+    // Sort by duration
+    const sortDur = document.getElementById('failedSortDur');
+    let sortDir = null; // null | 'asc' | 'desc'
+    function applySort() {{
+      if (!sortDir) {{
+        sortDur.setAttribute('aria-sort', 'none');
+        rows.forEach(r => fBody.appendChild(r)); // restore original DOM order
+        return;
+      }}
+      sortDur.setAttribute('aria-sort', sortDir === 'asc' ? 'ascending' : 'descending');
+      const sorted = rows.slice().sort((a, b) => {{
+        const da = parseInt(a.dataset.duration || '0', 10);
+        const db = parseInt(b.dataset.duration || '0', 10);
+        return sortDir === 'asc' ? da - db : db - da;
+      }});
+      sorted.forEach(r => fBody.appendChild(r));
+    }}
+    function cycleSort() {{
+      sortDir = sortDir === null ? 'desc' : sortDir === 'desc' ? 'asc' : null;
+      applySort();
+    }}
+    sortDur.addEventListener('click', cycleSort);
+    sortDur.addEventListener('keydown', (e) => {{
+      if (e.key === 'Enter' || e.key === ' ') {{ e.preventDefault(); cycleSort(); }}
+    }});
   }}
 </script>
 </body></html>"""
