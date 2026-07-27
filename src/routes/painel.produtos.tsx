@@ -696,6 +696,19 @@ function AdminProductsPage() {
                                     actionLabel: "Sim, trocar capa",
                                     candidates,
                                     selectedNext: candidates[0] ?? "",
+                                    preview: {
+                                      title: editing.title || "Título do produto",
+                                      tagline: editing.tagline || editing.title || "Subtítulo do produto",
+                                      category: editing.category || "Categoria",
+                                      platform: editing.platform,
+                                      price: Number(editing.price.replace(",", ".")) || 0,
+                                      originalPrice: editing.originalPrice
+                                        ? Number(editing.originalPrice.replace(",", ".")) || undefined
+                                        : undefined,
+                                      rating: 5,
+                                      reviews: 0,
+                                      gallery: editing.gallery.filter((_, j) => j !== i),
+                                    },
                                     onConfirm: (nextCover) => {
                                       setError(null);
                                       setEditing((prev) => {
