@@ -1183,27 +1183,40 @@ function AdminProductsPage() {
                 </div>
               </div>
             </div>
+            {saveError && (
+              <div className="mx-6 mb-4 rounded-xl border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                <p className="font-semibold">Erro ao salvar a nova capa</p>
+                <p className="mt-1 text-xs opacity-90">{saveError}</p>
+              </div>
+            )}
             <div className="flex flex-col-reverse gap-2 border-t border-border/60 bg-surface/60 px-6 py-4 sm:flex-row sm:justify-end">
               <button
                 type="button"
+                disabled={savingCover}
                 onClick={() => setFinalConfirm((p) => ({ ...p, open: false }))}
-                className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+                className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancelar
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  const next = finalConfirm.nextCover;
-                  setFinalConfirm({ open: false, currentCover: "", nextCover: "" });
-                  setFullPreview(false);
-                  confirm.onConfirm(next);
-                }}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
+                disabled={savingCover}
+                onClick={handleSaveCover}
+                aria-busy={savingCover}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
               >
-                <Check className="h-4 w-4" /> Salvar nova capa
+                {savingCover ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> Salvando…
+                  </>
+                ) : (
+                  <>
+                    <Check className="h-4 w-4" /> Salvar nova capa
+                  </>
+                )}
               </button>
             </div>
+
           </div>
         </div>
       )}
