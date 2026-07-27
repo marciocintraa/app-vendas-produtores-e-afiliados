@@ -367,6 +367,8 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .failed-reset-group.confirming #failedCopyModeReset:hover {{ background: #991b1b; color: #fee2e2; }}
   .failed-reset-cancel {{ background: #1e293b; border: 1px solid #334155; color: #cbd5e1; display: none; }}
   .failed-reset-cancel:hover {{ background: #334155; color: #e2e8f0; }}
+  .failed-reset-undo {{ background: #422006; color: #fbbf24; border: 1px solid #78350f; display: none; }}
+  .failed-reset-undo:hover {{ background: #713f12; color: #fde68a; }}
   .failed-export {{ background: #052e1a; color: #4ade80; }}
   .failed-export:hover {{ background: #064e2c; }}
   .failed-copy-matches-global {{ background: #0c1a33; color: #93c5fd; border: 1px dashed #1e3a8a; }}
