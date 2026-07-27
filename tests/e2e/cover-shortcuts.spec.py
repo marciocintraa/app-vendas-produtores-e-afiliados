@@ -85,20 +85,18 @@ async def install_toast_capture(page: Page) -> None:
     await page.evaluate(
         """() => {
           window.__toasts = [];
-          const push = (m) => window.__toasts.push(String(m));
+          const push = (m) => { if (m) window.__toasts.push(String(m)); };
           const scan = () => {
-            document
-              .querySelectorAll('[data-sonner-toast] [data-title], [data-sonner-toast] [data-description]')
-              .forEach((el) => {
-                const key = el.getAttribute('data-lovable-key') || (el.textContent + '::' + el.getAttribute('data-title') );
-                if (!el.__seen) { el.__seen = true; push(el.textContent || ''); }
-              });
+            document.querySelectorAll('[data-sonner-toast]').forEach((el) => {
+              if (!el.__seen) { el.__seen = true; push(el.textContent || ''); }
+            });
           };
           const mo = new MutationObserver(scan);
           mo.observe(document.body, { childList: true, subtree: true, characterData: true });
           scan();
         }"""
     )
+
 
 
 async def recent_toasts(page: Page) -> list[str]:
