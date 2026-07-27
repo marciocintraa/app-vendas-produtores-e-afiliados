@@ -856,10 +856,10 @@ function FinalCTA() {
           />
           <Rocket className="w-10 h-10 mx-auto text-accent" />
           <h2 className="mt-4 text-3xl md:text-5xl font-bold max-w-2xl mx-auto">
-            Lance seu <span className="text-gradient">próprio app</span> nesta semana.
+            Tenha seu <span className="text-gradient">app de vendas</span> no Android.
           </h2>
           <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-            Sem código. Sem depender de uma única plataforma. Sua marca, seus produtos, sua base.
+            Sem código. Sem loja. Sua marca, seus produtos, seus clientes instalando direto no Android.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <a href="#planos" className="btn-primary">
