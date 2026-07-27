@@ -16,8 +16,10 @@ import {
   Star,
   AlertTriangle,
   Check,
-
+  Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
+
 import { type Product } from "@/lib/catalog-data";
 import {
   useProducts,
@@ -129,14 +131,70 @@ function AdminProductsPage() {
     currentCover: string;
     nextCover: string;
   }>({ open: false, currentCover: "", nextCover: "" });
+  const [savingCover, setSavingCover] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   function requestFinalConfirm() {
+    setSaveError(null);
     setFinalConfirm({
       open: true,
       currentCover: editing?.cover ?? "",
       nextCover: confirm.selectedNext,
     });
   }
+
+  async function handleSaveCover() {
+    const next = finalConfirm.nextCover;
+    setSaveError(null);
+    if (!next) {
+      const msg = "Nenhuma imagem foi selecionada como nova capa.";
+      setSaveError(msg);
+      toast.error("Não foi possível salvar", { description: msg });
+      return;
+    }
+    setSavingCover(true);
+    const toastId = toast.loading("Salvando nova capa…", {
+      description: "Aguarde enquanto atualizamos a vitrine.",
+    });
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const img = new Image();
+        const timer = setTimeout(() => {
+          reject(new Error("Tempo esgotado ao carregar a imagem (10s)."));
+        }, 10000);
+        img.onload = () => {
+          clearTimeout(timer);
+          resolve();
+        };
+        img.onerror = () =>
+          reject(
+            new Error(
+              "A imagem selecionada não pôde ser carregada. Verifique se o arquivo é válido ou se a URL está acessível.",
+            ),
+          );
+        img.src = next;
+      });
+      await new Promise((r) => setTimeout(r, 400));
+      confirm.onConfirm(next);
+      setFinalConfirm({ open: false, currentCover: "", nextCover: "" });
+      setFullPreview(false);
+      toast.success("Nova capa salva com sucesso", {
+        id: toastId,
+        description: "A vitrine já reflete a alteração.",
+      });
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Erro desconhecido ao salvar a capa.";
+      setSaveError(message);
+      toast.error("Falha ao salvar a nova capa", {
+        id: toastId,
+        description: message,
+      });
+    } finally {
+      setSavingCover(false);
+    }
+  }
+
 
   const [confirm, setConfirm] = useState<ConfirmState>({
     open: false,
@@ -1125,27 +1183,40 @@ function AdminProductsPage() {
                 </div>
               </div>
             </div>
+            {saveError && (
+              <div className="mx-6 mb-4 rounded-xl border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                <p className="font-semibold">Erro ao salvar a nova capa</p>
+                <p className="mt-1 text-xs opacity-90">{saveError}</p>
+              </div>
+            )}
             <div className="flex flex-col-reverse gap-2 border-t border-border/60 bg-surface/60 px-6 py-4 sm:flex-row sm:justify-end">
               <button
                 type="button"
+                disabled={savingCover}
                 onClick={() => setFinalConfirm((p) => ({ ...p, open: false }))}
-                className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+                className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancelar
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  const next = finalConfirm.nextCover;
-                  setFinalConfirm({ open: false, currentCover: "", nextCover: "" });
-                  setFullPreview(false);
-                  confirm.onConfirm(next);
-                }}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
+                disabled={savingCover}
+                onClick={handleSaveCover}
+                aria-busy={savingCover}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
               >
-                <Check className="h-4 w-4" /> Salvar nova capa
+                {savingCover ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> Salvando…
+                  </>
+                ) : (
+                  <>
+                    <Check className="h-4 w-4" /> Salvar nova capa
+                  </>
+                )}
               </button>
             </div>
+
           </div>
         </div>
       )}
