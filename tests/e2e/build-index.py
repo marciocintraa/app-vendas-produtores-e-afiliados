@@ -331,7 +331,16 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
                     color: #cbd5e1; cursor: pointer; user-select: none; }}
   .failed-check input {{ accent-color: #38bdf8; }}
   .failed-table tr.hidden {{ display: none; }}
+  .err-text {{ margin: 8px 0 0; padding: 8px 10px; background: #0b1120;
+               border: 1px solid #1f2937; border-left: 3px solid #7f1d1d;
+               border-radius: 6px; color: #cbd5e1; font-size: 11.5px;
+               font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+               white-space: pre-wrap; max-height: 220px; overflow: auto;
+               line-height: 1.45; }}
   mark.hl {{ background: #fbbf24; color: #0b1120; padding: 0 2px; border-radius: 2px; }}
+  mark.hl-err {{ background: #f87171; color: #0b1120; padding: 0 2px; border-radius: 2px;
+                 font-weight: 600; }}
+
   th.sortable {{ cursor: pointer; user-select: none; }}
   th.sortable:hover {{ color: #e2e8f0; }}
   th.sortable:focus {{ outline: 2px solid #38bdf8; outline-offset: -2px; }}
