@@ -76,6 +76,7 @@ function Nav() {
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <a href="#recursos" className="hover:text-foreground transition-colors">Recursos</a>
           <a href="#publico" className="hover:text-foreground transition-colors">Para quem</a>
+          <a href="#depoimentos" className="hover:text-foreground transition-colors">Depoimentos</a>
           <a href="#planos" className="hover:text-foreground transition-colors">Planos</a>
           <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
         </nav>
