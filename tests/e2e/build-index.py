@@ -94,7 +94,9 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
     </div>
     <table class="failed-table">
-      <thead><tr><th>Engine</th><th>Scenario</th><th>Duration</th></tr></thead>
+      <thead><tr><th>Engine</th><th>Scenario</th>
+        <th id="failedSortDur" class="sortable" role="button" tabindex="0"
+            aria-sort="none" title="Sort by duration">Duration <span class="sort-arrow">⇅</span></th></tr></thead>
       <tbody id="failedTbody">{''.join(rows)}</tbody>
       <tfoot><tr id="failedEmpty" style="display:none"><td colspan="3" class="muted"
         style="text-align:center;padding:18px">No failures match the current filters.</td></tr></tfoot>
