@@ -71,8 +71,14 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
                 links.append(f'<a class="inline-link video" href="{video_href}" download title="Download video.webm">video</a>')
             links_html = f' <span class="inline-links">{" ".join(links)}</span>' if links else ""
             err_preview = _html.escape(err_raw) if err_raw else ""
+            err_toggle = (
+                '<button type="button" class="err-toggle" aria-expanded="false"'
+                ' title="Show error"><span class="chev">▸</span> error</button>'
+                if err_raw else ""
+            )
             err_block = (
-                f'<pre class="err-text" hidden>{err_preview}</pre>' if err_raw else ""
+                f'{err_toggle}<pre class="err-text" hidden>{err_preview}</pre>'
+                if err_raw else ""
             )
             rows.append(
                 f'<tr data-engine="{engine}" data-name="{name.lower()}" data-duration="{dur}"'
@@ -83,6 +89,7 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
                 f'<td class="sc"><span class="scn">{name}</span>{links_html}{err_block}</td>'
                 f'<td class="dur">{dur} ms</td></tr>'
             )
+
 
     if not rows:
         return ""
