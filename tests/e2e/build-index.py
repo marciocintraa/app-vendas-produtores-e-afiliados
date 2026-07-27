@@ -560,12 +560,24 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         default:      return true;
       }}
     }}
+    // Per-row manual expand state: WeakSet of rows the user explicitly toggled open.
+    const manualOpen = new WeakSet();
+    fBody.addEventListener('click', (e) => {{
+      const btn = e.target.closest('.err-toggle');
+      if (!btn) return;
+      const r = btn.closest('tr');
+      if (!r) return;
+      if (manualOpen.has(r)) manualOpen.delete(r); else manualOpen.add(r);
+      applyFilters();
+    }});
+
     function applyFilters() {{
       const q = (fSearch.value || '').trim().toLowerCase();
       const eng = fEngine.value || '';
       const assets = fAssets.value || '';
       const errTerm = (fError.value || '').trim().toLowerCase();
       const hasErrOnly = fHasError.checked;
+      const autoExpand = fAutoExpand.checked;
       let visible = 0;
       const re = q ? new RegExp('(' + escapeRe(q) + ')', 'ig') : null;
       const reErr = errTerm ? new RegExp('(' + escapeRe(errTerm) + ')', 'ig') : null;
@@ -592,18 +604,28 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
             : original;
         }}
         const et = r.querySelector('.err-text');
+        const toggle = r.querySelector('.err-toggle');
         if (et) {{
-          const showErr = match && errRaw && (errTerm || hasErrOnly);
-          if (showErr) {{
+          const autoOpen = autoExpand && !!errTerm && err.includes(errTerm);
+          const manual = manualOpen.has(r);
+          const open = match && errRaw && (autoOpen || manual);
+          if (open) {{
             const esc = escHtml(errRaw);
             et.innerHTML = reErr ? esc.replace(reErr, '<mark class="hl-err">$1</mark>') : esc;
             et.hidden = false;
           }} else {{
             et.hidden = true;
           }}
+          if (toggle) {{
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            toggle.classList.toggle('auto', open && autoOpen && !manual);
+            toggle.title = open ? 'Hide error' : 'Show error';
+          }}
         }}
         if (match) visible++;
       }});
+
+
 
       fCount.textContent = visible + ' of ' + totalRows + ' failure' + (totalRows === 1 ? '' : 's');
       fEmpty.style.display = visible === 0 ? '' : 'none';
