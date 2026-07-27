@@ -266,9 +266,23 @@ def main() -> int:
         shutil.copy2(html_path, reports_dir / f"report-{engine}.html")
         if json_path and json_path.exists():
             shutil.copy2(json_path, reports_dir / f"report-{engine}.json")
-        summaries[engine] = load_summary(json_path, engine)
-        print(f"[ok] {engine}: {summaries[engine]['overall']} "
-              f"({summaries[engine]['passed']}/{summaries[engine]['total']})")
+        summary = load_summary(json_path, engine)
+
+        # Copy trace/video assets if the artifact ships them alongside the report.
+        search_root = html_path.parent
+        for asset_key, filename in (("trace_href", f"trace-{engine}.zip"),
+                                    ("video_href", f"video-{engine}.webm")):
+            candidates = list(search_root.rglob(filename))
+            if candidates:
+                shutil.copy2(candidates[0], reports_dir / filename)
+                summary[asset_key] = f"reports/{filename}"
+            else:
+                summary[asset_key] = None
+
+        summaries[engine] = summary
+        print(f"[ok] {engine}: {summary['overall']} ({summary['passed']}/{summary['total']}) "
+              f"trace={'yes' if summary.get('trace_href') else 'no'} "
+              f"video={'yes' if summary.get('video_href') else 'no'}")
 
     index_path = output_dir / "index.html"
     render_index(summaries, index_path)
