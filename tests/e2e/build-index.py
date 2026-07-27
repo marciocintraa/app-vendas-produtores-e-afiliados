@@ -69,18 +69,38 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
                 links.append(f'<a class="inline-link video" href="{video_href}" download title="Download video.webm">video</a>')
             links_html = f' <span class="inline-links">{" ".join(links)}</span>' if links else ""
             rows.append(
-                f'<tr><td class="eng">{engine}</td>'
+                f'<tr data-engine="{engine}" data-name="{name.lower()}">'
+                f'<td class="eng">{engine}</td>'
                 f'<td class="sc"><span class="scn">{name}</span>{links_html}</td>'
                 f'<td class="dur">{dur} ms</td></tr>'
             )
     if not rows:
         return ""
+    engine_options = "".join(
+        f'<option value="{e}">{e}</option>'
+        for e in ENGINES if any(
+            (summaries.get(e) or {}).get("scenarios") and
+            any(sc.get("status") == "failed" for sc in (summaries.get(e) or {}).get("scenarios", []))
+            for _ in [0]
+        )
+    )
     return f"""
   <h2>Failed scenarios</h2>
   <div class="failed-table-wrap">
+    <div class="failed-toolbar">
+      <input type="search" id="failedSearch" class="failed-input"
+             placeholder="Search scenario name…" autocomplete="off" spellcheck="false">
+      <select id="failedEngine" class="failed-select" aria-label="Filter by engine">
+        <option value="">All engines</option>{engine_options}
+      </select>
+      <span class="failed-count muted" id="failedCount"></span>
+      <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
+    </div>
     <table class="failed-table">
       <thead><tr><th>Engine</th><th>Scenario</th><th>Duration</th></tr></thead>
-      <tbody>{''.join(rows)}</tbody>
+      <tbody id="failedTbody">{''.join(rows)}</tbody>
+      <tfoot><tr id="failedEmpty" style="display:none"><td colspan="3" class="muted"
+        style="text-align:center;padding:18px">No failures match the current filters.</td></tr></tfoot>
     </table>
     <p class="muted">Trace/video assets are recorded per engine run and shared across its failed scenarios.</p>
   </div>"""
