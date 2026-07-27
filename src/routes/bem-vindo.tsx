@@ -23,11 +23,24 @@ export const Route = createFileRoute("/bem-vindo")({
   component: BemVindoPage,
 });
 
+const HOTMARKT_PLACEHOLDERS = [
+  "{{",
+  "}}",
+  "buyer_email",
+  "email_do_comprador",
+  "email_comprador",
+  "undefined",
+  "null",
+  "n/a",
+  "nao_informado",
+];
+
 function sanitizeEmail(raw: string | null | undefined): string {
   if (!raw) return "";
-  const trimmed = raw.trim();
-  // Hotmart às vezes envia o placeholder literal quando a variável não é resolvida
-  if (!trimmed || trimmed.includes("{{") || trimmed.includes("}}")) return "";
+  const trimmed = raw.trim().toLowerCase();
+  if (!trimmed) return "";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return "";
+  if (HOTMARKT_PLACEHOLDERS.some((p) => trimmed.includes(p))) return "";
   return trimmed;
 }
 
@@ -40,8 +53,9 @@ function BemVindoPage() {
 
   const [email, setEmail] = useState(initialEmail);
   const [error, setError] = useState<string | null>(null);
+  const [editing, setEditing] = useState(initialEmail.length === 0);
 
-  const hasEmail = initialEmail.length > 0;
+  const hasEmail = initialEmail.length > 0 && !editing;
   const accessHref = hasEmail ? `/acesso?email=${encodeURIComponent(initialEmail)}` : "/acesso";
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -53,6 +67,11 @@ function BemVindoPage() {
     }
     setError(null);
     navigate({ to: "/acesso", search: { email: clean } });
+  };
+
+  const handleEdit = () => {
+    setEditing(true);
+    setEmail(initialEmail);
   };
 
   return (
