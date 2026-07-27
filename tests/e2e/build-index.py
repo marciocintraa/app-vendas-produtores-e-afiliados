@@ -151,7 +151,7 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
       <span id="failedCopyModeResetGroup" class="failed-reset-group">
         <button type="button" id="failedCopyModeReset" class="failed-clear" title="Reset copy mode to default and clear saved preference (Shift+R)">Reset mode</button>
         <button type="button" id="failedCopyModeCancel" class="failed-clear failed-reset-cancel" title="Cancel reset and keep current copy mode" style="display:none">Cancel</button>
-        <button type="button" id="failedCopyModeUndo" class="failed-clear failed-reset-undo" title="Undo reset and restore previous copy mode (Ctrl+Z)" style="display:none">Undo</button>
+        <button type="button" id="failedCopyModeUndo" class="failed-clear failed-reset-undo" title="Undo reset and restore previous copy mode (Ctrl+Z or Shift+Z)" style="display:none">Undo</button>
       </span>
       <button type="button" id="failedCopyMatchesAll" class="failed-clear failed-copy-matches-global" title="Copy matching error lines from all visible rows">Copy from visible rows</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
@@ -587,7 +587,8 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         resetBtn.focus();
       }}
     }}
-    if ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey) && !e.altKey && !modal.classList.contains('open')) {{
+    const isUndoShortcut = ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) || (e.key === 'Z' && e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey);
+    if (isUndoShortcut && !modal.classList.contains('open')) {{
       if (inInput) return;
       const undoBtn = document.getElementById('failedCopyModeUndo');
       if (undoBtn && undoBtn.style.display !== 'none') {{
