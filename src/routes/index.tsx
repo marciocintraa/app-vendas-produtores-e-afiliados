@@ -297,7 +297,7 @@ function Pricing() {
     },
     {
       name: "Premium",
-      price: "R$ 197",
+      price: "R$ 157",
       per: "/mês",
       desc: "Para operações profissionais com marca própria.",
       features: [
