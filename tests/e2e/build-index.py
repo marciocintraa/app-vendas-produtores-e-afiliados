@@ -829,7 +829,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         return;
       }}
 
-      navigator.clipboard.writeText(chunks.join('\n\n')).then(() => {{
+      navigator.clipboard.writeText(chunks.join(String.fromCharCode(10) + String.fromCharCode(10))).then(() => {{
         fCopyMatchesAll.classList.add('copied');
         const original = fCopyMatchesAll.textContent;
         const itemLabel = mode === 'matches' ? (totalItems === 1 ? ' line' : ' lines') : (totalItems === 1 ? ' row' : ' rows');
