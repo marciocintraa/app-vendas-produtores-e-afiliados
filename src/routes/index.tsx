@@ -53,6 +53,7 @@ function Landing() {
         <SocialProof />
         <Features />
         <Audience />
+        <Testimonials />
         <Pricing />
         <FAQ />
         <FinalCTA />
