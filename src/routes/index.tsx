@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Sparkles,
   Store,
@@ -573,7 +573,8 @@ function Pricing() {
         "Tema padrão",
         "Estatísticas básicas",
       ],
-      cta: "Começar",
+      cta: "Assinar Starter",
+      priceId: "starter_monthly",
       highlight: false,
     },
     {
@@ -589,6 +590,7 @@ function Pricing() {
         "Estatísticas completas",
       ],
       cta: "Assinar Pro",
+      priceId: "pro_monthly",
       highlight: true,
     },
     {
@@ -604,7 +606,8 @@ function Pricing() {
         "Exportação de dados",
         "Suporte prioritário",
       ],
-      cta: "Falar com vendas",
+      cta: "Assinar Premium",
+      priceId: "premium_monthly",
       highlight: false,
     },
   ];
@@ -651,12 +654,13 @@ function Pricing() {
                   </li>
                 ))}
               </ul>
-              <a
-                href="#"
+              <Link
+                to="/checkout/$plan"
+                params={{ plan: p.priceId }}
                 className={`mt-8 w-full ${p.highlight ? "btn-primary" : "btn-ghost"}`}
               >
                 {p.cta}
-              </a>
+              </Link>
             </div>
           ))}
         </div>

@@ -148,7 +148,7 @@ import {
   makeCoverPlaceholder,
 } from "@/lib/catalog-store";
 
-export const Route = createFileRoute("/painel/produtos")({
+export const Route = createFileRoute("/_authenticated/painel/produtos")({
   head: () => ({
     meta: [
       { title: "Meus produtos — Vende Fácil Pro" },
