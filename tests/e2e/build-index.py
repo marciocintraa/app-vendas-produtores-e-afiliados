@@ -148,7 +148,10 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
         <option value="message">Error message only</option>
         <option value="full">Full stack</option>
       </select>
-      <button type="button" id="failedCopyModeReset" class="failed-clear" title="Reset copy mode to default and clear saved preference">Reset mode</button>
+      <span id="failedCopyModeResetGroup" class="failed-reset-group">
+        <button type="button" id="failedCopyModeReset" class="failed-clear" title="Reset copy mode to default and clear saved preference">Reset mode</button>
+        <button type="button" id="failedCopyModeCancel" class="failed-clear failed-reset-cancel" title="Cancel reset and keep current copy mode" style="display:none">Cancel</button>
+      </span>
       <button type="button" id="failedCopyMatchesAll" class="failed-clear failed-copy-matches-global" title="Copy matching error lines from all visible rows">Copy from visible rows</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
     </div>
@@ -358,8 +361,11 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .failed-clear {{ background: #1e293b; border: none; color: #cbd5e1; padding: 6px 12px;
                    border-radius: 8px; font-size: 12px; cursor: pointer; }}
   .failed-clear:hover {{ background: #334155; }}
-  .failed-clear.confirming {{ background: #7f1d1d; color: #fca5a5; border: 1px solid #b91c1c; }}
-  .failed-clear.confirming:hover {{ background: #991b1b; color: #fee2e2; }}
+  .failed-reset-group {{ display: inline-flex; gap: 6px; align-items: center; }}
+  .failed-reset-group.confirming #failedCopyModeReset {{ background: #7f1d1d; color: #fca5a5; border: 1px solid #b91c1c; }}
+  .failed-reset-group.confirming #failedCopyModeReset:hover {{ background: #991b1b; color: #fee2e2; }}
+  .failed-reset-cancel {{ background: #1e293b; border: 1px solid #334155; color: #cbd5e1; display: none; }}
+  .failed-reset-cancel:hover {{ background: #334155; color: #e2e8f0; }}
   .failed-export {{ background: #052e1a; color: #4ade80; }}
   .failed-export:hover {{ background: #064e2c; }}
   .failed-copy-matches-global {{ background: #0c1a33; color: #93c5fd; border: 1px dashed #1e3a8a; }}
@@ -872,51 +878,71 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     }}
 
     const fCopyModeReset = document.getElementById('failedCopyModeReset');
-    if (fCopyModeReset) {{
+    const fCopyModeCancel = document.getElementById('failedCopyModeCancel');
+    const fCopyModeResetGroup = document.getElementById('failedCopyModeResetGroup');
+    if (fCopyModeReset && fCopyModeCancel && fCopyModeResetGroup) {{
       let resetConfirmTimer = null;
       const DEFAULT_LABEL = 'Reset mode';
       const CONFIRM_LABEL = 'Confirm reset?';
+
+      function setConfirming(isConfirming) {{
+        if (isConfirming) {{
+          fCopyModeResetGroup.classList.add('confirming');
+          fCopyModeReset.textContent = CONFIRM_LABEL;
+          fCopyModeReset.title = 'Click again to reset the copy mode and clear localStorage';
+          fCopyModeCancel.style.display = 'inline-block';
+        }} else {{
+          fCopyModeResetGroup.classList.remove('confirming');
+          fCopyModeReset.textContent = DEFAULT_LABEL;
+          fCopyModeReset.title = 'Reset copy mode to default and clear saved preference';
+          fCopyModeCancel.style.display = 'none';
+        }}
+      }}
 
       function cancelResetConfirm() {{
         if (resetConfirmTimer) {{
           clearTimeout(resetConfirmTimer);
           resetConfirmTimer = null;
         }}
-        fCopyModeReset.classList.remove('confirming');
-        fCopyModeReset.textContent = DEFAULT_LABEL;
-        fCopyModeReset.title = 'Reset copy mode to default and clear saved preference';
+        setConfirming(false);
+      }}
+
+      function performReset() {{
+        cancelResetConfirm();
+        const DEFAULT_MODE = 'matches';
+        if (fCopyMode) fCopyMode.value = DEFAULT_MODE;
+        try {{ localStorage.removeItem(COPY_MODE_KEY); }} catch (e) {{}}
+        updateCopyMatchesAllState();
+        fCopyModeReset.classList.add('copied');
+        fCopyModeReset.textContent = 'reset';
+        setTimeout(() => {{
+          fCopyModeReset.classList.remove('copied');
+          setConfirming(false);
+        }}, 1200);
       }}
 
       fCopyModeReset.addEventListener('click', () => {{
         if (fCopyModeReset.textContent === CONFIRM_LABEL) {{
-          // Confirmed: reset mode and clear saved preference.
-          cancelResetConfirm();
-          const DEFAULT_MODE = 'matches';
-          if (fCopyMode) fCopyMode.value = DEFAULT_MODE;
-          try {{ localStorage.removeItem(COPY_MODE_KEY); }} catch (e) {{}}
-          updateCopyMatchesAllState();
-          fCopyModeReset.classList.add('copied');
-          fCopyModeReset.textContent = 'reset';
-          setTimeout(() => {{
-            fCopyModeReset.classList.remove('copied');
-            fCopyModeReset.textContent = DEFAULT_LABEL;
-          }}, 1200);
+          performReset();
           return;
         }}
-
         // First click: ask for confirmation.
-        fCopyModeReset.classList.add('confirming');
-        fCopyModeReset.textContent = CONFIRM_LABEL;
-        fCopyModeReset.title = 'Click again to reset the copy mode and clear localStorage';
+        setConfirming(true);
         resetConfirmTimer = setTimeout(() => {{
           cancelResetConfirm();
         }}, 3500);
       }});
 
+      fCopyModeCancel.addEventListener('click', () => {{
+        cancelResetConfirm();
+      }});
+
       // Cancel confirmation if the user interacts with other toolbar controls.
       ['click', 'input', 'change'].forEach(evt => {{
-        fCopyModeReset.parentElement.addEventListener(evt, (e) => {{
-          if (e.target !== fCopyModeReset && fCopyModeReset.textContent === CONFIRM_LABEL) {{
+        fCopyModeResetGroup.parentElement.addEventListener(evt, (e) => {{
+          const target = e.target;
+          const insideGroup = fCopyModeResetGroup.contains(target);
+          if (!insideGroup && fCopyModeReset.textContent === CONFIRM_LABEL) {{
             cancelResetConfirm();
           }}
         }}, true);
