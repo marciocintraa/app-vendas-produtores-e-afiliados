@@ -687,7 +687,7 @@ function CheckoutModal({ plan, onClose }: { plan: PlanId; onClose: () => void })
               className="w-full px-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              É por este e-mail que você acessará o app após o pagamento.
+              É por este e-mail que você receberá o link para baixar o app Android após o pagamento.
             </p>
           </div>
           <div>
