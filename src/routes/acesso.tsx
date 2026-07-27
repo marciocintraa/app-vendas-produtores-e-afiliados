@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { Loader2, Mail, AlertCircle, CheckCircle, RefreshCw, ArrowLeft } from "lucide-react";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { findUserByEmail, logDelivery } from "@/lib/hotmart.server";
-import { logAccessEvent } from "@/lib/access-journey";
+
 
 
 /**
