@@ -506,7 +506,7 @@ function AdminProductsPage() {
               <Field
                 label={`Galeria de imagens (${editing.gallery.length}/${MAX_GALLERY})`}
                 className="sm:col-span-2"
-                hint="Imagens extras que aparecem na página do produto e como miniaturas no card do catálogo."
+                hint="Imagens extras que aparecem na página do produto e como miniaturas no card do catálogo. Arraste para reordenar."
               >
                 <div className="space-y-3">
                   {editing.gallery.length > 0 && (
