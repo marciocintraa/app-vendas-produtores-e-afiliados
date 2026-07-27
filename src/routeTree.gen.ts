@@ -9,14 +9,33 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as CheckoutReturnRouteImport } from './routes/checkout-return'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PainelProdutosRouteImport } from './routes/painel.produtos'
+import { Route as CheckoutPlanRouteImport } from './routes/checkout.$plan'
 import { Route as CatalogoProductIdRouteImport } from './routes/catalogo.$productId'
+import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
+const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
+  id: '/checkout-return',
+  path: '/checkout-return',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CatalogoRoute = CatalogoRouteImport.update({
   id: '/catalogo',
   path: '/catalogo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -24,9 +43,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PainelProdutosRoute = PainelProdutosRouteImport.update({
-  id: '/painel/produtos',
-  path: '/painel/produtos',
+const CheckoutPlanRoute = CheckoutPlanRouteImport.update({
+  id: '/checkout/$plan',
+  path: '/checkout/$plan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatalogoProductIdRoute = CatalogoProductIdRouteImport.update({
@@ -34,52 +53,123 @@ const CatalogoProductIdRoute = CatalogoProductIdRouteImport.update({
   path: '/$productId',
   getParentRoute: () => CatalogoRoute,
 } as any)
+const AuthenticatedPainelProdutosRoute =
+  AuthenticatedPainelProdutosRouteImport.update({
+    id: '/painel/produtos',
+    path: '/painel/produtos',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/checkout-return': typeof CheckoutReturnRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
-  '/painel/produtos': typeof PainelProdutosRoute
+  '/checkout/$plan': typeof CheckoutPlanRoute
+  '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/checkout-return': typeof CheckoutReturnRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
-  '/painel/produtos': typeof PainelProdutosRoute
+  '/checkout/$plan': typeof CheckoutPlanRoute
+  '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/checkout-return': typeof CheckoutReturnRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
-  '/painel/produtos': typeof PainelProdutosRoute
+  '/checkout/$plan': typeof CheckoutPlanRoute
+  '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/catalogo' | '/catalogo/$productId' | '/painel/produtos'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/catalogo'
+    | '/checkout-return'
+    | '/catalogo/$productId'
+    | '/checkout/$plan'
+    | '/painel/produtos'
+    | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalogo' | '/catalogo/$productId' | '/painel/produtos'
+  to:
+    | '/'
+    | '/auth'
+    | '/catalogo'
+    | '/checkout-return'
+    | '/catalogo/$productId'
+    | '/checkout/$plan'
+    | '/painel/produtos'
+    | '/api/public/payments/webhook'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
+    | '/auth'
     | '/catalogo'
+    | '/checkout-return'
     | '/catalogo/$productId'
-    | '/painel/produtos'
+    | '/checkout/$plan'
+    | '/_authenticated/painel/produtos'
+    | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   CatalogoRoute: typeof CatalogoRouteWithChildren
-  PainelProdutosRoute: typeof PainelProdutosRoute
+  CheckoutReturnRoute: typeof CheckoutReturnRoute
+  CheckoutPlanRoute: typeof CheckoutPlanRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/checkout-return': {
+      id: '/checkout-return'
+      path: '/checkout-return'
+      fullPath: '/checkout-return'
+      preLoaderRoute: typeof CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/catalogo': {
       id: '/catalogo'
       path: '/catalogo'
       fullPath: '/catalogo'
       preLoaderRoute: typeof CatalogoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -89,11 +179,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/painel/produtos': {
-      id: '/painel/produtos'
-      path: '/painel/produtos'
-      fullPath: '/painel/produtos'
-      preLoaderRoute: typeof PainelProdutosRouteImport
+    '/checkout/$plan': {
+      id: '/checkout/$plan'
+      path: '/checkout/$plan'
+      fullPath: '/checkout/$plan'
+      preLoaderRoute: typeof CheckoutPlanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catalogo/$productId': {
@@ -103,8 +193,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CatalogoProductIdRouteImport
       parentRoute: typeof CatalogoRoute
     }
+    '/_authenticated/painel/produtos': {
+      id: '/_authenticated/painel/produtos'
+      path: '/painel/produtos'
+      fullPath: '/painel/produtos'
+      preLoaderRoute: typeof AuthenticatedPainelProdutosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPainelProdutosRoute: typeof AuthenticatedPainelProdutosRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPainelProdutosRoute: AuthenticatedPainelProdutosRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface CatalogoRouteChildren {
   CatalogoProductIdRoute: typeof CatalogoProductIdRoute
@@ -120,8 +235,12 @@ const CatalogoRouteWithChildren = CatalogoRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   CatalogoRoute: CatalogoRouteWithChildren,
-  PainelProdutosRoute: PainelProdutosRoute,
+  CheckoutReturnRoute: CheckoutReturnRoute,
+  CheckoutPlanRoute: CheckoutPlanRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
