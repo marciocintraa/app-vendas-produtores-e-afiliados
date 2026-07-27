@@ -16,8 +16,10 @@ import {
   Star,
   AlertTriangle,
   Check,
-
+  Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
+
 import { type Product } from "@/lib/catalog-data";
 import {
   useProducts,
