@@ -98,8 +98,9 @@ type ConfirmState = {
   title: string;
   description: string;
   actionLabel: string;
-  nextCover?: string;
-  onConfirm: () => void;
+  candidates: string[];
+  selectedNext: string;
+  onConfirm: (nextCover: string) => void;
 };
 
 function AdminProductsPage() {
@@ -113,6 +114,8 @@ function AdminProductsPage() {
     title: "",
     description: "",
     actionLabel: "",
+    candidates: [],
+    selectedNext: "",
     onConfirm: () => {},
   });
 
