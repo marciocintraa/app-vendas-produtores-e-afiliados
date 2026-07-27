@@ -590,6 +590,16 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         resetBtn.focus();
       }}
     }}
+    const isRedoShortcut = (e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey) && e.shiftKey && !e.altKey;
+    if (isRedoShortcut && !modal.classList.contains('open')) {{
+      if (inInput) return;
+      const redoBtn = document.getElementById('failedCopyModeRedo');
+      if (redoBtn && redoBtn.style.display !== 'none') {{
+        e.preventDefault();
+        redoBtn.click();
+        return;
+      }}
+    }}
     const isUndoShortcut = ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) || (e.key === 'Z' && e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey);
     if (isUndoShortcut && !modal.classList.contains('open')) {{
       if (inInput) return;
