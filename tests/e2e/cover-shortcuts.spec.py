@@ -266,8 +266,8 @@ async def scenario_ctrl_z_restores_original(page: Page) -> None:
     )
 
     # Cleanup
-    await page.locator("button:has-text('Cancelar')").first.click()
-    await page.wait_for_timeout(200)
+    await close_editor(page)
+
 
 
 async def scenario_shortcuts_disabled_during_final_confirm(page: Page) -> None:
