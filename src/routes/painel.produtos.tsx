@@ -1220,9 +1220,7 @@ function AdminProductsPage() {
                           <button
                             key={src}
                             type="button"
-                            onClick={() =>
-                              setConfirm((prev) => ({ ...prev, selectedNext: src }))
-                            }
+                            onClick={() => selectNextCover(src)}
                             className={`relative aspect-[4/3] overflow-hidden rounded-lg border-2 transition-all ${
                               confirm.selectedNext === src
                                 ? "border-primary ring-2 ring-primary/40"
