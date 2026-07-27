@@ -749,44 +749,91 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     }});
 
     const fCopyMatchesAll = document.getElementById('failedCopyMatchesAll');
-    function updateCopyMatchesAllState() {{
-      const errTerm = (fError.value || '').trim().toLowerCase();
-      const hasVisibleMatches = rows.some(r => {{
-        if (r.classList.contains('hidden')) return false;
-        const errRaw = r.dataset.error || '';
-        return errTerm && errRaw && errRaw.toLowerCase().includes(errTerm);
-      }});
-      fCopyMatchesAll.disabled = !errTerm || !hasVisibleMatches;
-      fCopyMatchesAll.title = !errTerm
-        ? 'Type an error filter term to enable copying matching lines'
-        : (hasVisibleMatches ? 'Copy matching error lines from all visible rows' : 'No visible rows match the current error filter');
+    const fCopyMode = document.getElementById('failedCopyMode');
+
+    function getCopyMode() {{ return fCopyMode ? fCopyMode.value : 'matches'; }}
+
+    function firstErrorMessage(errRaw) {{
+      if (!errRaw) return '';
+      const lines = errRaw.split('\n').map(line => line.trimEnd()).filter(line => line.length > 0);
+      return lines.length ? lines[0] : '';
     }}
-    fCopyMatchesAll.addEventListener('click', () => {{
+
+    function updateCopyMatchesAllState() {{
+      const mode = getCopyMode();
       const errTerm = (fError.value || '').trim().toLowerCase();
-      if (!errTerm) return;
+      const hasVisibleErrors = rows.some(r => {{
+        if (r.classList.contains('hidden')) return false;
+        return !!(r.dataset.error || '');
+      }});
+      let enabled = false;
+      let title = '';
+      if (mode === 'matches') {{
+        const hasVisibleMatches = rows.some(r => {{
+          if (r.classList.contains('hidden')) return false;
+          const errRaw = r.dataset.error || '';
+          return errTerm && errRaw && errRaw.toLowerCase().includes(errTerm);
+        }});
+        enabled = !!errTerm && hasVisibleMatches;
+        title = !errTerm
+          ? 'Type an error filter term to enable copying matching lines'
+          : (hasVisibleMatches ? 'Copy matching error lines from all visible rows' : 'No visible rows match the current error filter');
+      }} else if (mode === 'message') {{
+        enabled = hasVisibleErrors;
+        title = enabled ? 'Copy the error message (first line) from all visible rows' : 'No visible rows with errors to copy';
+      }} else if (mode === 'full') {{
+        enabled = hasVisibleErrors;
+        title = enabled ? 'Copy the full error stack from all visible rows' : 'No visible rows with errors to copy';
+      }}
+      fCopyMatchesAll.disabled = !enabled;
+      fCopyMatchesAll.title = title;
+    }}
+
+    fCopyMatchesAll.addEventListener('click', () => {{
+      const mode = getCopyMode();
+      const errTerm = (fError.value || '').trim().toLowerCase();
       const termLower = errTerm;
       const chunks = [];
-      let totalMatches = 0;
+      let totalItems = 0;
+
       rows.forEach(r => {{
         if (r.classList.contains('hidden')) return;
         const errRaw = r.dataset.error || '';
-        if (!errRaw || !errRaw.toLowerCase().includes(termLower)) return;
+        if (!errRaw) return;
         const engine = r.dataset.engine || '';
         const scn = r.querySelector('.scn');
         const name = originalHtml.get(r) || (scn ? scn.textContent : '');
-        const matches = errRaw.split('\\n').map(line => line.trimEnd()).filter(line => line.toLowerCase().includes(termLower));
-        if (!matches.length) return;
-        totalMatches += matches.length;
-        chunks.push('[' + engine + '] ' + name + '\\n' + matches.join('\\n'));
+        let payload = '';
+
+        if (mode === 'matches') {{
+          if (!errTerm || !errRaw.toLowerCase().includes(termLower)) return;
+          const matches = errRaw.split('\n').map(line => line.trimEnd()).filter(line => line.toLowerCase().includes(termLower));
+          if (!matches.length) return;
+          payload = matches.join('\n');
+          totalItems += matches.length;
+        }} else if (mode === 'message') {{
+          const msg = firstErrorMessage(errRaw);
+          if (!msg) return;
+          payload = msg;
+          totalItems += 1;
+        }} else if (mode === 'full') {{
+          payload = errRaw;
+          totalItems += 1;
+        }}
+
+        chunks.push('[' + engine + '] ' + name + '\n' + payload);
       }});
+
       if (!chunks.length) {{
-        fCopyMatchesAll.title = 'No matching lines in visible rows';
+        fCopyMatchesAll.title = mode === 'matches' ? 'No matching lines in visible rows' : 'No errors to copy in visible rows';
         return;
       }}
-      navigator.clipboard.writeText(chunks.join('\\n\\n')).then(() => {{
+
+      navigator.clipboard.writeText(chunks.join('\n\n')).then(() => {{
         fCopyMatchesAll.classList.add('copied');
         const original = fCopyMatchesAll.textContent;
-        fCopyMatchesAll.textContent = 'copied ' + totalMatches + (totalMatches === 1 ? ' line' : ' lines');
+        const itemLabel = mode === 'matches' ? (totalItems === 1 ? ' line' : ' lines') : (totalItems === 1 ? ' row' : ' rows');
+        fCopyMatchesAll.textContent = 'copied ' + totalItems + itemLabel;
         setTimeout(() => {{
           fCopyMatchesAll.classList.remove('copied');
           fCopyMatchesAll.textContent = original;
@@ -796,6 +843,12 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         fCopyMatchesAll.title = 'Unable to copy';
       }});
     }});
+
+    if (fCopyMode) {{
+      fCopyMode.addEventListener('change', () => {{
+        updateCopyMatchesAllState();
+      }});
+    }}
 
     applyFilters();
 
