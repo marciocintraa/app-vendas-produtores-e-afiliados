@@ -635,11 +635,13 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     fAssets.addEventListener('change', applyFilters);
     fError.addEventListener('input', applyFilters);
     fHasError.addEventListener('change', applyFilters);
+    fAutoExpand.addEventListener('change', applyFilters);
     fClear.addEventListener('click', () => {{
       fSearch.value = ''; fEngine.value = ''; fAssets.value = '';
-      fError.value = ''; fHasError.checked = false;
+      fError.value = ''; fHasError.checked = false; fAutoExpand.checked = true;
       applyFilters(); fSearch.focus();
     }});
+
     applyFilters();
 
     // Export filtered failures to CSV
