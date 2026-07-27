@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { HOTMART_CHECKOUT_URLS, type PlanId } from "@/lib/hotmart";
+import { APK_DOWNLOAD_URL, APK_VERSION } from "@/lib/apk-config";
 import {
   Sparkles,
   Store,
