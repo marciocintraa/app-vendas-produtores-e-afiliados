@@ -1,5 +1,120 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
+
+const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
+const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+const MIN_DIM = 200;
+const MAX_DIM = 4000;
+
+type CoverMeta = { width: number; height: number; mime: string | null; bytes: number | null };
+
+async function validateCoverImage(next: string, signal?: AbortSignal): Promise<CoverMeta> {
+  const isDataUrl = next.startsWith("data:");
+  const isHttpUrl = /^https?:\/\//i.test(next);
+  if (!isDataUrl && !isHttpUrl) {
+    throw new Error("Formato de origem inválido. Use um upload local ou uma URL http(s) pública.");
+  }
+  let detectedBytes: number | null = null;
+  let detectedMime: string | null = null;
+
+  if (isDataUrl) {
+    const match = /^data:([^;,]+)(;base64)?,(.*)$/i.exec(next);
+    if (!match) throw new Error("Data URL malformada.");
+    detectedMime = match[1].toLowerCase();
+    if (!ALLOWED_MIME.includes(detectedMime)) {
+      throw new Error(`Formato "${detectedMime}" não suportado. Use JPEG, PNG, WebP, GIF ou AVIF.`);
+    }
+    const isB64 = !!match[2];
+    const payload = match[3];
+    detectedBytes = isB64
+      ? Math.floor((payload.length * 3) / 4) -
+        (payload.endsWith("==") ? 2 : payload.endsWith("=") ? 1 : 0)
+      : new Blob([decodeURIComponent(payload)]).size;
+    if (detectedBytes > MAX_BYTES) {
+      throw new Error(
+        `Imagem muito grande (${(detectedBytes / 1024 / 1024).toFixed(2)} MB). Limite: 5 MB.`,
+      );
+    }
+  } else {
+    try {
+      const ctrl = new AbortController();
+      const to = setTimeout(() => ctrl.abort(), 8000);
+      signal?.addEventListener("abort", () => ctrl.abort());
+      const res = await fetch(next, { method: "HEAD", signal: ctrl.signal, mode: "cors" });
+      clearTimeout(to);
+      if (res.ok) {
+        const ct = res.headers.get("content-type");
+        const cl = res.headers.get("content-length");
+        if (ct) {
+          detectedMime = ct.split(";")[0].trim().toLowerCase();
+          if (!detectedMime.startsWith("image/")) {
+            throw new Error(`A URL não retorna uma imagem (content-type: ${detectedMime}).`);
+          }
+          if (!ALLOWED_MIME.includes(detectedMime)) {
+            throw new Error(
+              `Formato "${detectedMime}" não suportado. Use JPEG, PNG, WebP, GIF ou AVIF.`,
+            );
+          }
+        }
+        if (cl) {
+          detectedBytes = parseInt(cl, 10);
+          if (Number.isFinite(detectedBytes) && detectedBytes > MAX_BYTES) {
+            throw new Error(
+              `Imagem muito grande (${(detectedBytes / 1024 / 1024).toFixed(2)} MB). Limite: 5 MB.`,
+            );
+          }
+        }
+      } else if (res.status >= 400) {
+        throw new Error(`URL inacessível (HTTP ${res.status}).`);
+      }
+    } catch (headErr) {
+      if (
+        headErr instanceof Error &&
+        /HTTP \d|não retorna|não suportado|muito grande/i.test(headErr.message)
+      ) {
+        throw headErr;
+      }
+    }
+  }
+
+  const { width, height } = await new Promise<{ width: number; height: number }>(
+    (resolve, reject) => {
+      const img = new Image();
+      const timer = setTimeout(() => reject(new Error("Tempo esgotado ao carregar a imagem (10s).")), 10000);
+      const onAbort = () => {
+        clearTimeout(timer);
+        reject(new Error("Validação cancelada."));
+      };
+      signal?.addEventListener("abort", onAbort);
+      img.onload = () => {
+        clearTimeout(timer);
+        resolve({ width: img.naturalWidth, height: img.naturalHeight });
+      };
+      img.onerror = () => {
+        clearTimeout(timer);
+        reject(
+          new Error(
+            "A imagem selecionada não pôde ser carregada. Verifique se o arquivo é válido ou se a URL está acessível.",
+          ),
+        );
+      };
+      img.src = next;
+    },
+  );
+
+  if (!width || !height) throw new Error("Não foi possível determinar as dimensões da imagem.");
+  if (width < MIN_DIM || height < MIN_DIM) {
+    throw new Error(
+      `Resolução muito baixa (${width}×${height}). Mínimo recomendado: ${MIN_DIM}×${MIN_DIM}.`,
+    );
+  }
+  if (width > MAX_DIM || height > MAX_DIM) {
+    throw new Error(
+      `Resolução muito alta (${width}×${height}). Máximo suportado: ${MAX_DIM}×${MAX_DIM}.`,
+    );
+  }
+  return { width, height, mime: detectedMime, bytes: detectedBytes };
+}
 import {
   ArrowLeft,
   ArrowRight,
