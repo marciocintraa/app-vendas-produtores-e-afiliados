@@ -25,8 +25,16 @@ function sb(): any {
 }
 
 function planFromEvent(payload: any): PlanId | null {
-  const offerId = String(payload?.data?.offer?.id ?? '');
-  if (offerId && HOTMART_OFFER_TO_PLAN[offerId]) return HOTMART_OFFER_TO_PLAN[offerId];
+  // O código da oferta vem em `purchase.offer.code` e equivale ao `off=` do link de checkout.
+  const offerCode = String(payload?.data?.purchase?.offer?.code ?? '');
+  if (offerCode && HOTMART_OFFER_TO_PLAN[offerCode]) return HOTMART_OFFER_TO_PLAN[offerCode];
+
+  // Fallback: alguns eventos de assinatura podem trazer o plano pelo nome.
+  const planName = String(payload?.data?.subscription?.plan?.name ?? '').toLowerCase();
+  if (planName.includes('starter') || planName.includes('individual')) return 'starter_monthly';
+  if (planName.includes('pro') || planName.includes('pró')) return 'pro_monthly';
+  if (planName.includes('premium')) return 'premium_monthly';
+
   const productId = String(payload?.data?.product?.id ?? '');
   return HOTMART_PRODUCT_TO_PLAN[productId] ?? null;
 }

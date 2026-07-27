@@ -1,7 +1,6 @@
 export type PlanId = 'starter_monthly' | 'pro_monthly' | 'premium_monthly';
 
 // Links de checkout da Hotmart para cada plano.
-// Substitua pelos links reais de checkout dos seus 3 produtos na Hotmart.
 // Você encontra em: Hotmart → Produtos → [seu produto] → Divulgação → Link de compra.
 export const HOTMART_CHECKOUT_URLS: Record<PlanId, string> = {
   starter_monthly: 'https://pay.hotmart.com/F106901874H?off=pqlbolqg&checkoutMode=6',
@@ -10,17 +9,17 @@ export const HOTMART_CHECKOUT_URLS: Record<PlanId, string> = {
 };
 
 // Mapeia o `product.id` que a Hotmart envia no webhook para o plano interno.
-// O produto Hotmart F106901874H tem 3 ofertas (Individual/Starter, Pro, Premium)
-// e o ID numérico do produto é 8200482.
+// Como as 3 ofertas estão no MESMO produto (ID 8200482), esse mapeamento sozinho
+// não consegue diferenciar os planos. Usamos o código da oferta (ver abaixo).
 export const HOTMART_PRODUCT_TO_PLAN: Record<string, PlanId> = {
-  '8200482': 'starter_monthly',
+  // '8200482': 'starter_monthly', // fallback genérico — evitar
 };
 
-// Como as 3 ofertas estão no MESMO produto, o webhook precisa do `offer.id` para
-// saber qual plano ativar. Preencha com os IDs numéricos de cada oferta.
-// Você encontra em: Hotmart → Produtos → [seu produto] → Ofertas → ID da oferta.
+// Mapeia o código da oferta (`purchase.offer.code` no webhook) para o plano interno.
+// O código da oferta é exatamente o valor que vem depois de `off=` no link de checkout.
+// Exemplo: https://pay.hotmart.com/F106901874H?off=pqlbolqg&checkoutMode=6
 export const HOTMART_OFFER_TO_PLAN: Record<string, PlanId> = {
-  // '123456': 'starter_monthly',
-  // '123457': 'pro_monthly',
-  // '123458': 'premium_monthly',
+  pqlbolqg: 'starter_monthly',
+  wqs9zkki: 'pro_monthly',
+  '5c699sq1': 'premium_monthly',
 };
