@@ -663,6 +663,9 @@ function CheckoutModal({ plan, onClose }: { plan: PlanId; onClose: () => void })
         </button>
         <h3 className="text-xl font-bold">Finalizar assinatura</h3>
         <p className="text-sm text-muted-foreground mt-1">Plano {planLabel[plan]}</p>
+        <p className="text-xs text-accent mt-2">
+          Após o pagamento aprovado você receberá o link do app Android por e-mail.
+        </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
