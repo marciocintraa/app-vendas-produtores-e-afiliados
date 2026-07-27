@@ -1434,6 +1434,12 @@ function AdminProductsPage() {
                   coverValidation.status !== "valid" ||
                   coverValidation.src !== confirm.selectedNext
                 }
+                title={
+                  coverValidation.status === "valid" &&
+                  coverValidation.src === confirm.selectedNext
+                    ? "Confirmar troca de capa (Enter)"
+                    : "Aguarde a validação da nova capa"
+                }
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
               >
                 {coverValidation.status === "validating" &&
@@ -1442,7 +1448,10 @@ function AdminProductsPage() {
                     <Loader2 className="h-4 w-4 animate-spin" /> Validando…
                   </>
                 ) : (
-                  confirm.actionLabel
+                  <>
+                    {confirm.actionLabel}{" "}
+                    <span className="hidden text-[10px] opacity-70 sm:inline">Enter</span>
+                  </>
                 )}
               </button>
             </div>
