@@ -287,6 +287,21 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .inline-link.video {{ background: #134e4a; color: #5eead4; }}
   .inline-link.video:hover {{ background: #115e59; }}
   .failed-table-wrap + p.muted {{ padding: 0 14px; }}
+  .failed-toolbar {{ display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+                     padding: 10px 12px; border-bottom: 1px solid #1f2937; }}
+  .failed-input, .failed-select {{ background: #0b1120; border: 1px solid #1f2937;
+                                    color: #e2e8f0; border-radius: 8px; padding: 6px 10px;
+                                    font-size: 13px; outline: none; }}
+  .failed-input {{ flex: 1; min-width: 200px; }}
+  .failed-input::placeholder {{ color: #475569; }}
+  .failed-input:focus, .failed-select:focus {{ border-color: #38bdf8; }}
+  .failed-select {{ text-transform: capitalize; cursor: pointer; }}
+  .failed-count {{ font-size: 12px; margin-left: auto; }}
+  .failed-clear {{ background: #1e293b; border: none; color: #cbd5e1; padding: 6px 12px;
+                   border-radius: 8px; font-size: 12px; cursor: pointer; }}
+  .failed-clear:hover {{ background: #334155; }}
+  .failed-table tr.hidden {{ display: none; }}
+  mark.hl {{ background: #fbbf24; color: #0b1120; padding: 0 2px; border-radius: 2px; }}
 
   /* Asset modal */
   .modal-backdrop {{ position: fixed; inset: 0; background: rgba(2, 6, 23, .82);
