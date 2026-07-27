@@ -76,14 +76,11 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
             )
     if not rows:
         return ""
-    engine_options = "".join(
-        f'<option value="{e}">{e}</option>'
-        for e in ENGINES if any(
-            (summaries.get(e) or {}).get("scenarios") and
-            any(sc.get("status") == "failed" for sc in (summaries.get(e) or {}).get("scenarios", []))
-            for _ in [0]
-        )
-    )
+    engines_with_failures = [
+        e for e in ENGINES
+        if any(sc.get("status") == "failed" for sc in (summaries.get(e) or {}).get("scenarios", []))
+    ]
+    engine_options = "".join(f'<option value="{e}">{e}</option>' for e in engines_with_failures)
     return f"""
   <h2>Failed scenarios</h2>
   <div class="failed-table-wrap">
