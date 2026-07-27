@@ -46,11 +46,13 @@ type Draft = {
   originalPrice: string;
   affiliateUrl: string;
   cover: string;
+  gallery: string[];
   highlights: string;
   published: boolean;
 };
 
 const PLATFORMS: Product["platform"][] = ["Hotmart", "Kiwify", "Eduzz", "Monetizze"];
+const MAX_GALLERY = 8;
 
 function emptyDraft(): Draft {
   return {
@@ -64,6 +66,7 @@ function emptyDraft(): Draft {
     originalPrice: "",
     affiliateUrl: "",
     cover: "",
+    gallery: [],
     highlights: "",
     published: true,
   };
@@ -81,6 +84,7 @@ function productToDraft(p: Product): Draft {
     originalPrice: p.originalPrice ? String(p.originalPrice) : "",
     affiliateUrl: p.affiliateUrl,
     cover: p.cover,
+    gallery: p.gallery ?? [],
     highlights: p.highlights.join("\n"),
     published: p.published !== false,
   };
