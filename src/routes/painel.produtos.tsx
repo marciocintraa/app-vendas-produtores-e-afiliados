@@ -331,29 +331,26 @@ function AdminProductsPage() {
   }
 
   function undoCoverSelection() {
-    const history = coverHistoryRef.current;
-    if (history.length === 0) {
-      if (editing?.cover && confirm.selectedNext !== editing.cover) {
-        setCoverDropError(null);
-        setConfirm((prev) => ({
-          ...prev,
-          selectedNext: editing.cover,
-          candidates: prev.candidates.includes(editing.cover)
-            ? prev.candidates
-            : [editing.cover, ...prev.candidates],
-        }));
-        toast.message("Capa atual restaurada", {
-          description: "A validação será executada automaticamente.",
-        });
-      }
+    const current = editing?.cover;
+    if (!current) {
+      toast.error("Nenhuma capa atual para restaurar.");
       return;
     }
-    const previous = history[history.length - 1];
-    coverHistoryRef.current = history.slice(0, -1);
-    setCanUndoCover(coverHistoryRef.current.length > 0);
+    if (confirm.selectedNext === current) {
+      toast.message("Já está na capa atual.");
+      return;
+    }
+    coverHistoryRef.current = [current];
+    setCanUndoCover(true);
     setCoverDropError(null);
-    setConfirm((prev) => ({ ...prev, selectedNext: previous }));
-    toast.message("Seleção desfeita", {
+    setConfirm((prev) => ({
+      ...prev,
+      selectedNext: current,
+      candidates: prev.candidates.includes(current)
+        ? prev.candidates
+        : [current, ...prev.candidates],
+    }));
+    toast.message("Capa atual restaurada", {
       description: "A validação será executada automaticamente.",
     });
   }
