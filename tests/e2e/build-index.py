@@ -70,7 +70,8 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
             links_html = f' <span class="inline-links">{" ".join(links)}</span>' if links else ""
             rows.append(
                 f'<tr data-engine="{engine}" data-name="{name.lower()}" data-duration="{dur}"'
-                f' data-trace="{"1" if trace_href else "0"}" data-video="{"1" if video_href else "0"}">'
+                f' data-trace="{"1" if trace_href else "0"}" data-video="{"1" if video_href else "0"}"'
+                f' data-trace-href="{trace_href or ""}" data-video-href="{video_href or ""}">'
                 f'<td class="eng">{engine}</td>'
                 f'<td class="sc"><span class="scn">{name}</span>{links_html}</td>'
                 f'<td class="dur">{dur} ms</td></tr>'
@@ -100,6 +101,7 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
         <option value="none">Without assets</option>
       </select>
       <span class="failed-count muted" id="failedCount"></span>
+      <button type="button" id="failedExport" class="failed-clear failed-export" title="Export filtered failures to CSV">Export CSV ↓</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
     </div>
     <table class="failed-table">
@@ -308,6 +310,8 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .failed-clear {{ background: #1e293b; border: none; color: #cbd5e1; padding: 6px 12px;
                    border-radius: 8px; font-size: 12px; cursor: pointer; }}
   .failed-clear:hover {{ background: #334155; }}
+  .failed-export {{ background: #052e1a; color: #4ade80; }}
+  .failed-export:hover {{ background: #064e2c; }}
   .failed-table tr.hidden {{ display: none; }}
   mark.hl {{ background: #fbbf24; color: #0b1120; padding: 0 2px; border-radius: 2px; }}
   th.sortable {{ cursor: pointer; user-select: none; }}
@@ -537,6 +541,37 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
       applyFilters(); fSearch.focus();
     }});
     applyFilters();
+
+    // Export filtered failures to CSV
+    const fExport = document.getElementById('failedExport');
+    function csvEscape(v) {{
+      const s = v == null ? '' : String(v);
+      return /[",\\n\\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }}
+    fExport.addEventListener('click', () => {{
+      const base = window.location.href.replace(/[?#].*$/, '');
+      const visibleRows = rows.filter(r => !r.classList.contains('hidden'));
+      const header = ['engine', 'scenario', 'duration_ms', 'trace_url', 'video_url'];
+      const lines = [header.join(',')];
+      visibleRows.forEach(r => {{
+        const engine = r.dataset.engine || '';
+        const scn = r.querySelector('.scn');
+        const name = originalHtml.get(r) || (scn ? scn.textContent : '');
+        const dur = r.dataset.duration || '0';
+        const th = r.dataset.traceHref || '';
+        const vh = r.dataset.videoHref || '';
+        const tUrl = th ? new URL(th, base).href : '';
+        const vUrl = vh ? new URL(vh, base).href : '';
+        lines.push([engine, name, dur, tUrl, vUrl].map(csvEscape).join(','));
+      }});
+      const blob = new Blob(['\\ufeff' + lines.join('\\r\\n')], {{ type: 'text/csv;charset=utf-8;' }});
+      const url = URL.createObjectURL(blob);
+      const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'failed-scenarios-' + ts + '.csv';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }});
 
     // Sort by duration
     const sortDur = document.getElementById('failedSortDur');
