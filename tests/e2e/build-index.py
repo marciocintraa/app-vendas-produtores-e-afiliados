@@ -452,7 +452,59 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   modal.addEventListener('click', (e) => {{ if (e.target === modal) closeModal(); }});
   document.addEventListener('keydown', (e) => {{
     if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+    if (e.key === '/' && !modal.classList.contains('open')) {{
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) return;
+      const s = document.getElementById('failedSearch');
+      if (s) {{ e.preventDefault(); s.focus(); s.select(); }}
+    }}
   }});
+
+  // Failed scenarios filters
+  const fSearch = document.getElementById('failedSearch');
+  const fEngine = document.getElementById('failedEngine');
+  const fClear = document.getElementById('failedClear');
+  const fCount = document.getElementById('failedCount');
+  const fEmpty = document.getElementById('failedEmpty');
+  const fBody = document.getElementById('failedTbody');
+  if (fBody) {{
+    const rows = Array.from(fBody.querySelectorAll('tr'));
+    const originalHtml = new Map(rows.map(r => {{
+      const scn = r.querySelector('.scn');
+      return [r, scn ? scn.textContent : ''];
+    }}));
+    const totalRows = rows.length;
+
+    function escapeRe(s) {{ return s.replace(/[.*+?^${{}}()|[\\]\\\\]/g, '\\\\$&'); }}
+    function applyFilters() {{
+      const q = (fSearch.value || '').trim().toLowerCase();
+      const eng = fEngine.value || '';
+      let visible = 0;
+      const re = q ? new RegExp('(' + escapeRe(q) + ')', 'ig') : null;
+      rows.forEach(r => {{
+        const name = r.dataset.name || '';
+        const engine = r.dataset.engine || '';
+        const match = (!eng || engine === eng) && (!q || name.includes(q));
+        r.classList.toggle('hidden', !match);
+        const scn = r.querySelector('.scn');
+        if (scn) {{
+          const original = originalHtml.get(r) || '';
+          scn.innerHTML = match && re
+            ? original.replace(re, '<mark class="hl">$1</mark>')
+            : original;
+        }}
+        if (match) visible++;
+      }});
+      fCount.textContent = visible + ' of ' + totalRows + ' failure' + (totalRows === 1 ? '' : 's');
+      fEmpty.style.display = visible === 0 ? '' : 'none';
+    }}
+    fSearch.addEventListener('input', applyFilters);
+    fEngine.addEventListener('change', applyFilters);
+    fClear.addEventListener('click', () => {{
+      fSearch.value = ''; fEngine.value = ''; applyFilters(); fSearch.focus();
+    }});
+    applyFilters();
+  }}
 </script>
 </body></html>"""
     out_path.write_text(html, encoding="utf-8")
