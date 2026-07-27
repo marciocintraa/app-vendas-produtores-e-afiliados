@@ -1313,6 +1313,15 @@ function AdminProductsPage() {
               >
                 Cancelar
               </button>
+              {editing?.cover && confirm.selectedNext !== editing.cover && (
+                <button
+                  type="button"
+                  onClick={resetToCurrentCover}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+                >
+                  <RotateCcw className="h-4 w-4" /> Voltar para capa atual
+                </button>
+              )}
               {confirm.candidates.length > 0 && (
                 <button
                   type="button"
