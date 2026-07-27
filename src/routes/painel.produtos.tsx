@@ -316,6 +316,23 @@ function AdminProductsPage() {
     });
   }
 
+  function resetToCurrentCover() {
+    const current = editing?.cover;
+    if (!current) {
+      toast.error("Nenhuma capa atual para restaurar.");
+      return;
+    }
+    setCoverDropError(null);
+    setConfirm((prev) => ({
+      ...prev,
+      selectedNext: current,
+      candidates: prev.candidates.includes(current) ? prev.candidates : [current, ...prev.candidates],
+    }));
+    toast.message("Capa atual restaurada", {
+      description: "A validação será executada automaticamente.",
+    });
+  }
+
   async function handleSaveCover() {
     const next = finalConfirm.nextCover;
     setSaveError(null);
