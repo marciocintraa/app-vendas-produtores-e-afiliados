@@ -15,6 +15,8 @@ import {
   GripVertical,
   Star,
   AlertTriangle,
+  Check,
+
 } from "lucide-react";
 import { type Product } from "@/lib/catalog-data";
 import {
