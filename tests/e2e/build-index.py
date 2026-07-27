@@ -807,9 +807,9 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
 
         if (mode === 'matches') {{
           if (!errTerm || !errRaw.toLowerCase().includes(termLower)) return;
-          const matches = errRaw.split('\n').map(line => line.trimEnd()).filter(line => line.toLowerCase().includes(termLower));
+          const matches = errRaw.split(String.fromCharCode(10)).map(line => line.trimEnd()).filter(line => line.toLowerCase().includes(termLower));
           if (!matches.length) return;
-          payload = matches.join('\n');
+          payload = matches.join(String.fromCharCode(10));
           totalItems += matches.length;
         }} else if (mode === 'message') {{
           const msg = firstErrorMessage(errRaw);
