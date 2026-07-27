@@ -718,6 +718,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
 
       fCount.textContent = visible + ' of ' + totalRows + ' failure' + (totalRows === 1 ? '' : 's');
       fEmpty.style.display = visible === 0 ? '' : 'none';
+      updateCopyMatchesAllState();
     }}
     fSearch.addEventListener('input', applyFilters);
     fEngine.addEventListener('change', applyFilters);
