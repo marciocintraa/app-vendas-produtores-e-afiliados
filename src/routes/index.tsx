@@ -31,17 +31,17 @@ const APK_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=SEU_ID_
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Vende Fácil Pro — App Builder para Produtos Digitais" },
+      { title: "Vende Fácil Pro — App Android para Produtos Digitais" },
       {
         name: "description",
         content:
-          "Transforme seu catálogo de infoprodutos em um app profissional com o Vende Fácil Pro. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
+          "Transforme seu catálogo de infoprodutos em um app profissional para Android com o Vende Fácil Pro. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
       },
-      { property: "og:title", content: "Vende Fácil Pro — App Builder para Produtos Digitais" },
+      { property: "og:title", content: "Vende Fácil Pro — App Android para Produtos Digitais" },
       {
         property: "og:description",
         content:
-          "Transforme seu catálogo de infoprodutos em um app profissional com o Vende Fácil Pro. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
+          "Transforme seu catálogo de infoprodutos em um app profissional para Android com o Vende Fácil Pro. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
