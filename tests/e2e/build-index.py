@@ -701,6 +701,11 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
             toggle.title = open ? 'Hide error' : 'Show error';
           }}
         }}
+        const copyMatches = r.querySelector('.err-copy-matches');
+        if (copyMatches) {{
+          const show = !!errTerm && errRaw && err.includes(errTerm);
+          copyMatches.hidden = !show;
+        }}
         if (match) visible++;
       }});
 
