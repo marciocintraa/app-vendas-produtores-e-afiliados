@@ -167,6 +167,7 @@ function AdminProductsPage() {
       reviews: existing?.reviews ?? 0,
       affiliateUrl,
       cover: editing.cover.trim() || existing?.cover || makeCoverPlaceholder(title),
+      gallery: editing.gallery.filter(Boolean),
       highlights: highlights.length ? highlights : existing?.highlights ?? [],
       modules: existing?.modules ?? [],
       published: editing.published,
