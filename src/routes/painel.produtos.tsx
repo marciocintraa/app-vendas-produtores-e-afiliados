@@ -134,6 +134,7 @@ import {
   Loader2,
   Upload,
   Image as ImageIcon,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 
