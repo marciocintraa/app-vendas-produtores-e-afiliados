@@ -11,6 +11,7 @@ export type Product = {
   reviews: number;
   affiliateUrl: string;
   cover: string;
+  gallery?: string[];
   highlights: string[];
   modules: { title: string; lessons: number }[];
   published?: boolean;

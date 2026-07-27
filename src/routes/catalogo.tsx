@@ -166,6 +166,24 @@ function CatalogPage() {
                     <h2 className="font-display text-lg font-semibold leading-tight">{p.title}</h2>
                     <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.tagline}</p>
                   </div>
+                  {p.gallery && p.gallery.length > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      {p.gallery.slice(0, 4).map((src, i) => (
+                        <img
+                          key={i}
+                          src={src}
+                          alt=""
+                          loading="lazy"
+                          className="h-10 w-10 rounded-md border border-border/60 object-cover"
+                        />
+                      ))}
+                      {p.gallery.length > 4 && (
+                        <span className="rounded-md border border-border/60 bg-surface px-2 py-1 text-[11px] text-muted-foreground">
+                          +{p.gallery.length - 4}
+                        </span>
+                      )}
+                    </div>
+                  )}
                   <div className="mt-auto flex items-end justify-between pt-2">
                     <div>
                       {p.originalPrice && (

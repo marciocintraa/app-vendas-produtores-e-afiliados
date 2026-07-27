@@ -46,11 +46,13 @@ type Draft = {
   originalPrice: string;
   affiliateUrl: string;
   cover: string;
+  gallery: string[];
   highlights: string;
   published: boolean;
 };
 
 const PLATFORMS: Product["platform"][] = ["Hotmart", "Kiwify", "Eduzz", "Monetizze"];
+const MAX_GALLERY = 8;
 
 function emptyDraft(): Draft {
   return {
@@ -64,6 +66,7 @@ function emptyDraft(): Draft {
     originalPrice: "",
     affiliateUrl: "",
     cover: "",
+    gallery: [],
     highlights: "",
     published: true,
   };
@@ -81,6 +84,7 @@ function productToDraft(p: Product): Draft {
     originalPrice: p.originalPrice ? String(p.originalPrice) : "",
     affiliateUrl: p.affiliateUrl,
     cover: p.cover,
+    gallery: p.gallery ?? [],
     highlights: p.highlights.join("\n"),
     published: p.published !== false,
   };
@@ -163,6 +167,7 @@ function AdminProductsPage() {
       reviews: existing?.reviews ?? 0,
       affiliateUrl,
       cover: editing.cover.trim() || existing?.cover || makeCoverPlaceholder(title),
+      gallery: editing.gallery.filter(Boolean),
       highlights: highlights.length ? highlights : existing?.highlights ?? [],
       modules: existing?.modules ?? [],
       published: editing.published,
@@ -482,6 +487,95 @@ function AdminProductsPage() {
                       placeholder="ou cole uma URL: https://…/capa.jpg"
                     />
                   </div>
+                </div>
+              </Field>
+              <Field
+                label={`Galeria de imagens (${editing.gallery.length}/${MAX_GALLERY})`}
+                className="sm:col-span-2"
+                hint="Imagens extras que aparecem na página do produto e como miniaturas no card do catálogo."
+              >
+                <div className="space-y-3">
+                  {editing.gallery.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                      {editing.gallery.map((src, i) => (
+                        <div
+                          key={`${i}-${src.slice(0, 24)}`}
+                          className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-border/60 bg-surface/60"
+                        >
+                          <img src={src} alt="" className="h-full w-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setEditing((prev) =>
+                                prev
+                                  ? { ...prev, gallery: prev.gallery.filter((_, j) => j !== i) }
+                                  : prev,
+                              )
+                            }
+                            className="absolute right-1 top-1 rounded-md bg-background/80 p-1 text-muted-foreground opacity-0 backdrop-blur transition-opacity hover:text-destructive group-hover:opacity-100"
+                            aria-label="Remover imagem"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <label
+                    className={`inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-sm font-medium transition-colors hover:bg-surface-2 ${
+                      editing.gallery.length >= MAX_GALLERY
+                        ? "pointer-events-none opacity-50"
+                        : ""
+                    }`}
+                  >
+                    <Plus className="h-4 w-4" /> Adicionar imagens
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files ?? []);
+                        e.target.value = "";
+                        if (!files.length) return;
+                        const slots = MAX_GALLERY - editing.gallery.length;
+                        const accepted = files.slice(0, slots).filter((f) => {
+                          if (f.size > 3 * 1024 * 1024) {
+                            setError("Cada imagem deve ter no máximo 3 MB.");
+                            return false;
+                          }
+                          return true;
+                        });
+                        Promise.all(
+                          accepted.map(
+                            (f) =>
+                              new Promise<string | null>((resolve) => {
+                                const r = new FileReader();
+                                r.onload = () =>
+                                  resolve(
+                                    typeof r.result === "string" ? r.result : null,
+                                  );
+                                r.onerror = () => resolve(null);
+                                r.readAsDataURL(f);
+                              }),
+                          ),
+                        ).then((results) => {
+                          const urls = results.filter(
+                            (x): x is string => typeof x === "string",
+                          );
+                          if (!urls.length) return;
+                          setEditing((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  gallery: [...prev.gallery, ...urls].slice(0, MAX_GALLERY),
+                                }
+                              : prev,
+                          );
+                        });
+                      }}
+                    />
+                  </label>
                 </div>
               </Field>
               <Field label="Descrição" className="sm:col-span-2">

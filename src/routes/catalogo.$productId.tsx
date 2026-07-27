@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { ArrowLeft, Check, ExternalLink, Sparkles, Star, BookOpen, Share2 } from "lucide-react";
 import { type Product } from "@/lib/catalog-data";
 import { useProduct, useProducts } from "@/lib/catalog-store";
@@ -42,6 +43,11 @@ function ProductPage() {
   const { productId } = Route.useParams();
   const product = useProduct(productId);
   const allProducts = useProducts();
+  const images = useMemo(
+    () => (product ? [product.cover, ...(product.gallery ?? [])].filter(Boolean) : []),
+    [product],
+  );
+  const [activeImage, setActiveImage] = useState(0);
   if (!product) return <NotFoundBlock />;
   const related = allProducts
     .filter((p) => p.id !== product.id && p.category === product.category)
@@ -50,6 +56,7 @@ function ProductPage() {
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : 0;
+  const currentImage = images[activeImage] ?? product.cover;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -73,8 +80,8 @@ function ProductPage() {
           <div>
             <div className="relative overflow-hidden rounded-3xl border border-border/70 shadow-card">
               <img
-                src={product.cover}
-                alt={`Capa de ${product.title}`}
+                src={currentImage}
+                alt={`Imagem de ${product.title}`}
                 className="aspect-[4/3] w-full object-cover"
               />
               <span className="absolute left-4 top-4 rounded-full bg-background/70 px-3 py-1 text-xs font-medium backdrop-blur">
@@ -86,6 +93,26 @@ function ProductPage() {
                 </span>
               )}
             </div>
+
+            {images.length > 1 && (
+              <div className="mt-4 grid grid-cols-5 gap-2 sm:grid-cols-6">
+                {images.map((src, i) => (
+                  <button
+                    key={`${i}-${src.slice(0, 24)}`}
+                    type="button"
+                    onClick={() => setActiveImage(i)}
+                    className={`aspect-[4/3] overflow-hidden rounded-lg border transition-all ${
+                      i === activeImage
+                        ? "border-primary ring-2 ring-primary/30"
+                        : "border-border/60 opacity-80 hover:opacity-100"
+                    }`}
+                    aria-label={`Ver imagem ${i + 1}`}
+                  >
+                    <img src={src} alt="" loading="lazy" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
 
             <section className="mt-8">
               <h2 className="font-display text-xl font-semibold">Sobre este produto</h2>
