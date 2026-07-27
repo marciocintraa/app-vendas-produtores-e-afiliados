@@ -131,15 +131,7 @@ function AccessPage() {
   const pollRef = useRef<number | null>(null);
 
   useEffect(() => {
-    logAccessEvent({
-      route: "/acesso",
-      state: initialState,
-      email: email || undefined,
-      detail:
-        initialState === "missing"
-          ? "email ausente — mostrando formulário"
-          : `estado inicial do loader: ${initialState}`,
-    });
+    // simplificado: sem logs de journey
   }, [initialState, email]);
 
   // Se o estado inicial for "no_purchase", faz polling por até ~30s.
