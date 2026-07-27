@@ -2,7 +2,6 @@ import { createFileRoute, Outlet, redirect, Link, useNavigate } from '@tanstack/
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { LogOut, Loader2, AlertCircle } from 'lucide-react';
-import { logAccessEvent } from '@/lib/access-journey';
 
 
 export const Route = createFileRoute('/_authenticated')({
@@ -21,12 +20,6 @@ function AuthenticatedLayout() {
   const [subStatus, setSubStatus] = useState<'checking' | 'active' | 'none'>('checking');
 
   useEffect(() => {
-    logAccessEvent({
-      route: "/_authenticated",
-      state: "auth_ok",
-      email: user.email ?? undefined,
-      detail: "sessão Supabase válida — verificando assinatura",
-    });
     supabase
       .from('subscriptions')
       .select('status,current_period_end,cancel_at_period_end')
@@ -35,27 +28,13 @@ function AuthenticatedLayout() {
       .limit(1)
       .maybeSingle()
       .then(({ data }) => {
-        if (!data) {
-          logAccessEvent({
-            route: "/_authenticated",
-            state: "no_active_sub",
-            email: user.email ?? undefined,
-            detail: "nenhuma linha em subscriptions",
-          });
-          return setSubStatus('none');
-        }
+        if (!data) return setSubStatus('none');
         const active =
           (['active', 'trialing', 'past_due'].includes(data.status as string) &&
             (!data.current_period_end || new Date(data.current_period_end as string) > new Date())) ||
           (data.status === 'canceled' &&
             data.current_period_end &&
             new Date(data.current_period_end as string) > new Date());
-        logAccessEvent({
-          route: "/_authenticated",
-          state: active ? "entered_app" : "no_active_sub",
-          email: user.email ?? undefined,
-          detail: `status=${data.status} period_end=${data.current_period_end ?? "—"}`,
-        });
         setSubStatus(active ? 'active' : 'none');
       });
   }, [user.id, user.email]);
