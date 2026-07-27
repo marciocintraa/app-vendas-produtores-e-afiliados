@@ -58,7 +58,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: e2e-report-${{ matrix.browser }}
-          path: /tmp/browser/cover-shortcuts/report-${{ matrix.browser }}.html
+          path: |
+            /tmp/browser/cover-shortcuts/report-${{ matrix.browser }}.html
+            /tmp/browser/cover-shortcuts/report-${{ matrix.browser }}.json
           if-no-files-found: warn
 
       - name: Upload failure artifacts (screenshots + trace.zip + video.webm)
@@ -74,3 +76,38 @@ jobs:
       - name: Stop dev server
         if: always()
         run: kill $(cat /tmp/dev-server.pid) || true
+
+  aggregate-report:
+    name: Consolidated report (chromium + firefox + webkit)
+    needs: cover-shortcuts
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download per-engine reports
+        uses: actions/download-artifact@v4
+        with:
+          path: downloaded-reports
+          pattern: e2e-report-*
+          merge-multiple: false
+
+      - name: Build consolidated index.html
+        run: |
+          mkdir -p consolidated
+          python3 tests/e2e/build-index.py \
+            --input downloaded-reports \
+            --output consolidated
+
+      - name: Upload consolidated report
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report-index
+          path: consolidated/
+          if-no-files-found: error
+
