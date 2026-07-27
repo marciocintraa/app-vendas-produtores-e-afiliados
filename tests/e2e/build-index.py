@@ -537,6 +537,8 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   const fAutoExpand = document.getElementById('failedAutoExpand');
 
   const fClear = document.getElementById('failedClear');
+  const fExpandAll = document.getElementById('failedExpandAll');
+  const fCollapseAll = document.getElementById('failedCollapseAll');
   const fCount = document.getElementById('failedCount');
   const fEmpty = document.getElementById('failedEmpty');
   const fBody = document.getElementById('failedTbody');
