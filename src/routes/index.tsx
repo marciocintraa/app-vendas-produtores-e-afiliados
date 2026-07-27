@@ -75,6 +75,7 @@ function Nav() {
           <a href="#recursos" className="hover:text-foreground transition-colors">Recursos</a>
           <a href="#publico" className="hover:text-foreground transition-colors">Para quem</a>
           <a href="#planos" className="hover:text-foreground transition-colors">Planos</a>
+          <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
         </nav>
         <a href="#planos" className="btn-primary text-sm !py-2.5 !px-4">
           Começar agora
