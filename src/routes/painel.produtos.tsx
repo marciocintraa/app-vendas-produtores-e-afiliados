@@ -135,6 +135,7 @@ import {
   Upload,
   Image as ImageIcon,
   RotateCcw,
+  Undo,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -260,6 +261,8 @@ function AdminProductsPage() {
   const validationCtrlRef = useRef<AbortController | null>(null);
   const [coverDropActive, setCoverDropActive] = useState(false);
   const [coverDropError, setCoverDropError] = useState<string | null>(null);
+  const coverHistoryRef = useRef<string[]>([]);
+  const [canUndoCover, setCanUndoCover] = useState(false);
 
   function handleCoverFileDrop(files: FileList | File[]) {
     setCoverDropError(null);
@@ -291,8 +294,8 @@ function AdminProductsPage() {
       setConfirm((prev) => ({
         ...prev,
         candidates: prev.candidates.includes(url) ? prev.candidates : [url, ...prev.candidates],
-        selectedNext: url,
       }));
+      selectNextCover(url);
       toast.message("Imagem recebida", { description: "Validando automaticamente…" });
     };
     reader.readAsDataURL(file);
@@ -316,13 +319,51 @@ function AdminProductsPage() {
     });
   }
 
+  function pushCoverHistory(value: string) {
+    coverHistoryRef.current = [...coverHistoryRef.current, value];
+    setCanUndoCover(true);
+  }
+
+  function selectNextCover(next: string) {
+    if (next === confirm.selectedNext) return;
+    pushCoverHistory(confirm.selectedNext);
+    setConfirm((prev) => ({ ...prev, selectedNext: next }));
+  }
+
+  function undoCoverSelection() {
+    const current = editing?.cover;
+    if (!current) {
+      toast.error("Nenhuma capa atual para restaurar.");
+      return;
+    }
+    if (confirm.selectedNext === current) {
+      toast.message("Já está na capa atual.");
+      return;
+    }
+    coverHistoryRef.current = [current];
+    setCanUndoCover(true);
+    setCoverDropError(null);
+    setConfirm((prev) => ({
+      ...prev,
+      selectedNext: current,
+      candidates: prev.candidates.includes(current)
+        ? prev.candidates
+        : [current, ...prev.candidates],
+    }));
+    toast.message("Capa atual restaurada", {
+      description: "A validação será executada automaticamente.",
+    });
+  }
+
   function resetToCurrentCover() {
     const current = editing?.cover;
     if (!current) {
       toast.error("Nenhuma capa atual para restaurar.");
       return;
     }
+    if (confirm.selectedNext === current) return;
     setCoverDropError(null);
+    pushCoverHistory(confirm.selectedNext);
     setConfirm((prev) => ({
       ...prev,
       selectedNext: current,
@@ -419,11 +460,15 @@ function AdminProductsPage() {
 
 
   function openConfirm(opts: Omit<ConfirmState, "open">) {
+    coverHistoryRef.current = [editing?.cover ?? ""];
+    setCanUndoCover(true);
     setConfirm({ open: true, ...opts });
   }
 
   function closeConfirm() {
     setFullPreview(false);
+    coverHistoryRef.current = [];
+    setCanUndoCover(false);
     setConfirm((prev) => ({ ...prev, open: false }));
   }
 
@@ -1172,9 +1217,7 @@ function AdminProductsPage() {
                           <button
                             key={src}
                             type="button"
-                            onClick={() =>
-                              setConfirm((prev) => ({ ...prev, selectedNext: src }))
-                            }
+                            onClick={() => selectNextCover(src)}
                             className={`relative aspect-[4/3] overflow-hidden rounded-lg border-2 transition-all ${
                               confirm.selectedNext === src
                                 ? "border-primary ring-2 ring-primary/40"
@@ -1313,13 +1356,13 @@ function AdminProductsPage() {
               >
                 Cancelar
               </button>
-              {editing?.cover && confirm.selectedNext !== editing.cover && (
+              {(canUndoCover || (editing?.cover && confirm.selectedNext !== editing.cover)) && (
                 <button
                   type="button"
-                  onClick={resetToCurrentCover}
+                  onClick={undoCoverSelection}
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
                 >
-                  <RotateCcw className="h-4 w-4" /> Voltar para capa atual
+                  <Undo className="h-4 w-4" /> Desfazer
                 </button>
               )}
               {confirm.candidates.length > 0 && (
@@ -1451,6 +1494,15 @@ function AdminProductsPage() {
               >
                 Voltar ao modal
               </button>
+              {(canUndoCover || (editing?.cover && confirm.selectedNext !== editing.cover)) && (
+                <button
+                  type="button"
+                  onClick={undoCoverSelection}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+                >
+                  <Undo className="h-4 w-4" /> Desfazer
+                </button>
+              )}
               <button
                 type="button"
                 onClick={requestFinalConfirm}
