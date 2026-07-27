@@ -126,6 +126,8 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
       </label>
 
       <span class="failed-count muted" id="failedCount"></span>
+      <button type="button" id="failedExpandAll" class="failed-clear" title="Expand error details for all visible rows">Expand all</button>
+      <button type="button" id="failedCollapseAll" class="failed-clear" title="Collapse error details for all visible rows">Collapse all</button>
       <button type="button" id="failedExport" class="failed-clear failed-export" title="Export filtered failures to CSV">Export CSV ↓</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
     </div>
