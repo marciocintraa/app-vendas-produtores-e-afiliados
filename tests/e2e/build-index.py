@@ -324,6 +324,24 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   <div class="frame-wrap">{''.join(panes) or '<p class="muted" style="padding:16px">No per-engine reports were found.</p>'}</div>
 </main>
 
+<div class="modal-backdrop" id="assetModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">
+        <span id="assetModalTitle">Asset</span>
+        <span class="badge" id="assetModalBadge">asset</span>
+      </div>
+      <div class="modal-actions">
+        <a class="pill link" id="assetModalDownload" href="#" download>Download ↓</a>
+        <a class="pill link" id="assetModalOpen" href="#" target="_blank" rel="noopener">Open in new tab ↗</a>
+        <button class="modal-close" id="assetModalClose" aria-label="Close">×</button>
+      </div>
+    </div>
+    <div class="modal-body" id="assetModalBody"></div>
+    <div class="modal-hint" id="assetModalHint"></div>
+  </div>
+</div>
+
 <script>
   const tabs = document.querySelectorAll('.tab:not(:disabled)');
   const panes = document.querySelectorAll('.pane');
@@ -332,6 +350,74 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     tabs.forEach(t => t.classList.toggle('active', t === tab));
     panes.forEach(p => p.classList.toggle('active', p.dataset.engine === engine));
   }}));
+
+  // Asset modal: intercept trace/video pill clicks and preview inline.
+  const modal = document.getElementById('assetModal');
+  const modalTitle = document.getElementById('assetModalTitle');
+  const modalBadge = document.getElementById('assetModalBadge');
+  const modalBody = document.getElementById('assetModalBody');
+  const modalHint = document.getElementById('assetModalHint');
+  const modalDownload = document.getElementById('assetModalDownload');
+  const modalOpen = document.getElementById('assetModalOpen');
+  const modalClose = document.getElementById('assetModalClose');
+
+  function openAsset(kind, href, label) {{
+    const absolute = new URL(href, window.location.href).href;
+    modalTitle.textContent = label || (kind === 'trace' ? 'Trace' : 'Video');
+    modalBadge.textContent = kind;
+    modalBadge.className = 'badge ' + kind;
+    modalDownload.href = href;
+    modalDownload.setAttribute('download', '');
+    modalOpen.href = href;
+    modalBody.innerHTML = '';
+    if (kind === 'video') {{
+      const v = document.createElement('video');
+      v.src = href; v.controls = true; v.autoplay = true; v.playsInline = true;
+      modalBody.appendChild(v);
+      modalHint.innerHTML = 'Playback served directly from the report artifacts.';
+    }} else {{
+      // Trace viewer requires an https URL reachable by trace.playwright.dev.
+      const isHttp = /^https?:/i.test(absolute);
+      if (isHttp) {{
+        const iframe = document.createElement('iframe');
+        iframe.src = 'https://trace.playwright.dev/?trace=' + encodeURIComponent(absolute);
+        iframe.allow = 'clipboard-read; clipboard-write';
+        modalBody.appendChild(iframe);
+        modalHint.innerHTML = 'Powered by <code>trace.playwright.dev</code> — trace loaded from <code>' + absolute + '</code>.';
+      }} else {{
+        modalBody.innerHTML = '<div style="padding:24px;color:#94a3b8;max-width:520px;text-align:center">' +
+          'Trace viewer requires an <code style="background:#1e293b;padding:1px 6px;border-radius:4px">http(s)</code> URL. ' +
+          'This page is served from <code style="background:#1e293b;padding:1px 6px;border-radius:4px">' + window.location.protocol + '</code>, so use <b>Download</b> and open with:<br><br>' +
+          '<code style="background:#1e293b;padding:6px 10px;border-radius:6px;display:inline-block">playwright show-trace ' + href.split('/').pop() + '</code></div>';
+        modalHint.innerHTML = 'Publish this report over http(s) to preview traces inline.';
+      }}
+    }}
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }}
+
+  function closeModal() {{
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    modalBody.innerHTML = '';
+    document.body.style.overflow = '';
+  }}
+
+  document.addEventListener('click', (e) => {{
+    const el = e.target.closest('a.pill.trace, a.pill.video, a.inline-link.trace, a.inline-link.video');
+    if (!el) return;
+    const kind = el.classList.contains('trace') ? 'trace' : 'video';
+    e.preventDefault();
+    const label = el.getAttribute('title') || el.textContent.trim();
+    openAsset(kind, el.getAttribute('href'), label);
+  }});
+
+  modalClose.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => {{ if (e.target === modal) closeModal(); }});
+  document.addEventListener('keydown', (e) => {{
+    if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  }});
 </script>
 </body></html>"""
     out_path.write_text(html, encoding="utf-8")
