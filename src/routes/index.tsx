@@ -18,9 +18,19 @@ import {
   HelpCircle,
   ChevronDown,
   Quote,
+  Download,
+  Monitor,
+  Apple,
+  Plus,
+  X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import heroImg from "@/assets/hero-app.jpg";
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -50,6 +60,7 @@ function Landing() {
       <Nav />
       <main>
         <Hero />
+        <DownloadApp />
         <SocialProof />
         <Features />
         <Audience />
@@ -80,6 +91,10 @@ function Nav() {
           <a href="#planos" className="hover:text-foreground transition-colors">Planos</a>
           <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
         </nav>
+        <a href="#baixar-app" className="hidden lg:inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Download className="w-4 h-4" />
+          Baixar app
+        </a>
         <a href="#planos" className="btn-primary text-sm !py-2.5 !px-4">
           Começar agora
         </a>
@@ -142,6 +157,192 @@ function Hero() {
             />
           </div>
         </div>
+      </div>
+    </section>
+  );
+}
+
+function DownloadApp() {
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [showIOSHelp, setShowIOSHelp] = useState(false);
+  const [platform, setPlatform] = useState<"android" | "ios" | "desktop" | "other">("other");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const ua = window.navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(ua);
+    const isAndroid = /android/.test(ua);
+    const isDesktop = !isIOS && !isAndroid && (window.innerWidth >= 1024 || /windows|macintosh|linux/.test(ua));
+
+    if (isIOS) setPlatform("ios");
+    else if (isAndroid) setPlatform("android");
+    else if (isDesktop) setPlatform("desktop");
+
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      setIsInstalled(true);
+    }
+
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+
+    window.addEventListener("beforeinstallprompt", handler);
+    window.addEventListener("appinstalled", () => {
+      setDeferredPrompt(null);
+      setIsInstalled(true);
+    });
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handler);
+    };
+  }, []);
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      setDeferredPrompt(null);
+    }
+  };
+
+  const platformSteps: Record<string, string[]> = {
+    android: [
+      "Toque no menu do Chrome (⋮) e escolha \"Adicionar à tela inicial\".",
+      "Confirme em \"Adicionar\". O ícone do Vende Fácil Pro aparecerá como um app.",
+    ],
+    ios: [
+      "Toque no botão Compartilhar (□⬆) na barra do Safari.",
+      "Role e selecione \"Adicionar à Tela de Início\".",
+      "Toque em \"Adicionar\". Pronto, seu app está instalado.",
+    ],
+    desktop: [
+      "No Chrome/Edge, clique no ícone de instalação na barra de endereço (ou menu ⋮ → Instalar Vende Fácil Pro).",
+      "Confirme a instalação. O app abrirá em uma janela própria, como um programa nativo.",
+    ],
+    other: [
+      "No menu do navegador, procure por \"Adicionar à tela inicial\" ou \"Instalar aplicativo\".",
+      "Confirme a instalação. O Vende Fácil Pro ficará disponível como um app.",
+    ],
+  };
+
+  return (
+    <section id="baixar-app" className="py-16 bg-surface/30 border-y border-border">
+      <div className="container-page">
+        <div className="card-glass p-8 md:p-10 relative overflow-hidden">
+          <div
+            className="absolute inset-0 -z-10 opacity-60"
+            style={{
+              background:
+                "radial-gradient(circle at 20% 50%, oklch(0.72 0.2 295 / 0.35), transparent 55%)",
+            }}
+          />
+          <div className="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-3 py-1 text-xs font-medium text-accent">
+                <Smartphone className="w-3.5 h-3.5" />
+                App instalável
+              </span>
+              <h2 className="mt-4 text-2xl md:text-4xl font-bold">
+                Baixe o <span className="text-gradient">Vende Fácil Pro</span> no seu dispositivo
+              </h2>
+              <p className="mt-3 text-muted-foreground max-w-xl">
+                Instale direto pelo navegador — sem lojas, sem burocracia. Acesse seu catálogo como
+                um app nativo no Android, iPhone ou computador.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                {isInstalled ? (
+                  <div className="inline-flex items-center gap-2 text-sm font-medium text-emerald-400">
+                    <Check className="w-4 h-4" />
+                    App já instalado
+                  </div>
+                ) : deferredPrompt ? (
+                  <button onClick={handleInstall} className="btn-primary">
+                    <Download className="w-4 h-4" />
+                    Instalar agora
+                  </button>
+                ) : platform === "ios" ? (
+                  <button onClick={() => setShowIOSHelp(true)} className="btn-primary">
+                    <Apple className="w-4 h-4" />
+                    Ver como instalar no iPhone
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setShowIOSHelp(true)}
+                    className="btn-primary"
+                  >
+                    <Download className="w-4 h-4" />
+                    Como instalar
+                  </button>
+                )}
+                <a href="#planos" className="btn-ghost">
+                  Ver planos <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+            <div className="hidden lg:flex items-center gap-4">
+              <div className="grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
+                <Smartphone className="w-7 h-7 text-accent" />
+              </div>
+              <div className="grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
+                <Apple className="w-7 h-7 text-accent" />
+              </div>
+              <div className="grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
+                <Monitor className="w-7 h-7 text-accent" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {showIOSHelp && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="install-title"
+          >
+            <div className="card-glass w-full max-w-md p-6 md:p-8 relative">
+              <button
+                onClick={() => setShowIOSHelp(false)}
+                className="absolute top-4 right-4 p-1 rounded-md hover:bg-white/5 text-muted-foreground"
+                aria-label="Fechar instruções"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="grid place-items-center w-10 h-10 rounded-xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
+                  <Plus className="w-5 h-5 text-accent" />
+                </div>
+                <h3 id="install-title" className="text-xl font-bold">
+                  Instale o Vende Fácil Pro
+                </h3>
+              </div>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Siga os passos abaixo para adicionar o app à sua tela inicial:
+              </p>
+              <ol className="mt-5 space-y-3">
+                {platformSteps[platform].map((step, idx) => (
+                  <li key={idx} className="flex gap-3 text-sm">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-accent/10 text-accent text-xs font-semibold grid place-items-center">
+                      {idx + 1}
+                    </span>
+                    <span className="text-muted-foreground">{step}</span>
+                  </li>
+                ))}
+              </ol>
+              <button
+                onClick={() => setShowIOSHelp(false)}
+                className="mt-7 w-full btn-primary"
+              >
+                Entendi
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
