@@ -124,6 +124,20 @@ function AdminProductsPage() {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [fullPreview, setFullPreview] = useState(false);
+  const [finalConfirm, setFinalConfirm] = useState<{
+    open: boolean;
+    currentCover: string;
+    nextCover: string;
+  }>({ open: false, currentCover: "", nextCover: "" });
+
+  function requestFinalConfirm() {
+    setFinalConfirm({
+      open: true,
+      currentCover: editing?.cover ?? "",
+      nextCover: confirm.selectedNext,
+    });
+  }
+
   const [confirm, setConfirm] = useState<ConfirmState>({
     open: false,
     title: "",
