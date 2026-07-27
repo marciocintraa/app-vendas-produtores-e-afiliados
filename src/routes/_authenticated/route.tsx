@@ -1,7 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link, useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { getStripeEnvironment } from '@/lib/stripe';
 import { LogOut, Loader2, AlertCircle } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated')({
@@ -20,13 +19,11 @@ function AuthenticatedLayout() {
   const [subStatus, setSubStatus] = useState<'checking' | 'active' | 'none'>('checking');
 
   useEffect(() => {
-    let env: 'sandbox' | 'live' = 'sandbox';
-    try { env = getStripeEnvironment(); } catch {}
     supabase
       .from('subscriptions')
       .select('status,current_period_end,cancel_at_period_end')
       .eq('user_id', user.id)
-      .eq('environment', env)
+      .eq('environment', 'hotmart')
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
