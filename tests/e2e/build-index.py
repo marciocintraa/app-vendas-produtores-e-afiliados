@@ -148,6 +148,7 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
         <option value="message">Error message only</option>
         <option value="full">Full stack</option>
       </select>
+      <button type="button" id="failedCopyModeReset" class="failed-clear" title="Reset copy mode to default and clear saved preference">Reset mode</button>
       <button type="button" id="failedCopyMatchesAll" class="failed-clear failed-copy-matches-global" title="Copy matching error lines from all visible rows">Copy from visible rows</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
     </div>
