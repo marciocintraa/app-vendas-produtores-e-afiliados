@@ -557,20 +557,57 @@ function AdminProductsPage() {
                             <div className="pointer-events-none absolute bottom-1 left-1 rounded-md bg-background/80 p-1 text-muted-foreground backdrop-blur">
                               <GripVertical className="h-3.5 w-3.5" />
                             </div>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setEditing((prev) =>
-                                  prev
-                                    ? { ...prev, gallery: prev.gallery.filter((_, j) => j !== i) }
-                                    : prev,
-                                )
-                              }
-                              className="absolute right-1 top-1 rounded-md bg-background/80 p-1 text-muted-foreground opacity-0 backdrop-blur transition-opacity hover:text-destructive group-hover:opacity-100"
-                              aria-label="Remover imagem"
-                            >
-                              <X className="h-3.5 w-3.5" />
-                            </button>
+                            <div className="absolute right-1 top-1 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setEditing((prev) =>
+                                    prev ? { ...prev, cover: src } : prev,
+                                  )
+                                }
+                                disabled={editing.cover === src}
+                                className={`rounded-md p-1 backdrop-blur transition-colors ${
+                                  editing.cover === src
+                                    ? "bg-primary/90 text-primary-foreground"
+                                    : "bg-background/80 text-muted-foreground hover:text-primary"
+                                }`}
+                                aria-label={
+                                  editing.cover === src
+                                    ? "Capa atual"
+                                    : "Definir como capa"
+                                }
+                                title={
+                                  editing.cover === src
+                                    ? "Capa atual"
+                                    : "Definir como capa"
+                                }
+                              >
+                                <Star
+                                  className={`h-3.5 w-3.5 ${
+                                    editing.cover === src ? "fill-current" : ""
+                                  }`}
+                                />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setEditing((prev) =>
+                                    prev
+                                      ? { ...prev, gallery: prev.gallery.filter((_, j) => j !== i) }
+                                      : prev,
+                                  )
+                                }
+                                className="rounded-md bg-background/80 p-1 text-muted-foreground backdrop-blur transition-colors hover:text-destructive"
+                                aria-label="Remover imagem"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                            {editing.cover === src && (
+                              <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-primary/90 px-2 py-0.5 text-center text-[10px] font-semibold text-primary-foreground">
+                                CAPA
+                              </div>
+                            )}
                           </div>
                         );
                       })}
