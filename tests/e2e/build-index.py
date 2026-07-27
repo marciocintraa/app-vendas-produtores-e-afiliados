@@ -227,10 +227,13 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   <h2>Per-engine summary</h2>
   <div class="engines">{''.join(engine_cards)}</div>
 
+  {_render_failed_table(summaries)}
+
   <h2>Full reports</h2>
   <div class="tabs">{''.join(tabs)}</div>
   <div class="frame-wrap">{''.join(panes) or '<p class="muted" style="padding:16px">No per-engine reports were found.</p>'}</div>
 </main>
+
 <script>
   const tabs = document.querySelectorAll('.tab:not(:disabled)');
   const panes = document.querySelectorAll('.pane');
