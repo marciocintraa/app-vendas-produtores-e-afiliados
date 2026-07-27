@@ -525,6 +525,7 @@ function AdminProductsPage() {
                               description:
                                 "A imagem atual é a capa do produto. Removê-la promoverá automaticamente a próxima imagem da galeria como nova capa.",
                               actionLabel: "Sim, trocar capa",
+                              nextCover: next,
                               onConfirm: () => {
                                 setError(null);
                                 setEditing({ ...editing, cover: next });
