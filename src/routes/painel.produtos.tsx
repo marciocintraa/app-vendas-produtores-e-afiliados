@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import {
   ArrowLeft,
+  ArrowRight,
   Plus,
   Pencil,
   Trash2,
@@ -100,6 +101,17 @@ type ConfirmState = {
   actionLabel: string;
   candidates: string[];
   selectedNext: string;
+  preview: {
+    title: string;
+    tagline: string;
+    category: string;
+    platform: Product["platform"];
+    price: number;
+    originalPrice?: number;
+    rating: number;
+    reviews: number;
+    gallery: string[];
+  };
   onConfirm: (nextCover: string) => void;
 };
 
@@ -116,6 +128,17 @@ function AdminProductsPage() {
     actionLabel: "",
     candidates: [],
     selectedNext: "",
+    preview: {
+      title: "",
+      tagline: "",
+      category: "",
+      platform: "Hotmart",
+      price: 0,
+      originalPrice: undefined,
+      rating: 5,
+      reviews: 0,
+      gallery: [],
+    },
     onConfirm: () => {},
   });
 
@@ -530,6 +553,19 @@ function AdminProductsPage() {
                               actionLabel: "Sim, trocar capa",
                               candidates,
                               selectedNext: candidates[0],
+                              preview: {
+                                title: editing.title || "Título do produto",
+                                tagline: editing.tagline || editing.title || "Subtítulo do produto",
+                                category: editing.category || "Categoria",
+                                platform: editing.platform,
+                                price: Number(editing.price.replace(",", ".")) || 0,
+                                originalPrice: editing.originalPrice
+                                  ? Number(editing.originalPrice.replace(",", ".")) || undefined
+                                  : undefined,
+                                rating: 5,
+                                reviews: 0,
+                                gallery: editing.gallery.filter(Boolean),
+                              },
                               onConfirm: (nextCover) => {
                                 setError(null);
                                 setEditing({ ...editing, cover: nextCover });
@@ -661,6 +697,19 @@ function AdminProductsPage() {
                                     actionLabel: "Sim, trocar capa",
                                     candidates,
                                     selectedNext: candidates[0] ?? "",
+                                    preview: {
+                                      title: editing.title || "Título do produto",
+                                      tagline: editing.tagline || editing.title || "Subtítulo do produto",
+                                      category: editing.category || "Categoria",
+                                      platform: editing.platform,
+                                      price: Number(editing.price.replace(",", ".")) || 0,
+                                      originalPrice: editing.originalPrice
+                                        ? Number(editing.originalPrice.replace(",", ".")) || undefined
+                                        : undefined,
+                                      rating: 5,
+                                      reviews: 0,
+                                      gallery: editing.gallery.filter((_, j) => j !== i),
+                                    },
                                     onConfirm: (nextCover) => {
                                       setError(null);
                                       setEditing((prev) => {
@@ -835,32 +884,40 @@ function AdminProductsPage() {
                 {confirm.description}
               </p>
               {confirm.candidates.length > 0 ? (
-                <div className="mt-5 w-full rounded-xl border border-border/60 bg-surface/60 p-3 text-left">
-                  <p className="mb-2 text-xs font-medium text-muted-foreground">
-                    Selecione a nova capa:
-                  </p>
-                  <div className="grid grid-cols-4 gap-2">
-                    {confirm.candidates.map((src) => (
-                      <button
-                        key={src}
-                        type="button"
-                        onClick={() =>
-                          setConfirm((prev) => ({ ...prev, selectedNext: src }))
-                        }
-                        className={`relative aspect-[4/3] overflow-hidden rounded-lg border-2 transition-all ${
-                          confirm.selectedNext === src
-                            ? "border-primary ring-2 ring-primary/40"
-                            : "border-border/60 hover:border-primary/50"
-                        }`}
-                      >
-                        <img src={src} alt="" className="h-full w-full object-cover" />
-                        {confirm.selectedNext === src && (
-                          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-primary/90 px-1 py-0.5 text-center text-[10px] font-semibold text-primary-foreground">
-                            NOVA CAPA
-                          </div>
-                        )}
-                      </button>
-                    ))}
+                <div className="mt-5 grid w-full gap-5 text-left sm:grid-cols-[1fr_220px]">
+                  <div className="rounded-xl border border-border/60 bg-surface/60 p-3">
+                    <p className="mb-2 text-xs font-medium text-muted-foreground">
+                      Selecione a nova capa:
+                    </p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {confirm.candidates.map((src) => (
+                        <button
+                          key={src}
+                          type="button"
+                          onClick={() =>
+                            setConfirm((prev) => ({ ...prev, selectedNext: src }))
+                          }
+                          className={`relative aspect-[4/3] overflow-hidden rounded-lg border-2 transition-all ${
+                            confirm.selectedNext === src
+                              ? "border-primary ring-2 ring-primary/40"
+                              : "border-border/60 hover:border-primary/50"
+                          }`}
+                        >
+                          <img src={src} alt="" className="h-full w-full object-cover" />
+                          {confirm.selectedNext === src && (
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-primary/90 px-1 py-0.5 text-center text-[10px] font-semibold text-primary-foreground">
+                              NOVA CAPA
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="rounded-xl border border-border/60 bg-surface/60 p-3">
+                    <p className="mb-2 text-xs font-medium text-muted-foreground">
+                      Prévia no catálogo:
+                    </p>
+                    <CoverPreviewCard cover={confirm.selectedNext} {...confirm.preview} />
                   </div>
                 </div>
               ) : (
@@ -888,6 +945,91 @@ function AdminProductsPage() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function CoverPreviewCard({
+  cover,
+  title,
+  tagline,
+  category,
+  platform,
+  price,
+  originalPrice,
+  rating,
+  reviews,
+  gallery,
+}: {
+  cover: string;
+  title: string;
+  tagline: string;
+  category: string;
+  platform: Product["platform"];
+  price: number;
+  originalPrice?: number;
+  rating: number;
+  reviews: number;
+  gallery: string[];
+}) {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-xl border border-border/70 bg-card shadow-card">
+      <div className="relative aspect-[3/2] overflow-hidden">
+        <img
+          src={cover}
+          alt={`Capa de ${title}`}
+          className="h-full w-full object-cover"
+        />
+        <span className="absolute left-2 top-2 rounded-full bg-background/70 px-2 py-0.5 text-[10px] font-medium backdrop-blur">
+          {platform}
+        </span>
+      </div>
+      <div className="flex flex-1 flex-col gap-2 p-3">
+        <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+          <span className="truncate">{category}</span>
+          <span className="inline-flex items-center gap-0.5 text-foreground/80">
+            <Star className="h-3 w-3 fill-accent text-accent" />
+            {rating.toFixed(1)}
+            <span className="text-muted-foreground">({reviews})</span>
+          </span>
+        </div>
+        <div>
+          <h4 className="font-display text-sm font-semibold leading-tight line-clamp-1">{title}</h4>
+          <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-2">{tagline}</p>
+        </div>
+        {gallery.length > 0 && (
+          <div className="flex items-center gap-1">
+            {gallery.slice(0, 3).map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt=""
+                className="h-7 w-7 rounded border border-border/60 object-cover"
+              />
+            ))}
+            {gallery.length > 3 && (
+              <span className="rounded border border-border/60 bg-surface px-1 py-0.5 text-[9px] text-muted-foreground">
+                +{gallery.length - 3}
+              </span>
+            )}
+          </div>
+        )}
+        <div className="mt-auto flex items-end justify-between pt-1">
+          <div>
+            {originalPrice !== undefined && originalPrice > 0 && (
+              <div className="text-[9px] text-muted-foreground line-through">
+                R$ {originalPrice.toFixed(0)}
+              </div>
+            )}
+            <div className="font-display text-sm font-semibold text-foreground">
+              R$ {price.toFixed(0)}
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-0.5 text-[10px] text-primary">
+            Ver <ArrowRight className="h-3 w-3" />
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
