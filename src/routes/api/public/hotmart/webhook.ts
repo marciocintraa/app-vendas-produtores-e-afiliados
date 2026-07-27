@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { createClient } from '@supabase/supabase-js';
-import { HOTMART_PRODUCT_TO_PLAN, type PlanId } from '@/lib/hotmart';
+import { HOTMART_PRODUCT_TO_PLAN, HOTMART_OFFER_TO_PLAN, type PlanId } from '@/lib/hotmart';
 
 /**
  * Webhook de compra da Hotmart.
