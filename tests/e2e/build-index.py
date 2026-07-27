@@ -321,6 +321,10 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .failed-clear:hover {{ background: #334155; }}
   .failed-export {{ background: #052e1a; color: #4ade80; }}
   .failed-export:hover {{ background: #064e2c; }}
+  .failed-error-input {{ flex: 0 1 200px; min-width: 160px; }}
+  .failed-check {{ display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
+                    color: #cbd5e1; cursor: pointer; user-select: none; }}
+  .failed-check input {{ accent-color: #38bdf8; }}
   .failed-table tr.hidden {{ display: none; }}
   mark.hl {{ background: #fbbf24; color: #0b1120; padding: 0 2px; border-radius: 2px; }}
   th.sortable {{ cursor: pointer; user-select: none; }}
