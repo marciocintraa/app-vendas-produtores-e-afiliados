@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { CheckCircle2, ArrowRight, Mail, Sparkles, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/bem-vindo")({
@@ -22,10 +23,37 @@ export const Route = createFileRoute("/bem-vindo")({
   component: BemVindoPage,
 });
 
+function sanitizeEmail(raw: string | null | undefined): string {
+  if (!raw) return "";
+  const trimmed = raw.trim();
+  // Hotmart às vezes envia o placeholder literal quando a variável não é resolvida
+  if (!trimmed || trimmed.includes("{{") || trimmed.includes("}}")) return "";
+  return trimmed;
+}
+
 function BemVindoPage() {
-  const search = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
-  const email = search?.get("email") ?? "";
-  const accessHref = email ? `/acesso?email=${encodeURIComponent(email)}` : "/acesso";
+  const navigate = useNavigate();
+  const initialEmail =
+    typeof window !== "undefined"
+      ? sanitizeEmail(new URLSearchParams(window.location.search).get("email"))
+      : "";
+
+  const [email, setEmail] = useState(initialEmail);
+  const [error, setError] = useState<string | null>(null);
+
+  const hasEmail = initialEmail.length > 0;
+  const accessHref = hasEmail ? `/acesso?email=${encodeURIComponent(initialEmail)}` : "/acesso";
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const clean = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) {
+      setError("Digite um email válido (o mesmo usado na compra).");
+      return;
+    }
+    setError(null);
+    navigate({ to: "/acesso", search: { email: clean } });
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 px-4 py-16">
@@ -40,8 +68,10 @@ function BemVindoPage() {
           Sua compra foi aprovada!
         </h1>
         <p className="mb-10 text-center text-lg text-muted-foreground">
-          Bem-vindo ao <span className="font-semibold text-foreground">Vende Fácil Pro</span>. Seu
-          acesso já está liberado — é só clicar no botão abaixo para entrar.
+          Bem-vindo ao <span className="font-semibold text-foreground">Vende Fácil Pro</span>.{" "}
+          {hasEmail
+            ? "Seu acesso já está liberado — é só clicar no botão abaixo para entrar."
+            : "Confirme o email usado na compra para liberar seu acesso."}
         </p>
 
         <div className="rounded-2xl border border-border/60 bg-card/60 p-6 shadow-lg backdrop-blur sm:p-8">
@@ -60,20 +90,46 @@ function BemVindoPage() {
               icon={<Mail className="h-5 w-5" />}
               title="Login automático por email"
               text={
-                email
-                  ? `Vamos te logar automaticamente como ${email}.`
-                  : "Basta informar o email usado na compra."
+                hasEmail
+                  ? `Vamos te logar automaticamente como ${initialEmail}.`
+                  : "Use o mesmo email que você informou no checkout da Hotmart."
               }
             />
           </div>
 
-          <Link
-            to={accessHref}
-            className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90"
-          >
-            Acessar o Vende Fácil Pro
-            <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
-          </Link>
+          {hasEmail ? (
+            <Link
+              to={accessHref}
+              className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90"
+            >
+              Acessar o Vende Fácil Pro
+              <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
+            </Link>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <label htmlFor="buyer-email" className="block text-sm font-medium">
+                Email usado na compra
+              </label>
+              <input
+                id="buyer-email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="seu@email.com"
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-base outline-none ring-primary/40 transition focus:ring-2"
+              />
+              {error && <p className="text-sm text-red-500">{error}</p>}
+              <button
+                type="submit"
+                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90"
+              >
+                Liberar meu acesso
+                <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
+              </button>
+            </form>
+          )}
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
             Problemas para entrar?{" "}
