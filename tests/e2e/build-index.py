@@ -342,6 +342,16 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
                     color: #cbd5e1; cursor: pointer; user-select: none; }}
   .failed-check input {{ accent-color: #38bdf8; }}
   .failed-table tr.hidden {{ display: none; }}
+  .err-toggle {{ margin: 8px 0 0; display: inline-flex; align-items: center; gap: 4px;
+                 background: transparent; border: 1px solid #1f2937; color: #94a3b8;
+                 border-radius: 6px; padding: 2px 8px; font-size: 10.5px;
+                 text-transform: uppercase; letter-spacing: .05em; cursor: pointer; }}
+  .err-toggle:hover {{ color: #e2e8f0; border-color: #334155; }}
+  .err-toggle .chev {{ display: inline-block; transition: transform .15s ease; font-size: 9px; }}
+  .err-toggle[aria-expanded="true"] {{ color: #fca5a5; border-color: #7f1d1d; }}
+  .err-toggle[aria-expanded="true"] .chev {{ transform: rotate(90deg); }}
+  .err-toggle.auto {{ border-style: dashed; }}
+
   .err-text {{ margin: 8px 0 0; padding: 8px 10px; background: #0b1120;
                border: 1px solid #1f2937; border-left: 3px solid #7f1d1d;
                border-radius: 6px; color: #cbd5e1; font-size: 11.5px;
