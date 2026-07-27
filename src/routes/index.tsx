@@ -25,8 +25,7 @@ import {
 import { useState } from "react";
 import heroImg from "@/assets/hero-app.jpg";
 
-// 🔁 Substitua pelo link direto do Google Drive do seu .apk
-const APK_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=SEU_ID_DO_ARQUIVO";
+const APK_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=1LAo1ZB4tD0VUNUMuvmI6iUrmFMrK7JPB";
 
 export const Route = createFileRoute("/")({
   head: () => ({
