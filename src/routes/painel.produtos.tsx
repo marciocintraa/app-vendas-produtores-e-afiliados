@@ -948,6 +948,91 @@ function AdminProductsPage() {
   );
 }
 
+function CoverPreviewCard({
+  cover,
+  title,
+  tagline,
+  category,
+  platform,
+  price,
+  originalPrice,
+  rating,
+  reviews,
+  gallery,
+}: {
+  cover: string;
+  title: string;
+  tagline: string;
+  category: string;
+  platform: Product["platform"];
+  price: number;
+  originalPrice?: number;
+  rating: number;
+  reviews: number;
+  gallery: string[];
+}) {
+  return (
+    <div className="flex flex-col overflow-hidden rounded-xl border border-border/70 bg-card shadow-card">
+      <div className="relative aspect-[3/2] overflow-hidden">
+        <img
+          src={cover}
+          alt={`Capa de ${title}`}
+          className="h-full w-full object-cover"
+        />
+        <span className="absolute left-2 top-2 rounded-full bg-background/70 px-2 py-0.5 text-[10px] font-medium backdrop-blur">
+          {platform}
+        </span>
+      </div>
+      <div className="flex flex-1 flex-col gap-2 p-3">
+        <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+          <span className="truncate">{category}</span>
+          <span className="inline-flex items-center gap-0.5 text-foreground/80">
+            <Star className="h-3 w-3 fill-accent text-accent" />
+            {rating.toFixed(1)}
+            <span className="text-muted-foreground">({reviews})</span>
+          </span>
+        </div>
+        <div>
+          <h4 className="font-display text-sm font-semibold leading-tight line-clamp-1">{title}</h4>
+          <p className="mt-0.5 text-[11px] text-muted-foreground line-clamp-2">{tagline}</p>
+        </div>
+        {gallery.length > 0 && (
+          <div className="flex items-center gap-1">
+            {gallery.slice(0, 3).map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt=""
+                className="h-7 w-7 rounded border border-border/60 object-cover"
+              />
+            ))}
+            {gallery.length > 3 && (
+              <span className="rounded border border-border/60 bg-surface px-1 py-0.5 text-[9px] text-muted-foreground">
+                +{gallery.length - 3}
+              </span>
+            )}
+          </div>
+        )}
+        <div className="mt-auto flex items-end justify-between pt-1">
+          <div>
+            {originalPrice !== undefined && originalPrice > 0 && (
+              <div className="text-[9px] text-muted-foreground line-through">
+                R$ {originalPrice.toFixed(0)}
+              </div>
+            )}
+            <div className="font-display text-sm font-semibold text-foreground">
+              R$ {price.toFixed(0)}
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-0.5 text-[10px] text-primary">
+            Ver <ArrowRight className="h-3 w-3" />
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function Field({
   label,
   children,
