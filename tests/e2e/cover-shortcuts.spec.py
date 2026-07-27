@@ -539,7 +539,27 @@ async def main() -> int:
             trace_asset=trace_asset,
             video_asset=video_asset,
         )
+        # Machine-readable summary consumed by the aggregated index page.
+        summary_path = SCREENSHOTS / f"report-{browser_name}.json"
+        passed_ct = sum(1 for r in results if r["status"] == "passed")
+        failed_ct = sum(1 for r in results if r["status"] == "failed")
+        summary_path.write_text(json.dumps({
+            "browser": browser_name,
+            "overall": "passed" if failed_ct == 0 else "failed",
+            "passed": passed_ct,
+            "failed": failed_ct,
+            "total": len(results),
+            "duration_ms": suite_duration_ms,
+            "report": report_path.name,
+            "trace": trace_asset,
+            "video": video_asset,
+            "scenarios": [
+                {"name": r["name"], "status": r["status"], "duration_ms": r.get("duration_ms", 0)}
+                for r in results
+            ],
+        }, indent=2), encoding="utf-8")
         print(f"report saved: {report_path}")
+        print(f"summary saved: {summary_path}")
 
         print("")
         if failures:
