@@ -755,7 +755,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
 
     function firstErrorMessage(errRaw) {{
       if (!errRaw) return '';
-      const lines = errRaw.split('\n').map(line => line.trimEnd()).filter(line => line.length > 0);
+      const lines = errRaw.split(String.fromCharCode(10)).map(line => line.trimEnd()).filter(line => line.length > 0);
       return lines.length ? lines[0] : '';
     }}
 
