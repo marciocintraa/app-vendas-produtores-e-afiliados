@@ -125,13 +125,43 @@ async def modal_is_open(page: Page) -> bool:
 
 
 async def final_modal_is_open(page: Page) -> bool:
-    return await page.locator("text=Comparar capas antes de salvar").count() > 0 \
-        or await page.locator("text=ATUAL").count() > 0 and await page.locator("text=NOVA").count() > 0
+    return await page.locator("text=Confirmação final da troca de capa").count() > 0
+
+
+async def close_final_confirm(page: Page) -> None:
+    if await final_modal_is_open(page):
+        # The final-confirm modal footer's Cancelar button
+        loc = page.locator("div.z-\\[90\\] button:has-text('Cancelar')").first
+        if await loc.count() > 0:
+            await loc.click()
+            await page.wait_for_timeout(150)
+
+
+async def close_confirm_modal(page: Page) -> None:
+    await close_final_confirm(page)
+    if await modal_is_open(page):
+        # First-level modal Cancelar (avoid final-confirm scope)
+        loc = page.locator("div.z-\\[60\\] button:has-text('Cancelar')").first
+        if await loc.count() == 0:
+            loc = page.get_by_role("button", name="Cancelar").first
+        await loc.click()
+        await page.wait_for_timeout(150)
+
+
+async def close_editor(page: Page) -> None:
+    await close_confirm_modal(page)
+    fechar = page.get_by_role("button", name="Fechar").first
+    if await fechar.count() > 0 and await fechar.is_visible():
+        try:
+            await fechar.click(timeout=1500)
+            await page.wait_for_timeout(150)
+        except Exception:
+            pass
 
 
 async def validation_status(page: Page) -> str:
     """Read the confirm button's disabled attribute as a proxy for validation state."""
-    btn = page.get_by_role("button", name="Sim, trocar capa")
+    btn = page.get_by_role("button", name="Confirmar troca de capa")
     if await btn.count() == 0:
         return "missing"
     disabled = await btn.first.is_disabled()
@@ -151,11 +181,11 @@ async def wait_for_validation(page: Page, expect: str, timeout_ms: int = 8000) -
 
 
 async def select_candidate(page: Page, data_url: str) -> None:
-    """Click a gallery candidate inside the modal by its src."""
-    loc = page.locator(f"div.fixed >> img[src='{data_url}']").first
-    await loc.scroll_into_view_if_needed()
-    # The clickable wrapper is the parent button/div; click the image itself works too.
-    await loc.click()
+    """Click a gallery candidate button inside the modal by its <img src>."""
+    btn = page.locator(f"div.z-\\[60\\] button:has(img[src='{data_url}'])").first
+    await btn.scroll_into_view_if_needed()
+    await btn.click()
+
 
 
 async def press(page: Page, key: str) -> None:
