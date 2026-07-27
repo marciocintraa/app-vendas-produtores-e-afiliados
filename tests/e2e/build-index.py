@@ -906,14 +906,55 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
 
     const fCopyModeReset = document.getElementById('failedCopyModeReset');
     const fCopyModeCancel = document.getElementById('failedCopyModeCancel');
+    const fCopyModeUndo = document.getElementById('failedCopyModeUndo');
     const fCopyModeResetGroup = document.getElementById('failedCopyModeResetGroup');
-    if (fCopyModeReset && fCopyModeCancel && fCopyModeResetGroup) {{
+    if (fCopyModeReset && fCopyModeCancel && fCopyModeUndo && fCopyModeResetGroup) {{
       let resetConfirmTimer = null;
+      let undoTimer = null;
+      let previousMode = null;
       const DEFAULT_LABEL = 'Reset mode';
       const CONFIRM_LABEL = 'Confirm reset?';
+      const UNDO_LABEL = 'Undo';
+
+      function clearUndoTimer() {{
+        if (undoTimer) {{ clearTimeout(undoTimer); undoTimer = null; }}
+      }}
+
+      function showUndo(modeToRestore) {{
+        clearUndoTimer();
+        previousMode = modeToRestore;
+        fCopyModeUndo.style.display = 'inline-block';
+        fCopyModeReset.style.display = 'none';
+        fCopyModeCancel.style.display = 'none';
+        fCopyModeUndo.textContent = UNDO_LABEL;
+        fCopyModeUndo.classList.remove('copied');
+        undoTimer = setTimeout(() => hideUndo(), 8000);
+      }}
+
+      function hideUndo() {{
+        clearUndoTimer();
+        previousMode = null;
+        fCopyModeUndo.style.display = 'none';
+        fCopyModeReset.style.display = '';
+      }}
+
+      function undoReset() {{
+        if (!previousMode || !fCopyMode) return;
+        fCopyMode.value = previousMode;
+        saveCopyMode(previousMode);
+        updateCopyMatchesAllState();
+        hideUndo();
+        fCopyModeReset.classList.add('copied');
+        fCopyModeReset.textContent = 'undone';
+        setTimeout(() => {{
+          fCopyModeReset.classList.remove('copied');
+          fCopyModeReset.textContent = DEFAULT_LABEL;
+        }}, 1200);
+      }}
 
       function setConfirming(isConfirming) {{
         if (isConfirming) {{
+          hideUndo();
           fCopyModeResetGroup.classList.add('confirming');
           fCopyModeReset.textContent = CONFIRM_LABEL;
           fCopyModeReset.title = 'Click again to reset the copy mode and clear localStorage';
@@ -936,16 +977,12 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
 
       function performReset() {{
         cancelResetConfirm();
+        const modeBeforeReset = fCopyMode ? fCopyMode.value : 'matches';
         const DEFAULT_MODE = 'matches';
         if (fCopyMode) fCopyMode.value = DEFAULT_MODE;
         try {{ localStorage.removeItem(COPY_MODE_KEY); }} catch (e) {{}}
         updateCopyMatchesAllState();
-        fCopyModeReset.classList.add('copied');
-        fCopyModeReset.textContent = 'reset';
-        setTimeout(() => {{
-          fCopyModeReset.classList.remove('copied');
-          setConfirming(false);
-        }}, 1200);
+        showUndo(modeBeforeReset);
       }}
 
       fCopyModeReset.addEventListener('click', () => {{
@@ -964,6 +1001,10 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         cancelResetConfirm();
       }});
 
+      fCopyModeUndo.addEventListener('click', () => {{
+        undoReset();
+      }});
+
       // Cancel confirmation if the user interacts with other toolbar controls.
       ['click', 'input', 'change'].forEach(evt => {{
         fCopyModeResetGroup.parentElement.addEventListener(evt, (e) => {{
@@ -974,6 +1015,13 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
           }}
         }}, true);
       }});
+
+      // Hide undo when the user manually changes the copy mode.
+      if (fCopyMode) {{
+        fCopyMode.addEventListener('change', () => {{
+          if (fCopyModeUndo.style.display !== 'none') hideUndo();
+        }});
+      }}
     }}
 
     restoreCopyMode();
