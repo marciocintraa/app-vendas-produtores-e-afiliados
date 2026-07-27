@@ -113,9 +113,10 @@ async def open_modal(page: Page) -> None:
     """Open the product editor, then the cover-swap modal via the cover 'Remover' button."""
     # Open editor
     await page.get_by_role("button", name="Editar").first.click()
-    await page.wait_for_selector("text=Capa principal", timeout=5000)
-    # Trigger the cover-swap modal
-    await page.get_by_role("button", name="Remover", exact=False).first.click()
+    await page.wait_for_selector("text=Imagem de capa", timeout=5000)
+    # Trigger the cover-swap modal (the cover-section 'Remover' button; gallery
+    # variants use the aria-label 'Remover imagem' and are excluded by exact=True).
+    await page.get_by_role("button", name="Remover", exact=True).first.click()
     await page.wait_for_selector("text=Trocar capa principal?", timeout=5000)
 
 
