@@ -62,6 +62,8 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
                 continue
             name = _html.escape(sc.get("name", "(unnamed)"))
             dur = sc.get("duration_ms", 0)
+            err_raw = sc.get("error") or ""
+            err_attr = _html.escape(err_raw, quote=True)
             links = []
             if trace_href:
                 links.append(f'<a class="inline-link trace" href="{trace_href}" download title="Download trace.zip">trace</a>')
@@ -71,7 +73,8 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
             rows.append(
                 f'<tr data-engine="{engine}" data-name="{name.lower()}" data-duration="{dur}"'
                 f' data-trace="{"1" if trace_href else "0"}" data-video="{"1" if video_href else "0"}"'
-                f' data-trace-href="{trace_href or ""}" data-video-href="{video_href or ""}">'
+                f' data-trace-href="{trace_href or ""}" data-video-href="{video_href or ""}"'
+                f' data-error="{err_attr}">'
                 f'<td class="eng">{engine}</td>'
                 f'<td class="sc"><span class="scn">{name}</span>{links_html}</td>'
                 f'<td class="dur">{dur} ms</td></tr>'
