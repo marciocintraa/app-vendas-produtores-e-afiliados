@@ -489,16 +489,16 @@ function AdminProductsPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            if (editing.gallery.some((g) => g === editing.cover)) {
-                              setError(
-                                "Escolha outra imagem da galeria como capa antes de remover a atual.",
-                              );
-                              return;
-                            }
+                            const next = editing.gallery.find((g) => g !== editing.cover) ?? "";
                             setError(null);
-                            setEditing({ ...editing, cover: "" });
+                            setEditing({ ...editing, cover: next });
                           }}
                           className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                          title={
+                            editing.gallery.some((g) => g !== editing.cover)
+                              ? "A próxima imagem da galeria será usada como capa."
+                              : "Remove a capa."
+                          }
                         >
                           <Trash2 className="h-3.5 w-3.5" /> Remover
                         </button>
@@ -600,21 +600,24 @@ function AdminProductsPage() {
                               <button
                                 type="button"
                                 onClick={() => {
-                                  if (editing.cover === src) {
-                                    setError(
-                                      "Esta é a imagem de capa. Escolha outra capa da galeria (botão de estrela) antes de removê-la.",
-                                    );
-                                    return;
-                                  }
                                   setError(null);
-                                  setEditing((prev) =>
-                                    prev
-                                      ? { ...prev, gallery: prev.gallery.filter((_, j) => j !== i) }
-                                      : prev,
-                                  );
+                                  setEditing((prev) => {
+                                    if (!prev) return prev;
+                                    const nextGallery = prev.gallery.filter((_, j) => j !== i);
+                                    const nextCover =
+                                      prev.cover === src
+                                        ? nextGallery[0] ?? ""
+                                        : prev.cover;
+                                    return { ...prev, gallery: nextGallery, cover: nextCover };
+                                  });
                                 }}
                                 className="rounded-md bg-background/80 p-1 text-muted-foreground backdrop-blur transition-colors hover:text-destructive"
                                 aria-label="Remover imagem"
+                                title={
+                                  editing.cover === src
+                                    ? "Remover — a próxima imagem da galeria vira capa."
+                                    : "Remover imagem"
+                                }
                               >
                                 <X className="h-3.5 w-3.5" />
                               </button>
