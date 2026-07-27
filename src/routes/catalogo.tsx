@@ -109,7 +109,7 @@ function CatalogPage() {
             >
               Todas
             </button>
-            {CATEGORIES.map((c) => (
+            {categories.map((c: string) => (
               <button
                 key={c}
                 onClick={() => setCategory(c)}
