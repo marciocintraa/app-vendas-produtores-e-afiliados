@@ -98,8 +98,9 @@ type ConfirmState = {
   title: string;
   description: string;
   actionLabel: string;
-  nextCover?: string;
-  onConfirm: () => void;
+  candidates: string[];
+  selectedNext: string;
+  onConfirm: (nextCover: string) => void;
 };
 
 function AdminProductsPage() {
@@ -113,6 +114,8 @@ function AdminProductsPage() {
     title: "",
     description: "",
     actionLabel: "",
+    candidates: [],
+    selectedNext: "",
     onConfirm: () => {},
   });
 
@@ -514,8 +517,8 @@ function AdminProductsPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            const next = editing.gallery.find((g) => g !== editing.cover) ?? "";
-                            if (!next) {
+                            const candidates = editing.gallery.filter((g) => g !== editing.cover);
+                            if (candidates.length === 0) {
                               setError(null);
                               setEditing({ ...editing, cover: "" });
                               return;
@@ -523,12 +526,13 @@ function AdminProductsPage() {
                             openConfirm({
                               title: "Trocar capa principal?",
                               description:
-                                "A imagem atual é a capa do produto. Removê-la promoverá automaticamente a próxima imagem da galeria como nova capa.",
+                                "A imagem atual é a capa do produto. Escolha abaixo qual imagem da galeria será a nova capa.",
                               actionLabel: "Sim, trocar capa",
-                              nextCover: next,
-                              onConfirm: () => {
+                              candidates,
+                              selectedNext: candidates[0],
+                              onConfirm: (nextCover) => {
                                 setError(null);
-                                setEditing({ ...editing, cover: next });
+                                setEditing({ ...editing, cover: nextCover });
                                 closeConfirm();
                               },
                             });
@@ -649,14 +653,15 @@ function AdminProductsPage() {
                                     );
                                     return;
                                   }
-                                  const nextGallery = editing.gallery.filter((_, j) => j !== i);
+                                  const candidates = editing.gallery.filter((_, j) => j !== i);
                                   openConfirm({
                                     title: "Trocar capa principal?",
                                     description:
-                                      "Esta imagem é a capa atual do produto. Removê-la promoverá automaticamente a próxima imagem da galeria como nova capa.",
+                                      "Esta imagem é a capa atual do produto. Escolha abaixo qual imagem da galeria será a nova capa.",
                                     actionLabel: "Sim, trocar capa",
-                                    nextCover: nextGallery[0] ?? "",
-                                    onConfirm: () => {
+                                    candidates,
+                                    selectedNext: candidates[0] ?? "",
+                                    onConfirm: (nextCover) => {
                                       setError(null);
                                       setEditing((prev) => {
                                         if (!prev) return prev;
@@ -664,7 +669,7 @@ function AdminProductsPage() {
                                         return {
                                           ...prev,
                                           gallery: next,
-                                          cover: next[0] ?? "",
+                                          cover: nextCover,
                                         };
                                       });
                                       closeConfirm();
@@ -829,20 +834,33 @@ function AdminProductsPage() {
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 {confirm.description}
               </p>
-              {confirm.nextCover ? (
+              {confirm.candidates.length > 0 ? (
                 <div className="mt-5 w-full rounded-xl border border-border/60 bg-surface/60 p-3 text-left">
                   <p className="mb-2 text-xs font-medium text-muted-foreground">
-                    Próxima capa do produto:
+                    Selecione a nova capa:
                   </p>
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={confirm.nextCover}
-                      alt="Próxima capa"
-                      className="h-16 w-24 rounded-lg object-cover"
-                    />
-                    <p className="text-sm font-medium text-foreground">
-                      Esta imagem será promovida automaticamente.
-                    </p>
+                  <div className="grid grid-cols-4 gap-2">
+                    {confirm.candidates.map((src) => (
+                      <button
+                        key={src}
+                        type="button"
+                        onClick={() =>
+                          setConfirm((prev) => ({ ...prev, selectedNext: src }))
+                        }
+                        className={`relative aspect-[4/3] overflow-hidden rounded-lg border-2 transition-all ${
+                          confirm.selectedNext === src
+                            ? "border-primary ring-2 ring-primary/40"
+                            : "border-border/60 hover:border-primary/50"
+                        }`}
+                      >
+                        <img src={src} alt="" className="h-full w-full object-cover" />
+                        {confirm.selectedNext === src && (
+                          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-primary/90 px-1 py-0.5 text-center text-[10px] font-semibold text-primary-foreground">
+                            NOVA CAPA
+                          </div>
+                        )}
+                      </button>
+                    ))}
                   </div>
                 </div>
               ) : (
@@ -861,7 +879,7 @@ function AdminProductsPage() {
               </button>
               <button
                 type="button"
-                onClick={confirm.onConfirm}
+                onClick={() => confirm.onConfirm(confirm.selectedNext)}
                 className="rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
               >
                 {confirm.actionLabel}
