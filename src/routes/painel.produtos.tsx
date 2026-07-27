@@ -458,6 +458,58 @@ function AdminProductsPage() {
     return () => ctrl.abort();
   }, [confirm.selectedNext, confirm.open]);
 
+  function isTypingTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) return false;
+    const tag = target.tagName.toLowerCase();
+    return (
+      tag === "input" ||
+      tag === "textarea" ||
+      tag === "select" ||
+      target.isContentEditable
+    );
+  }
+
+  function isActionTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) return false;
+    const tag = target.tagName.toLowerCase();
+    return (
+      tag === "button" ||
+      tag === "a" ||
+      target.getAttribute("role") === "button" ||
+      target.getAttribute("role") === "link"
+    );
+  }
+
+  useEffect(() => {
+    if (!confirm.open || finalConfirm.open) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (isTypingTarget(e.target)) return;
+      const mod = e.ctrlKey || e.metaKey;
+      if (mod && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        if (canUndoCover || (editing?.cover && confirm.selectedNext !== editing.cover)) {
+          undoCoverSelection();
+        } else {
+          toast.message("Nada para desfazer.");
+        }
+        return;
+      }
+      if (e.key === "Enter" && !e.shiftKey && !e.altKey && !isActionTarget(e.target)) {
+        e.preventDefault();
+        requestFinalConfirm();
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [
+    confirm.open,
+    confirm.selectedNext,
+    editing?.cover,
+    canUndoCover,
+    finalConfirm.open,
+    coverValidation,
+  ]);
+
 
   function openConfirm(opts: Omit<ConfirmState, "open">) {
     coverHistoryRef.current = [editing?.cover ?? ""];
@@ -1360,9 +1412,10 @@ function AdminProductsPage() {
                 <button
                   type="button"
                   onClick={undoCoverSelection}
+                  title="Desfazer seleção (Ctrl+Z)"
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
                 >
-                  <Undo className="h-4 w-4" /> Desfazer
+                  <Undo className="h-4 w-4" /> Desfazer <span className="hidden text-[10px] opacity-60 sm:inline">Ctrl+Z</span>
                 </button>
               )}
               {confirm.candidates.length > 0 && (
@@ -1381,6 +1434,12 @@ function AdminProductsPage() {
                   coverValidation.status !== "valid" ||
                   coverValidation.src !== confirm.selectedNext
                 }
+                title={
+                  coverValidation.status === "valid" &&
+                  coverValidation.src === confirm.selectedNext
+                    ? "Confirmar troca de capa (Enter)"
+                    : "Aguarde a validação da nova capa"
+                }
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
               >
                 {coverValidation.status === "validating" &&
@@ -1389,7 +1448,10 @@ function AdminProductsPage() {
                     <Loader2 className="h-4 w-4 animate-spin" /> Validando…
                   </>
                 ) : (
-                  confirm.actionLabel
+                  <>
+                    {confirm.actionLabel}{" "}
+                    <span className="hidden text-[10px] opacity-70 sm:inline">Enter</span>
+                  </>
                 )}
               </button>
             </div>
@@ -1479,10 +1541,12 @@ function AdminProductsPage() {
           <button
             type="button"
             onClick={requestFinalConfirm}
+            title="Confirmar troca de capa (Enter)"
             className="fixed bottom-24 right-6 z-[80] inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-3 text-sm font-semibold text-destructive-foreground shadow-2xl shadow-destructive/40 ring-1 ring-destructive/60 transition-transform hover:scale-[1.03] sm:bottom-28 sm:right-10"
-            aria-label="Confirmar troca de capa"
+            aria-label="Confirmar troca de capa (Enter)"
           >
-            <Check className="h-4 w-4" /> Confirmar troca de capa
+            <Check className="h-4 w-4" /> Confirmar troca de capa{" "}
+            <span className="hidden text-[10px] opacity-70 sm:inline">Enter</span>
           </button>
 
           <div className="border-t border-border/60 bg-surface/60 px-6 py-4">
@@ -1498,17 +1562,21 @@ function AdminProductsPage() {
                 <button
                   type="button"
                   onClick={undoCoverSelection}
+                  title="Desfazer seleção (Ctrl+Z)"
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
                 >
-                  <Undo className="h-4 w-4" /> Desfazer
+                  <Undo className="h-4 w-4" /> Desfazer{" "}
+                  <span className="hidden text-[10px] opacity-60 sm:inline">Ctrl+Z</span>
                 </button>
               )}
               <button
                 type="button"
                 onClick={requestFinalConfirm}
-                className="rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
+                title="Confirmar troca de capa (Enter)"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
               >
-                {confirm.actionLabel}
+                {confirm.actionLabel}{" "}
+                <span className="hidden text-[10px] opacity-70 sm:inline">Enter</span>
               </button>
             </div>
           </div>
