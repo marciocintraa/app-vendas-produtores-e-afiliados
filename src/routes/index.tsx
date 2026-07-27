@@ -268,11 +268,11 @@ function Pricing() {
   const plans = [
     {
       name: "Starter",
-      price: "R$ 47",
+      price: "R$ 57",
       per: "/mês",
       desc: "Para começar a vender com um catálogo enxuto.",
       features: [
-        "Até 20 produtos",
+        "Até 2 produtos",
         "Categorias básicas",
         "Tema padrão",
         "Estatísticas básicas",
@@ -286,7 +286,7 @@ function Pricing() {
       per: "/mês",
       desc: "Para produtores em crescimento que querem escalar.",
       features: [
-        "Até 100 produtos",
+        "Até 5 produtos",
         "Categorias ilimitadas",
         "Personalização visual",
         "Notificações push",
@@ -297,7 +297,7 @@ function Pricing() {
     },
     {
       name: "Premium",
-      price: "R$ 197",
+      price: "R$ 157",
       per: "/mês",
       desc: "Para operações profissionais com marca própria.",
       features: [
