@@ -143,6 +143,7 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
       <button type="button" id="failedExpandAll" class="failed-clear" title="Expand error details for all visible rows">Expand all</button>
       <button type="button" id="failedCollapseAll" class="failed-clear" title="Collapse error details for all visible rows">Collapse all</button>
       <button type="button" id="failedExport" class="failed-clear failed-export" title="Export filtered failures to CSV">Export CSV ↓</button>
+      <button type="button" id="failedCopyMatchesAll" class="failed-clear failed-copy-matches-global" title="Copy matching error lines from all visible rows">Copy matches from visible rows</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
     </div>
     <table class="failed-table">
@@ -353,6 +354,10 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .failed-clear:hover {{ background: #334155; }}
   .failed-export {{ background: #052e1a; color: #4ade80; }}
   .failed-export:hover {{ background: #064e2c; }}
+  .failed-copy-matches-global {{ background: #0c1a33; color: #93c5fd; border: 1px dashed #1e3a8a; }}
+  .failed-copy-matches-global:hover {{ background: #13254a; color: #e0f2fe; border-color: #38bdf8; }}
+  .failed-copy-matches-global.copied {{ background: #052e1a; color: #34d399; border-style: solid; border-color: #14532d; }}
+  .failed-copy-matches-global:disabled {{ opacity: .45; cursor: not-allowed; }}
   .failed-error-input {{ flex: 0 1 200px; min-width: 160px; }}
   .failed-check {{ display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
                     color: #cbd5e1; cursor: pointer; user-select: none; }}
@@ -612,7 +617,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         const term = (fError.value || '').trim();
         if (!err || !term) return;
         const termLower = term.toLowerCase();
-        const matches = err.split(/\\r?\\n/).filter(line => line.toLowerCase().includes(termLower));
+        const matches = err.split('\\n').map(line => line.trimEnd()).filter(line => line.toLowerCase().includes(termLower));
         if (!matches.length) {{
           copyMatchesBtn.title = 'No matching lines';
           return;
@@ -713,6 +718,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
 
       fCount.textContent = visible + ' of ' + totalRows + ' failure' + (totalRows === 1 ? '' : 's');
       fEmpty.style.display = visible === 0 ? '' : 'none';
+      updateCopyMatchesAllState();
     }}
     fSearch.addEventListener('input', applyFilters);
     fEngine.addEventListener('change', applyFilters);
@@ -735,6 +741,55 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     fCollapseAll.addEventListener('click', () => {{
       rows.forEach(r => manualOpen.delete(r));
       applyFilters();
+    }});
+
+    const fCopyMatchesAll = document.getElementById('failedCopyMatchesAll');
+    function updateCopyMatchesAllState() {{
+      const errTerm = (fError.value || '').trim().toLowerCase();
+      const hasVisibleMatches = rows.some(r => {{
+        if (r.classList.contains('hidden')) return false;
+        const errRaw = r.dataset.error || '';
+        return errTerm && errRaw && errRaw.toLowerCase().includes(errTerm);
+      }});
+      fCopyMatchesAll.disabled = !errTerm || !hasVisibleMatches;
+      fCopyMatchesAll.title = !errTerm
+        ? 'Type an error filter term to enable copying matching lines'
+        : (hasVisibleMatches ? 'Copy matching error lines from all visible rows' : 'No visible rows match the current error filter');
+    }}
+    fCopyMatchesAll.addEventListener('click', () => {{
+      const errTerm = (fError.value || '').trim().toLowerCase();
+      if (!errTerm) return;
+      const termLower = errTerm;
+      const chunks = [];
+      let totalMatches = 0;
+      rows.forEach(r => {{
+        if (r.classList.contains('hidden')) return;
+        const errRaw = r.dataset.error || '';
+        if (!errRaw || !errRaw.toLowerCase().includes(termLower)) return;
+        const engine = r.dataset.engine || '';
+        const scn = r.querySelector('.scn');
+        const name = originalHtml.get(r) || (scn ? scn.textContent : '');
+        const matches = errRaw.split('\\n').map(line => line.trimEnd()).filter(line => line.toLowerCase().includes(termLower));
+        if (!matches.length) return;
+        totalMatches += matches.length;
+        chunks.push('[' + engine + '] ' + name + '\\n' + matches.join('\\n'));
+      }});
+      if (!chunks.length) {{
+        fCopyMatchesAll.title = 'No matching lines in visible rows';
+        return;
+      }}
+      navigator.clipboard.writeText(chunks.join('\\n\\n')).then(() => {{
+        fCopyMatchesAll.classList.add('copied');
+        const original = fCopyMatchesAll.textContent;
+        fCopyMatchesAll.textContent = 'copied ' + totalMatches + (totalMatches === 1 ? ' line' : ' lines');
+        setTimeout(() => {{
+          fCopyMatchesAll.classList.remove('copied');
+          fCopyMatchesAll.textContent = original;
+          updateCopyMatchesAllState();
+        }}, 1500);
+      }}).catch(() => {{
+        fCopyMatchesAll.title = 'Unable to copy';
+      }});
     }});
 
     applyFilters();
