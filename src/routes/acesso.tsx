@@ -232,11 +232,7 @@ function AccessPage() {
               </button>
             </form>
             <p className="text-xs text-muted-foreground mt-4">
-              Também pode conferir o status em{" "}
-              <Link to="/entrega" className="text-primary hover:underline">
-                /entrega
-              </Link>
-              .
+              Após a compra na Hotmart, use o mesmo email do checkout.
             </p>
           </>
         )}
