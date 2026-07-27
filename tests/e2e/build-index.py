@@ -76,8 +76,16 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
                 ' title="Show error"><span class="chev">▸</span> error</button>'
                 if err_raw else ""
             )
+            copy_btn = (
+                '<button type="button" class="err-copy" title="Copy full error stack">'
+                '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">'
+                '<rect x="2" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/>'
+                '<path d="M5 2h9v9" fill="none" stroke="currentColor" stroke-width="1.5"/>'
+                '</svg> copy</button>'
+                if err_raw else ""
+            )
             err_block = (
-                f'{err_toggle}<pre class="err-text" hidden>{err_preview}</pre>'
+                f'{err_toggle}{copy_btn}<pre class="err-text" hidden>{err_preview}</pre>'
                 if err_raw else ""
             )
             rows.append(
@@ -353,6 +361,14 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .err-toggle[aria-expanded="true"] {{ color: #fca5a5; border-color: #7f1d1d; }}
   .err-toggle[aria-expanded="true"] .chev {{ transform: rotate(90deg); }}
   .err-toggle.auto {{ border-style: dashed; }}
+  .err-copy {{ margin: 8px 0 0 8px; display: inline-flex; align-items: center; gap: 4px;
+               background: transparent; border: 1px solid #1f2937; color: #94a3b8;
+               border-radius: 6px; padding: 2px 8px; font-size: 10.5px;
+               text-transform: uppercase; letter-spacing: .05em; cursor: pointer;
+               transition: color .15s ease, border-color .15s ease, background .15s ease; }}
+  .err-copy:hover {{ color: #e2e8f0; border-color: #334155; background: #1e293b; }}
+  .err-copy.copied {{ color: #34d399; border-color: #14532d; background: #052e1a; }}
+  .err-copy svg {{ vertical-align: middle; }}
 
   .err-text {{ margin: 8px 0 0; padding: 8px 10px; background: #0b1120;
                border: 1px solid #1f2937; border-left: 3px solid #7f1d1d;
@@ -568,11 +584,31 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     const manualOpen = new WeakSet();
     fBody.addEventListener('click', (e) => {{
       const btn = e.target.closest('.err-toggle');
-      if (!btn) return;
-      const r = btn.closest('tr');
-      if (!r) return;
-      if (manualOpen.has(r)) manualOpen.delete(r); else manualOpen.add(r);
-      applyFilters();
+      if (btn) {{
+        const r = btn.closest('tr');
+        if (!r) return;
+        if (manualOpen.has(r)) manualOpen.delete(r); else manualOpen.add(r);
+        applyFilters();
+        return;
+      }}
+      const copyBtn = e.target.closest('.err-copy');
+      if (copyBtn) {{
+        const r = copyBtn.closest('tr');
+        const err = r ? (r.dataset.error || '') : '';
+        if (!err) return;
+        navigator.clipboard.writeText(err).then(() => {{
+          copyBtn.classList.add('copied');
+          const original = copyBtn.innerHTML;
+          copyBtn.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M2 9l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg> copied';
+          setTimeout(() => {{
+            copyBtn.classList.remove('copied');
+            copyBtn.innerHTML = original;
+          }}, 1500);
+        }}).catch(() => {{
+          copyBtn.title = 'Unable to copy';
+        }});
+        return;
+      }}
     }});
 
     function applyFilters() {{
