@@ -188,9 +188,13 @@ async def select_candidate(page: Page, data_url: str) -> None:
 
 
 async def press(page: Page, key: str) -> None:
-    # Ensure focus is on body so shortcut handler receives it (not on an <input>).
-    await page.evaluate("() => document.body.focus()")
+    # Blur any focused actionable element so the global keydown handler runs
+    # (isActionTarget short-circuits the handler when a button/link owns focus).
+    await page.evaluate(
+        "() => { const a = document.activeElement; if (a && typeof a.blur === 'function') a.blur(); }"
+    )
     await page.keyboard.press(key)
+
 
 
 async def scenario_shortcuts_ignored_before_modal(page: Page) -> None:
