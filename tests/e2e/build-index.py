@@ -554,7 +554,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     fExport.addEventListener('click', () => {{
       const base = window.location.href.replace(/[?#].*$/, '');
       const visibleRows = rows.filter(r => !r.classList.contains('hidden'));
-      const header = ['engine', 'scenario', 'duration_ms', 'trace_url', 'video_url'];
+      const header = ['engine', 'scenario', 'duration_ms', 'trace_url', 'video_url', 'error'];
       const lines = [header.join(',')];
       visibleRows.forEach(r => {{
         const engine = r.dataset.engine || '';
@@ -565,7 +565,8 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         const vh = r.dataset.videoHref || '';
         const tUrl = th ? new URL(th, base).href : '';
         const vUrl = vh ? new URL(vh, base).href : '';
-        lines.push([engine, name, dur, tUrl, vUrl].map(csvEscape).join(','));
+        const err = r.dataset.error || '';
+        lines.push([engine, name, dur, tUrl, vUrl, err].map(csvEscape).join(','));
       }});
       const blob = new Blob(['\\ufeff' + lines.join('\\r\\n')], {{ type: 'text/csv;charset=utf-8;' }});
       const url = URL.createObjectURL(blob);
