@@ -127,6 +127,17 @@ function AdminProductsPage() {
     actionLabel: "",
     candidates: [],
     selectedNext: "",
+    preview: {
+      title: "",
+      tagline: "",
+      category: "",
+      platform: "Hotmart",
+      price: 0,
+      originalPrice: undefined,
+      rating: 5,
+      reviews: 0,
+      gallery: [],
+    },
     onConfirm: () => {},
   });
 
