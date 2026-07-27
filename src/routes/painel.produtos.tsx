@@ -963,7 +963,7 @@ function AdminProductsPage() {
               )}
               <button
                 type="button"
-                onClick={() => confirm.onConfirm(confirm.selectedNext)}
+                onClick={requestFinalConfirm}
                 className="rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
               >
                 {confirm.actionLabel}
@@ -1053,10 +1053,7 @@ function AdminProductsPage() {
           </div>
           <button
             type="button"
-            onClick={() => {
-              setFullPreview(false);
-              confirm.onConfirm(confirm.selectedNext);
-            }}
+            onClick={requestFinalConfirm}
             className="fixed bottom-24 right-6 z-[80] inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-3 text-sm font-semibold text-destructive-foreground shadow-2xl shadow-destructive/40 ring-1 ring-destructive/60 transition-transform hover:scale-[1.03] sm:bottom-28 sm:right-10"
             aria-label="Confirmar troca de capa"
           >
@@ -1074,10 +1071,7 @@ function AdminProductsPage() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setFullPreview(false);
-                  confirm.onConfirm(confirm.selectedNext);
-                }}
+                onClick={requestFinalConfirm}
                 className="rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
               >
                 {confirm.actionLabel}
