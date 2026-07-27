@@ -554,7 +554,8 @@ async def main() -> int:
             "trace": trace_asset,
             "video": video_asset,
             "scenarios": [
-                {"name": r["name"], "status": r["status"], "duration_ms": r.get("duration_ms", 0)}
+                {"name": r["name"], "status": r["status"], "duration_ms": r.get("duration_ms", 0),
+                 "error": r.get("error")}
                 for r in results
             ],
         }, indent=2), encoding="utf-8")
