@@ -1,9 +1,10 @@
-import { createFileRoute, redirect, Link } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { useEffect, useState, useRef } from "react";
-import { Loader2, Mail, AlertCircle, CheckCircle, RefreshCw, ArrowLeft } from "lucide-react";
+import { Loader2, Mail, AlertCircle, CheckCircle, RefreshCw } from "lucide-react";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { findUserByEmail, logDelivery } from "@/lib/hotmart.server";
+
 
 
 
