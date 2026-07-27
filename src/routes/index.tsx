@@ -608,9 +608,9 @@ function CheckoutModal({ plan, onClose }: { plan: PlanId; onClose: () => void })
   const [error, setError] = useState<string | null>(null);
 
   const planLabel: Record<PlanId, string> = {
-    starter_monthly: "Starter — R$ 57/mês",
-    pro_monthly: "Pro — R$ 97/mês",
-    premium_monthly: "Premium — R$ 157/mês",
+    starter_monthly: "Individual — R$ 37/mês",
+    pro_monthly: "Familiar — R$ 57/mês",
+    premium_monthly: "Premium — R$ 97/mês",
   };
 
   const formatCpf = (v: string) => {
@@ -740,7 +740,7 @@ function FAQ() {
       id: "planos",
       question: "Quantos produtos posso cadastrar em cada plano?",
       answer:
-        "O plano Starter permite até 2 produtos, o Pro até 5 produtos, e o Premium é ilimitado. Você pode trocar de plano a qualquer momento conforme seu catálogo cresce.",
+        "O plano Individual permite até 1 produto, o Familiar até 5 produtos, e o Premium é ilimitado. Você pode trocar de plano a qualquer momento conforme seu catálogo cresce.",
     },
     {
       id: "produtos",
@@ -770,7 +770,7 @@ function FAQ() {
       id: "personalizacao",
       question: "Posso personalizar cores, logo e domínio?",
       answer:
-        "Sim. Nos planos Pro e Premium você pode alterar cores, tipografia, logotipo e ícone. No Premium também é possível usar domínio próprio e configurações white label completas.",
+        "Sim. Nos planos Familiar e Premium você pode alterar cores, tipografia, logotipo e ícone. No Premium também é possível usar domínio próprio e configurações white label completas.",
     },
     {
       id: "cancelamento",

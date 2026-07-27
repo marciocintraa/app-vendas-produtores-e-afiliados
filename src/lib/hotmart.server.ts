@@ -63,7 +63,7 @@ export function planFromEvent(payload: HotmartWebhookPayload): PlanId | null {
 
   const planName = String(payload.data?.subscription?.plan?.name ?? "").toLowerCase();
   if (planName.includes("starter") || planName.includes("individual")) return "starter_monthly";
-  if (planName.includes("pro") || planName.includes("pró")) return "pro_monthly";
+  if (planName.includes("pro") || planName.includes("pró") || planName.includes("familiar")) return "pro_monthly";
   if (planName.includes("premium")) return "premium_monthly";
 
   const productId = String(payload.data?.product?.id ?? "");
