@@ -126,6 +126,8 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
       </label>
 
       <span class="failed-count muted" id="failedCount"></span>
+      <button type="button" id="failedExpandAll" class="failed-clear" title="Expand error details for all visible rows">Expand all</button>
+      <button type="button" id="failedCollapseAll" class="failed-clear" title="Collapse error details for all visible rows">Collapse all</button>
       <button type="button" id="failedExport" class="failed-clear failed-export" title="Export filtered failures to CSV">Export CSV ↓</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
     </div>
@@ -535,6 +537,8 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   const fAutoExpand = document.getElementById('failedAutoExpand');
 
   const fClear = document.getElementById('failedClear');
+  const fExpandAll = document.getElementById('failedExpandAll');
+  const fCollapseAll = document.getElementById('failedCollapseAll');
   const fCount = document.getElementById('failedCount');
   const fEmpty = document.getElementById('failedEmpty');
   const fBody = document.getElementById('failedTbody');
@@ -639,7 +643,18 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     fClear.addEventListener('click', () => {{
       fSearch.value = ''; fEngine.value = ''; fAssets.value = '';
       fError.value = ''; fHasError.checked = false; fAutoExpand.checked = true;
+      rows.forEach(r => manualOpen.delete(r));
       applyFilters(); fSearch.focus();
+    }});
+
+    fExpandAll.addEventListener('click', () => {{
+      rows.forEach(r => {{ if (!r.classList.contains('hidden')) manualOpen.add(r); }});
+      applyFilters();
+    }});
+
+    fCollapseAll.addEventListener('click', () => {{
+      rows.forEach(r => manualOpen.delete(r));
+      applyFilters();
     }});
 
     applyFilters();
