@@ -184,6 +184,19 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .pill.ok {{ background: #052e1a; color: #4ade80; }}
   .pill.err {{ background: #3f0d0d; color: #fca5a5; }}
   .pill.warn {{ background: #3a2d0a; color: #fbbf24; }}
+  .pill.trace {{ background: #1e1b4b; color: #c4b5fd; }}
+  .pill.trace:hover {{ background: #312e81; }}
+  .pill.video {{ background: #134e4a; color: #5eead4; }}
+  .pill.video:hover {{ background: #115e59; }}
+  .failed-list {{ margin-top: 14px; padding-top: 12px; border-top: 1px dashed #1f2937; }}
+  .failed-list .k {{ color: #94a3b8; font-size: 11px; text-transform: uppercase;
+                     letter-spacing: .05em; margin-bottom: 8px; }}
+  .failed-list ul {{ list-style: none; padding: 0; margin: 0 0 8px; }}
+  .failed-list li {{ display: flex; justify-content: space-between; align-items: center;
+                     gap: 8px; padding: 6px 0; border-bottom: 1px solid #111827; }}
+  .failed-list li:last-child {{ border-bottom: none; }}
+  .scname {{ color: #f87171; font-size: 13px; font-weight: 500; }}
+  .scassets {{ display: flex; gap: 6px; flex-wrap: wrap; }}
   .tabs {{ display: flex; gap: 4px; border-bottom: 1px solid #1e293b; margin-bottom: 0; }}
   .tab {{ background: transparent; color: #94a3b8; border: none;
           padding: 10px 16px; cursor: pointer; font-size: 14px;
