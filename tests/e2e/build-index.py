@@ -869,6 +869,23 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
       }});
     }}
 
+    const fCopyModeReset = document.getElementById('failedCopyModeReset');
+    if (fCopyModeReset) {{
+      fCopyModeReset.addEventListener('click', () => {{
+        const DEFAULT_MODE = 'matches';
+        if (fCopyMode) fCopyMode.value = DEFAULT_MODE;
+        try {{ localStorage.removeItem(COPY_MODE_KEY); }} catch (e) {{}}
+        updateCopyMatchesAllState();
+        fCopyModeReset.classList.add('copied');
+        const original = fCopyModeReset.textContent;
+        fCopyModeReset.textContent = 'reset';
+        setTimeout(() => {{
+          fCopyModeReset.classList.remove('copied');
+          fCopyModeReset.textContent = original;
+        }}, 1200);
+      }});
+    }}
+
     restoreCopyMode();
     updateCopyMatchesAllState();
 
