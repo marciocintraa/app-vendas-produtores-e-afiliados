@@ -135,6 +135,7 @@ import {
   Upload,
   Image as ImageIcon,
   RotateCcw,
+  Undo,
 } from "lucide-react";
 import { toast } from "sonner";
 
