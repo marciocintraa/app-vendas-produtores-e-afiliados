@@ -1382,6 +1382,53 @@ function AdminProductsPage() {
   );
 }
 
+function ValidationBadge({
+  state,
+  selected,
+}: {
+  state: {
+    src: string;
+    status: "idle" | "validating" | "valid" | "invalid";
+    message?: string;
+    meta?: CoverMeta;
+  };
+  selected: string;
+}) {
+  if (!selected) return null;
+  const matches = state.src === selected;
+  if (!matches || state.status === "idle") {
+    return (
+      <div className="mt-2 flex items-center gap-2 rounded-lg border border-border/60 bg-surface px-2.5 py-1.5 text-[11px] text-muted-foreground">
+        <Loader2 className="h-3 w-3 animate-spin" /> Preparando validação…
+      </div>
+    );
+  }
+  if (state.status === "validating") {
+    return (
+      <div className="mt-2 flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/10 px-2.5 py-1.5 text-[11px] text-primary">
+        <Loader2 className="h-3 w-3 animate-spin" /> Validando formato, tamanho e acessibilidade…
+      </div>
+    );
+  }
+  if (state.status === "valid" && state.meta) {
+    const { width, height, mime, bytes } = state.meta;
+    const size = bytes ? ` · ${(bytes / 1024).toFixed(0)} KB` : "";
+    return (
+      <div className="mt-2 flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1.5 text-[11px] text-emerald-500">
+        <Check className="h-3 w-3" /> Imagem válida · {width}×{height}
+        {mime ? ` · ${mime}` : ""}
+        {size}
+      </div>
+    );
+  }
+  return (
+    <div className="mt-2 flex items-start gap-2 rounded-lg border border-destructive/50 bg-destructive/10 px-2.5 py-1.5 text-[11px] text-destructive">
+      <AlertTriangle className="mt-0.5 h-3 w-3 shrink-0" />
+      <span>{state.message ?? "Imagem inválida."}</span>
+    </div>
+  );
+}
+
 function CoverPreviewCard({
   cover,
   title,
