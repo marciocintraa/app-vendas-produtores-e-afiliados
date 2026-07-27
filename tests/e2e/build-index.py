@@ -545,10 +545,15 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
       const hasErrOnly = fHasError.checked;
       let visible = 0;
       const re = q ? new RegExp('(' + escapeRe(q) + ')', 'ig') : null;
+      const reErr = errTerm ? new RegExp('(' + escapeRe(errTerm) + ')', 'ig') : null;
+      function escHtml(s) {{
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }}
       rows.forEach(r => {{
         const name = r.dataset.name || '';
         const engine = r.dataset.engine || '';
-        const err = (r.dataset.error || '').toLowerCase();
+        const errRaw = r.dataset.error || '';
+        const err = errRaw.toLowerCase();
         const errorOk = (!hasErrOnly || err.length > 0)
           && (!errTerm || err.includes(errTerm));
         const match = (!eng || engine === eng)
@@ -563,8 +568,20 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
             ? original.replace(re, '<mark class="hl">$1</mark>')
             : original;
         }}
+        const et = r.querySelector('.err-text');
+        if (et) {{
+          const showErr = match && errRaw && (errTerm || hasErrOnly);
+          if (showErr) {{
+            const esc = escHtml(errRaw);
+            et.innerHTML = reErr ? esc.replace(reErr, '<mark class="hl-err">$1</mark>') : esc;
+            et.hidden = false;
+          }} else {{
+            et.hidden = true;
+          }}
+        }}
         if (match) visible++;
       }});
+
       fCount.textContent = visible + ' of ' + totalRows + ' failure' + (totalRows === 1 ? '' : 's');
       fEmpty.style.display = visible === 0 ? '' : 'none';
     }}
