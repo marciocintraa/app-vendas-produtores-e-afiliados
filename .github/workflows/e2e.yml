@@ -61,6 +61,8 @@ jobs:
           path: |
             /tmp/browser/cover-shortcuts/report-${{ matrix.browser }}.html
             /tmp/browser/cover-shortcuts/report-${{ matrix.browser }}.json
+            /tmp/browser/cover-shortcuts/trace-${{ matrix.browser }}.zip
+            /tmp/browser/cover-shortcuts/video-${{ matrix.browser }}.webm
           if-no-files-found: warn
 
       - name: Upload failure artifacts (screenshots + trace.zip + video.webm)
