@@ -584,11 +584,31 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     const manualOpen = new WeakSet();
     fBody.addEventListener('click', (e) => {{
       const btn = e.target.closest('.err-toggle');
-      if (!btn) return;
-      const r = btn.closest('tr');
-      if (!r) return;
-      if (manualOpen.has(r)) manualOpen.delete(r); else manualOpen.add(r);
-      applyFilters();
+      if (btn) {{
+        const r = btn.closest('tr');
+        if (!r) return;
+        if (manualOpen.has(r)) manualOpen.delete(r); else manualOpen.add(r);
+        applyFilters();
+        return;
+      }}
+      const copyBtn = e.target.closest('.err-copy');
+      if (copyBtn) {{
+        const r = copyBtn.closest('tr');
+        const err = r ? (r.dataset.error || '') : '';
+        if (!err) return;
+        navigator.clipboard.writeText(err).then(() => {{
+          copyBtn.classList.add('copied');
+          const original = copyBtn.innerHTML;
+          copyBtn.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M2 9l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg> copied';
+          setTimeout(() => {{
+            copyBtn.classList.remove('copied');
+            copyBtn.innerHTML = original;
+          }}, 1500);
+        }}).catch(() => {{
+          copyBtn.title = 'Unable to copy';
+        }});
+        return;
+      }}
     }});
 
     function applyFilters() {{
