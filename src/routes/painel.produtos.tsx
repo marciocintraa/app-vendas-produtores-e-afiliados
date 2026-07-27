@@ -829,6 +829,27 @@ function AdminProductsPage() {
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                 {confirm.description}
               </p>
+              {confirm.nextCover ? (
+                <div className="mt-5 w-full rounded-xl border border-border/60 bg-surface/60 p-3 text-left">
+                  <p className="mb-2 text-xs font-medium text-muted-foreground">
+                    Próxima capa do produto:
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={confirm.nextCover}
+                      alt="Próxima capa"
+                      className="h-16 w-24 rounded-lg object-cover"
+                    />
+                    <p className="text-sm font-medium text-foreground">
+                      Esta imagem será promovida automaticamente.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-4 text-xs text-muted-foreground">
+                  Nenhuma imagem restante na galeria. A capa ficará vazia.
+                </p>
+              )}
             </div>
             <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <button
