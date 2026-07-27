@@ -608,6 +608,15 @@ function AdminProductsPage() {
                               <button
                                 type="button"
                                 onClick={() => {
+                                  if (
+                                    editing.cover === src &&
+                                    typeof window !== "undefined" &&
+                                    !window.confirm(
+                                      "Esta imagem é a capa principal do produto. Removê-la trocará a capa automaticamente. Deseja continuar?",
+                                    )
+                                  ) {
+                                    return;
+                                  }
                                   setError(null);
                                   setEditing((prev) => {
                                     if (!prev) return prev;
