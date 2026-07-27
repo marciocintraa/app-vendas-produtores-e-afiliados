@@ -113,9 +113,9 @@ function Hero() {
             <span className="text-gradient">Vende Fácil Pro</span>.
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-xl">
-            Produtores e afiliados agora têm sua própria vitrine de vendas. Concentre todos os seus
-            produtos da Hotmart, Kiwify, Eduzz e outras plataformas em um único aplicativo — com IA,
-            analytics e notificações push para converter mais.
+            Produtores e afiliados agora têm seu próprio app de vendas para Android. Concentre todos
+            os seus produtos da Hotmart, Kiwify, Eduzz e outras plataformas em um único aplicativo
+            instalável — com IA, analytics e notificações push para converter mais.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#planos" className="btn-primary">
