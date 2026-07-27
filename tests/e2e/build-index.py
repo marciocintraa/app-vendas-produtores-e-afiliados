@@ -64,6 +64,11 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         cls = {"passed": "ok", "failed": "err"}.get(status, "warn")
         return f'<span class="pill {cls}">{_html.escape(status.upper())}</span>'
 
+    def asset_link(label: str, href: str | None, kind: str) -> str:
+        if not href:
+            return f'<span class="pill warn" title="not available">{label} —</span>'
+        return f'<a class="pill link {kind}" href="{href}" download>{label} ↓</a>'
+
     # Engine cards
     engine_cards = []
     for engine in ENGINES:
@@ -78,6 +83,26 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
       </div>""")
             continue
         report_href = f"reports/report-{engine}.html"
+        trace_href = s.get("trace_href")
+        video_href = s.get("video_href")
+
+        failed_scenarios = [sc for sc in s.get("scenarios", []) if sc.get("status") == "failed"]
+        if failed_scenarios:
+            failed_rows = "".join(
+                f'<li><span class="scname">{_html.escape(sc["name"])}</span>'
+                f'<span class="scassets">{asset_link("trace.zip", trace_href, "trace")}'
+                f'{asset_link("video.webm", video_href, "video")}</span></li>'
+                for sc in failed_scenarios
+            )
+            failed_block = f"""
+        <div class="failed-list">
+          <div class="k">Failed scenarios &middot; downloads</div>
+          <ul>{failed_rows}</ul>
+          <p class="muted">Note: trace/video are recorded per engine run and shared across its failed scenarios.</p>
+        </div>"""
+        else:
+            failed_block = ""
+
         engine_cards.append(f"""
       <div class="engine-card {s.get('overall','unknown')}">
         <div class="engine-head">
@@ -92,7 +117,9 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         <div class="actions">
           <a class="pill link" href="{report_href}" target="engine-frame">Open report ↗</a>
           <a class="pill link" href="{report_href}" target="_blank" rel="noopener">New tab</a>
-        </div>
+          {asset_link("trace.zip", trace_href, "trace")}
+          {asset_link("video.webm", video_href, "video")}
+        </div>{failed_block}
       </div>""")
 
     # Tabs
