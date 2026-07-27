@@ -600,21 +600,24 @@ function AdminProductsPage() {
                               <button
                                 type="button"
                                 onClick={() => {
-                                  if (editing.cover === src) {
-                                    setError(
-                                      "Esta é a imagem de capa. Escolha outra capa da galeria (botão de estrela) antes de removê-la.",
-                                    );
-                                    return;
-                                  }
                                   setError(null);
-                                  setEditing((prev) =>
-                                    prev
-                                      ? { ...prev, gallery: prev.gallery.filter((_, j) => j !== i) }
-                                      : prev,
-                                  );
+                                  setEditing((prev) => {
+                                    if (!prev) return prev;
+                                    const nextGallery = prev.gallery.filter((_, j) => j !== i);
+                                    const nextCover =
+                                      prev.cover === src
+                                        ? nextGallery[0] ?? ""
+                                        : prev.cover;
+                                    return { ...prev, gallery: nextGallery, cover: nextCover };
+                                  });
                                 }}
                                 className="rounded-md bg-background/80 p-1 text-muted-foreground backdrop-blur transition-colors hover:text-destructive"
                                 aria-label="Remover imagem"
+                                title={
+                                  editing.cover === src
+                                    ? "Remover — a próxima imagem da galeria vira capa."
+                                    : "Remover imagem"
+                                }
                               >
                                 <X className="h-3.5 w-3.5" />
                               </button>
