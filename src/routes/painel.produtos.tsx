@@ -261,6 +261,8 @@ function AdminProductsPage() {
   const validationCtrlRef = useRef<AbortController | null>(null);
   const [coverDropActive, setCoverDropActive] = useState(false);
   const [coverDropError, setCoverDropError] = useState<string | null>(null);
+  const coverHistoryRef = useRef<string[]>([]);
+  const [canUndoCover, setCanUndoCover] = useState(false);
 
   function handleCoverFileDrop(files: FileList | File[]) {
     setCoverDropError(null);
