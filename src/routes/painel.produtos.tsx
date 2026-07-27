@@ -1166,3 +1166,92 @@ function Field({
     </label>
   );
 }
+
+function StorefrontCard({
+  cover,
+  title,
+  tagline,
+  category,
+  platform,
+  price,
+  originalPrice,
+  rating,
+  reviews,
+  gallery,
+}: {
+  cover: string;
+  title: string;
+  tagline: string;
+  category: string;
+  platform: Product["platform"];
+  price: number;
+  originalPrice?: number;
+  rating: number;
+  reviews: number;
+  gallery: string[];
+}) {
+  return (
+    <>
+      <div className="relative aspect-[3/2] overflow-hidden">
+        {cover ? (
+          <img src={cover} alt={`Capa de ${title}`} className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-surface text-xs text-muted-foreground">
+            Sem capa
+          </div>
+        )}
+        <span className="absolute left-3 top-3 rounded-full bg-background/70 px-2.5 py-1 text-[11px] font-medium backdrop-blur">
+          {platform}
+        </span>
+      </div>
+      <div className="flex flex-1 flex-col gap-3 p-5">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>{category || "Sem categoria"}</span>
+          <span className="inline-flex items-center gap-1 text-foreground/80">
+            <Star className="h-3.5 w-3.5 fill-accent text-accent" />
+            {rating.toFixed(1)}
+            <span className="text-muted-foreground">({reviews})</span>
+          </span>
+        </div>
+        <div>
+          <h2 className="font-display text-lg font-semibold leading-tight">
+            {title || "Sem título"}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{tagline}</p>
+        </div>
+        {gallery.length > 0 && (
+          <div className="flex items-center gap-1.5">
+            {gallery.slice(0, 4).map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt=""
+                className="h-10 w-10 rounded-md border border-border/60 object-cover"
+              />
+            ))}
+            {gallery.length > 4 && (
+              <span className="rounded-md border border-border/60 bg-surface px-2 py-1 text-[11px] text-muted-foreground">
+                +{gallery.length - 4}
+              </span>
+            )}
+          </div>
+        )}
+        <div className="mt-auto flex items-end justify-between pt-2">
+          <div>
+            {originalPrice !== undefined && originalPrice > 0 && (
+              <div className="text-xs text-muted-foreground line-through">
+                R$ {originalPrice.toFixed(0)}
+              </div>
+            )}
+            <div className="font-display text-xl font-semibold text-foreground">
+              R$ {price.toFixed(0)}
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-1 text-sm text-primary">
+            Ver <ArrowRight className="h-4 w-4" />
+          </span>
+        </div>
+      </div>
+    </>
+  );
+}
