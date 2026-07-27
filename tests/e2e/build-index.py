@@ -64,6 +64,11 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         cls = {"passed": "ok", "failed": "err"}.get(status, "warn")
         return f'<span class="pill {cls}">{_html.escape(status.upper())}</span>'
 
+    def asset_link(label: str, href: str | None, kind: str) -> str:
+        if not href:
+            return f'<span class="pill warn" title="not available">{label} —</span>'
+        return f'<a class="pill link {kind}" href="{href}" download>{label} ↓</a>'
+
     # Engine cards
     engine_cards = []
     for engine in ENGINES:
@@ -78,6 +83,26 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
       </div>""")
             continue
         report_href = f"reports/report-{engine}.html"
+        trace_href = s.get("trace_href")
+        video_href = s.get("video_href")
+
+        failed_scenarios = [sc for sc in s.get("scenarios", []) if sc.get("status") == "failed"]
+        if failed_scenarios:
+            failed_rows = "".join(
+                f'<li><span class="scname">{_html.escape(sc["name"])}</span>'
+                f'<span class="scassets">{asset_link("trace.zip", trace_href, "trace")}'
+                f'{asset_link("video.webm", video_href, "video")}</span></li>'
+                for sc in failed_scenarios
+            )
+            failed_block = f"""
+        <div class="failed-list">
+          <div class="k">Failed scenarios &middot; downloads</div>
+          <ul>{failed_rows}</ul>
+          <p class="muted">Note: trace/video are recorded per engine run and shared across its failed scenarios.</p>
+        </div>"""
+        else:
+            failed_block = ""
+
         engine_cards.append(f"""
       <div class="engine-card {s.get('overall','unknown')}">
         <div class="engine-head">
@@ -92,7 +117,9 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         <div class="actions">
           <a class="pill link" href="{report_href}" target="engine-frame">Open report ↗</a>
           <a class="pill link" href="{report_href}" target="_blank" rel="noopener">New tab</a>
-        </div>
+          {asset_link("trace.zip", trace_href, "trace")}
+          {asset_link("video.webm", video_href, "video")}
+        </div>{failed_block}
       </div>""")
 
     # Tabs
@@ -157,6 +184,19 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .pill.ok {{ background: #052e1a; color: #4ade80; }}
   .pill.err {{ background: #3f0d0d; color: #fca5a5; }}
   .pill.warn {{ background: #3a2d0a; color: #fbbf24; }}
+  .pill.trace {{ background: #1e1b4b; color: #c4b5fd; }}
+  .pill.trace:hover {{ background: #312e81; }}
+  .pill.video {{ background: #134e4a; color: #5eead4; }}
+  .pill.video:hover {{ background: #115e59; }}
+  .failed-list {{ margin-top: 14px; padding-top: 12px; border-top: 1px dashed #1f2937; }}
+  .failed-list .k {{ color: #94a3b8; font-size: 11px; text-transform: uppercase;
+                     letter-spacing: .05em; margin-bottom: 8px; }}
+  .failed-list ul {{ list-style: none; padding: 0; margin: 0 0 8px; }}
+  .failed-list li {{ display: flex; justify-content: space-between; align-items: center;
+                     gap: 8px; padding: 6px 0; border-bottom: 1px solid #111827; }}
+  .failed-list li:last-child {{ border-bottom: none; }}
+  .scname {{ color: #f87171; font-size: 13px; font-weight: 500; }}
+  .scassets {{ display: flex; gap: 6px; flex-wrap: wrap; }}
   .tabs {{ display: flex; gap: 4px; border-bottom: 1px solid #1e293b; margin-bottom: 0; }}
   .tab {{ background: transparent; color: #94a3b8; border: none;
           padding: 10px 16px; cursor: pointer; font-size: 14px;
@@ -226,9 +266,23 @@ def main() -> int:
         shutil.copy2(html_path, reports_dir / f"report-{engine}.html")
         if json_path and json_path.exists():
             shutil.copy2(json_path, reports_dir / f"report-{engine}.json")
-        summaries[engine] = load_summary(json_path, engine)
-        print(f"[ok] {engine}: {summaries[engine]['overall']} "
-              f"({summaries[engine]['passed']}/{summaries[engine]['total']})")
+        summary = load_summary(json_path, engine)
+
+        # Copy trace/video assets if the artifact ships them alongside the report.
+        search_root = html_path.parent
+        for asset_key, filename in (("trace_href", f"trace-{engine}.zip"),
+                                    ("video_href", f"video-{engine}.webm")):
+            candidates = list(search_root.rglob(filename))
+            if candidates:
+                shutil.copy2(candidates[0], reports_dir / filename)
+                summary[asset_key] = f"reports/{filename}"
+            else:
+                summary[asset_key] = None
+
+        summaries[engine] = summary
+        print(f"[ok] {engine}: {summary['overall']} ({summary['passed']}/{summary['total']}) "
+              f"trace={'yes' if summary.get('trace_href') else 'no'} "
+              f"video={'yes' if summary.get('video_href') else 'no'}")
 
     index_path = output_dir / "index.html"
     render_index(summaries, index_path)
