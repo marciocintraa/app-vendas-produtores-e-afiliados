@@ -103,6 +103,12 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
         <option value="both">With trace and video</option>
         <option value="none">Without assets</option>
       </select>
+      <input type="search" id="failedError" class="failed-input failed-error-input"
+             placeholder="Error contains…" autocomplete="off" spellcheck="false"
+             aria-label="Filter by error message">
+      <label class="failed-check" title="Show only failures with an error message/stack">
+        <input type="checkbox" id="failedHasError"> with error only
+      </label>
       <span class="failed-count muted" id="failedCount"></span>
       <button type="button" id="failedExport" class="failed-clear failed-export" title="Export filtered failures to CSV">Export CSV ↓</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
