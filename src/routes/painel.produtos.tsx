@@ -319,13 +319,54 @@ function AdminProductsPage() {
     });
   }
 
+  function pushCoverHistory(value: string) {
+    coverHistoryRef.current = [...coverHistoryRef.current, value];
+    setCanUndoCover(true);
+  }
+
+  function selectNextCover(next: string) {
+    if (next === confirm.selectedNext) return;
+    pushCoverHistory(confirm.selectedNext);
+    setConfirm((prev) => ({ ...prev, selectedNext: next }));
+  }
+
+  function undoCoverSelection() {
+    const history = coverHistoryRef.current;
+    if (history.length === 0) {
+      if (editing?.cover && confirm.selectedNext !== editing.cover) {
+        setCoverDropError(null);
+        setConfirm((prev) => ({
+          ...prev,
+          selectedNext: editing.cover,
+          candidates: prev.candidates.includes(editing.cover)
+            ? prev.candidates
+            : [editing.cover, ...prev.candidates],
+        }));
+        toast.message("Capa atual restaurada", {
+          description: "A validação será executada automaticamente.",
+        });
+      }
+      return;
+    }
+    const previous = history[history.length - 1];
+    coverHistoryRef.current = history.slice(0, -1);
+    setCanUndoCover(coverHistoryRef.current.length > 0);
+    setCoverDropError(null);
+    setConfirm((prev) => ({ ...prev, selectedNext: previous }));
+    toast.message("Seleção desfeita", {
+      description: "A validação será executada automaticamente.",
+    });
+  }
+
   function resetToCurrentCover() {
     const current = editing?.cover;
     if (!current) {
       toast.error("Nenhuma capa atual para restaurar.");
       return;
     }
+    if (confirm.selectedNext === current) return;
     setCoverDropError(null);
+    pushCoverHistory(confirm.selectedNext);
     setConfirm((prev) => ({
       ...prev,
       selectedNext: current,
