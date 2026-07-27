@@ -1035,6 +1035,18 @@ function AdminProductsPage() {
               </div>
             </div>
           </div>
+          <button
+            type="button"
+            onClick={() => {
+              setFullPreview(false);
+              confirm.onConfirm(confirm.selectedNext);
+            }}
+            className="fixed bottom-24 right-6 z-[80] inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-3 text-sm font-semibold text-destructive-foreground shadow-2xl shadow-destructive/40 ring-1 ring-destructive/60 transition-transform hover:scale-[1.03] sm:bottom-28 sm:right-10"
+            aria-label="Confirmar troca de capa"
+          >
+            <Check className="h-4 w-4" /> Confirmar troca de capa
+          </button>
+
           <div className="border-t border-border/60 bg-surface/60 px-6 py-4">
             <div className="mx-auto flex max-w-6xl flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <button
