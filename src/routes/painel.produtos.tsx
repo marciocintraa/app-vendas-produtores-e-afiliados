@@ -124,6 +124,20 @@ function AdminProductsPage() {
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [fullPreview, setFullPreview] = useState(false);
+  const [finalConfirm, setFinalConfirm] = useState<{
+    open: boolean;
+    currentCover: string;
+    nextCover: string;
+  }>({ open: false, currentCover: "", nextCover: "" });
+
+  function requestFinalConfirm() {
+    setFinalConfirm({
+      open: true,
+      currentCover: editing?.cover ?? "",
+      nextCover: confirm.selectedNext,
+    });
+  }
+
   const [confirm, setConfirm] = useState<ConfirmState>({
     open: false,
     title: "",
@@ -949,7 +963,7 @@ function AdminProductsPage() {
               )}
               <button
                 type="button"
-                onClick={() => confirm.onConfirm(confirm.selectedNext)}
+                onClick={requestFinalConfirm}
                 className="rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
               >
                 {confirm.actionLabel}
@@ -1039,10 +1053,7 @@ function AdminProductsPage() {
           </div>
           <button
             type="button"
-            onClick={() => {
-              setFullPreview(false);
-              confirm.onConfirm(confirm.selectedNext);
-            }}
+            onClick={requestFinalConfirm}
             className="fixed bottom-24 right-6 z-[80] inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-3 text-sm font-semibold text-destructive-foreground shadow-2xl shadow-destructive/40 ring-1 ring-destructive/60 transition-transform hover:scale-[1.03] sm:bottom-28 sm:right-10"
             aria-label="Confirmar troca de capa"
           >
@@ -1060,13 +1071,79 @@ function AdminProductsPage() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setFullPreview(false);
-                  confirm.onConfirm(confirm.selectedNext);
-                }}
+                onClick={requestFinalConfirm}
                 className="rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
               >
                 {confirm.actionLabel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {finalConfirm.open && (
+        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-background/80 backdrop-blur-md p-4">
+          <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-border/70 bg-card shadow-2xl">
+            <div className="flex items-start gap-3 border-b border-border/60 bg-surface/60 px-6 py-4">
+              <div className="rounded-xl bg-destructive/15 p-2 text-destructive">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-display text-lg font-semibold">
+                  Confirmação final da troca de capa
+                </h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Compare a capa atual com a nova capa antes de salvar. Esta ação atualizará imediatamente o card do catálogo.
+                </p>
+              </div>
+            </div>
+            <div className="grid gap-4 p-6 sm:grid-cols-2">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs uppercase tracking-wider text-muted-foreground">Capa atual</span>
+                  <span className="rounded-full bg-surface-2 px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">ATUAL</span>
+                </div>
+                <div className="aspect-[4/3] overflow-hidden rounded-xl border border-border/60 bg-surface">
+                  {finalConfirm.currentCover ? (
+                    <img src={finalConfirm.currentCover} alt="Capa atual" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">Sem capa</div>
+                  )}
+                </div>
+              </div>
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs uppercase tracking-wider text-primary">Nova capa</span>
+                  <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">NOVA</span>
+                </div>
+                <div className="aspect-[4/3] overflow-hidden rounded-xl border-2 border-primary bg-surface ring-2 ring-primary/30">
+                  {finalConfirm.nextCover ? (
+                    <img src={finalConfirm.nextCover} alt="Nova capa" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">Sem capa</div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col-reverse gap-2 border-t border-border/60 bg-surface/60 px-6 py-4 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setFinalConfirm((p) => ({ ...p, open: false }))}
+                className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const next = finalConfirm.nextCover;
+                  setFinalConfirm({ open: false, currentCover: "", nextCover: "" });
+                  setFullPreview(false);
+                  confirm.onConfirm(next);
+                }}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
+              >
+                <Check className="h-4 w-4" /> Salvar nova capa
               </button>
             </div>
           </div>
