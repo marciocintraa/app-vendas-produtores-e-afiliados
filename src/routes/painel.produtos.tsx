@@ -1199,22 +1199,6 @@ function AdminProductsPage() {
                       }
                     }}
                     className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-6 text-center transition-all ${
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      if (!coverDropActive) setCoverDropActive(true);
-                    }}
-                    onDragLeave={(e) => {
-                      e.preventDefault();
-                      setCoverDropActive(false);
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      setCoverDropActive(false);
-                      if (e.dataTransfer.files?.length) {
-                        handleCoverFileDrop(e.dataTransfer.files);
-                      }
-                    }}
-                    className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-6 text-center transition-all ${
                       coverDropActive
                         ? "border-primary bg-primary/10"
                         : "border-border/70 bg-surface/40 hover:border-primary/50"
