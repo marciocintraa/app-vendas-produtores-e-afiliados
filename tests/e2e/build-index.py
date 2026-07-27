@@ -495,6 +495,8 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   const fSearch = document.getElementById('failedSearch');
   const fEngine = document.getElementById('failedEngine');
   const fAssets = document.getElementById('failedAssets');
+  const fError = document.getElementById('failedError');
+  const fHasError = document.getElementById('failedHasError');
   const fClear = document.getElementById('failedClear');
   const fCount = document.getElementById('failedCount');
   const fEmpty = document.getElementById('failedEmpty');
@@ -525,14 +527,20 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
       const q = (fSearch.value || '').trim().toLowerCase();
       const eng = fEngine.value || '';
       const assets = fAssets.value || '';
+      const errTerm = (fError.value || '').trim().toLowerCase();
+      const hasErrOnly = fHasError.checked;
       let visible = 0;
       const re = q ? new RegExp('(' + escapeRe(q) + ')', 'ig') : null;
       rows.forEach(r => {{
         const name = r.dataset.name || '';
         const engine = r.dataset.engine || '';
+        const err = (r.dataset.error || '').toLowerCase();
+        const errorOk = (!hasErrOnly || err.length > 0)
+          && (!errTerm || err.includes(errTerm));
         const match = (!eng || engine === eng)
           && (!q || name.includes(q))
-          && assetMatch(r, assets);
+          && assetMatch(r, assets)
+          && errorOk;
         r.classList.toggle('hidden', !match);
         const scn = r.querySelector('.scn');
         if (scn) {{
@@ -549,8 +557,11 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     fSearch.addEventListener('input', applyFilters);
     fEngine.addEventListener('change', applyFilters);
     fAssets.addEventListener('change', applyFilters);
+    fError.addEventListener('input', applyFilters);
+    fHasError.addEventListener('change', applyFilters);
     fClear.addEventListener('click', () => {{
       fSearch.value = ''; fEngine.value = ''; fAssets.value = '';
+      fError.value = ''; fHasError.checked = false;
       applyFilters(); fSearch.focus();
     }});
     applyFilters();
