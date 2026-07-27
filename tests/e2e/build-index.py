@@ -585,6 +585,13 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         resetBtn.focus();
       }}
     }}
+    if (e.key === 'Escape' && !modal.classList.contains('open')) {{
+      const resetBtn = document.getElementById('failedCopyModeReset');
+      if (resetBtn && resetBtn.textContent === 'Confirm reset?') {{
+        const cancelBtn = document.getElementById('failedCopyModeCancel');
+        if (cancelBtn) cancelBtn.click();
+      }}
+    }}
   }});
 
   // Failed scenarios filters
