@@ -326,6 +326,98 @@ async def scenario_shortcuts_after_close(page: Page) -> None:
           "no final-confirm step opens after the modal was closed")
 
 
+
+def write_html_report(path: Path, *, browser_name: str, results: list[dict],
+                      suite_duration_ms: int, trace_asset: str | None,
+                      video_asset: str | None) -> None:
+    import html as _html
+    from datetime import datetime, timezone
+    total = len(results)
+    passed = sum(1 for r in results if r["status"] == "passed")
+    failed = total - passed
+    overall = "passed" if failed == 0 else "failed"
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+    rows = []
+    for i, r in enumerate(results, 1):
+        badge_cls = "ok" if r["status"] == "passed" else "err"
+        badge_txt = "PASS" if r["status"] == "passed" else "FAIL"
+        err_html = ""
+        if r["error"]:
+            err_html = f'<pre class="err-pre">{_html.escape(r["error"])}</pre>'
+        shot_html = ""
+        if r.get("screenshot"):
+            s = _html.escape(r["screenshot"])
+            shot_html = f'<div class="shot"><a href="{s}" target="_blank"><img src="{s}" alt="screenshot"></a></div>'
+        rows.append(f"""
+        <tr class="row-{r['status']}">
+          <td class="idx">{i}</td>
+          <td class="name">{_html.escape(r['name'])}</td>
+          <td><span class="badge {badge_cls}">{badge_txt}</span></td>
+          <td class="dur">{r['duration_ms']} ms</td>
+          <td class="details">{err_html}{shot_html}</td>
+        </tr>""")
+
+    artifacts = []
+    if trace_asset:
+        artifacts.append(f'<a class="pill" href="{_html.escape(trace_asset)}" download>trace.zip</a>')
+    if video_asset:
+        artifacts.append(f'<a class="pill" href="{_html.escape(video_asset)}" download>video.webm</a>')
+    artifacts_html = " ".join(artifacts) if artifacts else '<span class="muted">no failure artifacts</span>'
+
+    html = f"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>E2E report — cover-shortcuts ({_html.escape(browser_name)})</title>
+<style>
+  :root {{ color-scheme: dark; }}
+  body {{ font: 14px/1.5 -apple-system,Segoe UI,Roboto,sans-serif; margin: 0; padding: 32px;
+          background: #0b0f1a; color: #e5e7eb; }}
+  h1 {{ margin: 0 0 4px; font-size: 22px; }}
+  .sub {{ color: #94a3b8; margin-bottom: 20px; }}
+  .summary {{ display: flex; gap: 12px; margin: 16px 0 24px; flex-wrap: wrap; }}
+  .card {{ background: #111827; border: 1px solid #1f2937; border-radius: 10px; padding: 12px 16px; min-width: 110px; }}
+  .card .k {{ font-size: 11px; text-transform: uppercase; color: #94a3b8; letter-spacing: .05em; }}
+  .card .v {{ font-size: 20px; font-weight: 600; margin-top: 2px; }}
+  .card.ok .v {{ color: #34d399; }}
+  .card.err .v {{ color: #f87171; }}
+  table {{ width: 100%; border-collapse: collapse; background: #0f172a; border: 1px solid #1f2937; border-radius: 10px; overflow: hidden; }}
+  th, td {{ padding: 10px 12px; text-align: left; border-bottom: 1px solid #1f2937; vertical-align: top; }}
+  th {{ background: #111827; font-size: 12px; text-transform: uppercase; color: #94a3b8; letter-spacing: .05em; }}
+  tr:last-child td {{ border-bottom: 0; }}
+  .row-failed {{ background: rgba(248,113,113,.06); }}
+  .idx {{ color: #64748b; width: 32px; }}
+  .name {{ font-family: ui-monospace,SFMono-Regular,Menlo,monospace; }}
+  .dur {{ color: #94a3b8; white-space: nowrap; }}
+  .badge {{ display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .05em; }}
+  .badge.ok {{ background: rgba(52,211,153,.15); color: #34d399; }}
+  .badge.err {{ background: rgba(248,113,113,.15); color: #f87171; }}
+  .err-pre {{ background: #1f1315; color: #fecaca; padding: 8px 10px; border-radius: 6px; white-space: pre-wrap;
+              margin: 0 0 8px; font-size: 12px; }}
+  .shot img {{ max-width: 320px; border-radius: 6px; border: 1px solid #1f2937; }}
+  .pill {{ display: inline-block; padding: 4px 10px; border-radius: 999px; background: #1e293b;
+           color: #93c5fd; text-decoration: none; font-size: 12px; margin-right: 6px; }}
+  .pill:hover {{ background: #334155; }}
+  .muted {{ color: #64748b; font-size: 12px; }}
+  .artifacts {{ margin: 12px 0 24px; }}
+</style></head><body>
+  <h1>E2E report — cover-shortcuts</h1>
+  <div class="sub">Engine: <strong>{_html.escape(browser_name)}</strong> · Generated {now}</div>
+  <div class="summary">
+    <div class="card"><div class="k">Overall</div><div class="v">{overall.upper()}</div></div>
+    <div class="card ok"><div class="k">Passed</div><div class="v">{passed}</div></div>
+    <div class="card err"><div class="k">Failed</div><div class="v">{failed}</div></div>
+    <div class="card"><div class="k">Total</div><div class="v">{total}</div></div>
+    <div class="card"><div class="k">Duration</div><div class="v">{suite_duration_ms} ms</div></div>
+  </div>
+  <div class="artifacts"><strong>Failure artifacts:</strong> {artifacts_html}</div>
+  <table>
+    <thead><tr><th>#</th><th>Scenario</th><th>Status</th><th>Duration</th><th>Details</th></tr></thead>
+    <tbody>{''.join(rows)}</tbody>
+  </table>
+</body></html>"""
+    path.write_text(html, encoding="utf-8")
+
+
 async def main() -> int:
     browser_name = os.environ.get("PLAYWRIGHT_BROWSER", "chromium").lower()
     if browser_name not in {"chromium", "firefox", "webkit"}:
