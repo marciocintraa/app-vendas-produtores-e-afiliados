@@ -108,7 +108,7 @@ function Hero() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#planos" className="btn-primary">
-              Começar teste grátis <ArrowRight className="w-4 h-4" />
+              Começar agora <ArrowRight className="w-4 h-4" />
             </a>
             <a href="#recursos" className="btn-ghost">
               Ver recursos
