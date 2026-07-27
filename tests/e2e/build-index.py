@@ -617,7 +617,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         const term = (fError.value || '').trim();
         if (!err || !term) return;
         const termLower = term.toLowerCase();
-        const matches = err.split(/\\r?\\n/).filter(line => line.toLowerCase().includes(termLower));
+        const matches = err.split('\\n').map(line => line.trimEnd()).filter(line => line.toLowerCase().includes(termLower));
         if (!matches.length) {{
           copyMatchesBtn.title = 'No matching lines';
           return;
