@@ -26,7 +26,7 @@ import {
 import { useState } from "react";
 import heroImg from "@/assets/hero-app.jpg";
 
-const APK_DOWNLOAD_URL = "https://drive.usercontent.google.com/download?id=1LAo1ZB4tD0VUNUMuvmI6iUrmFMrK7JPB&export=download&confirm=t";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
