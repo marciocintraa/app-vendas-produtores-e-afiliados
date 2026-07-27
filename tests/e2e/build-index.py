@@ -587,7 +587,8 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         resetBtn.focus();
       }}
     }}
-    if ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey) && !e.altKey && !modal.classList.contains('open')) {{
+    const isUndoShortcut = ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) || (e.key === 'Z' && e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey);
+    if (isUndoShortcut && !modal.classList.contains('open')) {{
       if (inInput) return;
       const undoBtn = document.getElementById('failedCopyModeUndo');
       if (undoBtn && undoBtn.style.display !== 'none') {{
