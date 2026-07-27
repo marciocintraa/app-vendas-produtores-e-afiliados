@@ -95,6 +95,19 @@ function AdminProductsPage() {
   const products = useProducts();
   const [editing, setEditing] = useState<Draft | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+
+  function reorderGallery(from: number, to: number) {
+    if (from === to) return;
+    setEditing((prev) => {
+      if (!prev) return prev;
+      const next = [...prev.gallery];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return { ...prev, gallery: next };
+    });
+  }
 
   const sorted = useMemo(
     () => [...products].sort((a, b) => a.title.localeCompare(b.title, "pt-BR")),
