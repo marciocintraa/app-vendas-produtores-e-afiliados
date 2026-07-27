@@ -1061,10 +1061,21 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
 
       fCopyModeUndo.addEventListener('click', () => {{
         undoReset();
+        // After Undo, Redo becomes the actionable control — move focus there
+        // so keyboard users land predictably on the next available action.
+        requestAnimationFrame(() => {{
+          if (fCopyModeRedo.style.display !== 'none') fCopyModeRedo.focus();
+          else fCopyModeReset.focus();
+        }});
       }});
 
       fCopyModeRedo.addEventListener('click', () => {{
         redoReset();
+        // After Redo, Undo becomes the actionable control — return focus to it.
+        requestAnimationFrame(() => {{
+          if (fCopyModeUndo.style.display !== 'none') fCopyModeUndo.focus();
+          else fCopyModeReset.focus();
+        }});
       }});
 
       // Cancel confirmation if the user interacts with other toolbar controls.
