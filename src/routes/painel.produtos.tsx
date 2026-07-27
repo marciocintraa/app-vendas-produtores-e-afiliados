@@ -153,34 +153,137 @@ function AdminProductsPage() {
       return;
     }
     setSavingCover(true);
-    const toastId = toast.loading("Salvando nova capa…", {
-      description: "Aguarde enquanto atualizamos a vitrine.",
+    const toastId = toast.loading("Validando nova capa…", {
+      description: "Verificando formato, tamanho e acessibilidade.",
     });
     try {
-      await new Promise<void>((resolve, reject) => {
-        const img = new Image();
-        const timer = setTimeout(() => {
-          reject(new Error("Tempo esgotado ao carregar a imagem (10s)."));
-        }, 10000);
-        img.onload = () => {
-          clearTimeout(timer);
-          resolve();
-        };
-        img.onerror = () =>
-          reject(
-            new Error(
-              "A imagem selecionada não pôde ser carregada. Verifique se o arquivo é válido ou se a URL está acessível.",
-            ),
+      // 1) Formato: data URL de imagem ou URL http(s)
+      const isDataUrl = next.startsWith("data:");
+      const isHttpUrl = /^https?:\/\//i.test(next);
+      if (!isDataUrl && !isHttpUrl) {
+        throw new Error(
+          "Formato de origem inválido. Use um upload local ou uma URL http(s) pública.",
+        );
+      }
+
+      const ALLOWED_MIME = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
+      const MAX_BYTES = 5 * 1024 * 1024; // 5 MB
+      const MIN_DIM = 200;
+      const MAX_DIM = 4000;
+      let detectedBytes: number | null = null;
+      let detectedMime: string | null = null;
+
+      if (isDataUrl) {
+        const match = /^data:([^;,]+)(;base64)?,(.*)$/i.exec(next);
+        if (!match) throw new Error("Data URL malformada.");
+        detectedMime = match[1].toLowerCase();
+        if (!ALLOWED_MIME.includes(detectedMime)) {
+          throw new Error(
+            `Formato "${detectedMime}" não suportado. Use JPEG, PNG, WebP, GIF ou AVIF.`,
           );
-        img.src = next;
+        }
+        const isB64 = !!match[2];
+        const payload = match[3];
+        detectedBytes = isB64
+          ? Math.floor((payload.length * 3) / 4) -
+            (payload.endsWith("==") ? 2 : payload.endsWith("=") ? 1 : 0)
+          : new Blob([decodeURIComponent(payload)]).size;
+        if (detectedBytes > MAX_BYTES) {
+          throw new Error(
+            `Imagem muito grande (${(detectedBytes / 1024 / 1024).toFixed(2)} MB). Limite: 5 MB.`,
+          );
+        }
+      } else {
+        // 2) Acessibilidade da URL remota via HEAD (com fallback silencioso p/ CORS)
+        try {
+          const ctrl = new AbortController();
+          const to = setTimeout(() => ctrl.abort(), 8000);
+          const res = await fetch(next, { method: "HEAD", signal: ctrl.signal, mode: "cors" });
+          clearTimeout(to);
+          if (res.ok) {
+            const ct = res.headers.get("content-type");
+            const cl = res.headers.get("content-length");
+            if (ct) {
+              detectedMime = ct.split(";")[0].trim().toLowerCase();
+              if (!detectedMime.startsWith("image/")) {
+                throw new Error(`A URL não retorna uma imagem (content-type: ${detectedMime}).`);
+              }
+              if (!ALLOWED_MIME.includes(detectedMime)) {
+                throw new Error(
+                  `Formato "${detectedMime}" não suportado. Use JPEG, PNG, WebP, GIF ou AVIF.`,
+                );
+              }
+            }
+            if (cl) {
+              detectedBytes = parseInt(cl, 10);
+              if (Number.isFinite(detectedBytes) && detectedBytes > MAX_BYTES) {
+                throw new Error(
+                  `Imagem muito grande (${(detectedBytes / 1024 / 1024).toFixed(2)} MB). Limite: 5 MB.`,
+                );
+              }
+            }
+          } else if (res.status >= 400) {
+            throw new Error(`URL inacessível (HTTP ${res.status}).`);
+          }
+        } catch (headErr) {
+          // Se falhou por CORS/rede sem status, seguimos para checagem via <img>.
+          if (headErr instanceof Error && /HTTP \d|não retorna|não suportado|muito grande/i.test(headErr.message)) {
+            throw headErr;
+          }
+        }
+      }
+
+      // 3) Carregamento + dimensões
+      const { width, height } = await new Promise<{ width: number; height: number }>(
+        (resolve, reject) => {
+          const img = new Image();
+          const timer = setTimeout(() => {
+            reject(new Error("Tempo esgotado ao carregar a imagem (10s)."));
+          }, 10000);
+          img.onload = () => {
+            clearTimeout(timer);
+            resolve({ width: img.naturalWidth, height: img.naturalHeight });
+          };
+          img.onerror = () => {
+            clearTimeout(timer);
+            reject(
+              new Error(
+                "A imagem selecionada não pôde ser carregada. Verifique se o arquivo é válido ou se a URL está acessível.",
+              ),
+            );
+          };
+          img.src = next;
+        },
+      );
+
+      if (!width || !height) {
+        throw new Error("Não foi possível determinar as dimensões da imagem.");
+      }
+      if (width < MIN_DIM || height < MIN_DIM) {
+        throw new Error(
+          `Resolução muito baixa (${width}×${height}). Mínimo recomendado: ${MIN_DIM}×${MIN_DIM}.`,
+        );
+      }
+      if (width > MAX_DIM || height > MAX_DIM) {
+        throw new Error(
+          `Resolução muito alta (${width}×${height}). Máximo suportado: ${MAX_DIM}×${MAX_DIM}.`,
+        );
+      }
+
+      toast.loading("Salvando nova capa…", {
+        id: toastId,
+        description: "Atualizando a vitrine.",
       });
       await new Promise((r) => setTimeout(r, 400));
       confirm.onConfirm(next);
       setFinalConfirm({ open: false, currentCover: "", nextCover: "" });
       setFullPreview(false);
+      const sizeInfo = detectedBytes
+        ? ` · ${(detectedBytes / 1024).toFixed(0)} KB`
+        : "";
       toast.success("Nova capa salva com sucesso", {
         id: toastId,
-        description: "A vitrine já reflete a alteração.",
+        description: `${width}×${height}${detectedMime ? ` · ${detectedMime}` : ""}${sizeInfo}`,
       });
     } catch (err) {
       const message =
