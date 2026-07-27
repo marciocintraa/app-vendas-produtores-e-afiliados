@@ -91,6 +91,14 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
       <select id="failedEngine" class="failed-select" aria-label="Filter by engine">
         <option value="">All engines</option>{engine_options}
       </select>
+      <select id="failedAssets" class="failed-select" aria-label="Filter by assets">
+        <option value="">All assets</option>
+        <option value="any">With trace or video</option>
+        <option value="trace">With trace</option>
+        <option value="video">With video</option>
+        <option value="both">With trace and video</option>
+        <option value="none">Without assets</option>
+      </select>
       <span class="failed-count muted" id="failedCount"></span>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
     </div>
