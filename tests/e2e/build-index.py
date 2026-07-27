@@ -82,6 +82,12 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
                 '<rect x="2" y="5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/>'
                 '<path d="M5 2h9v9" fill="none" stroke="currentColor" stroke-width="1.5"/>'
                 '</svg> copy</button>'
+                '<button type="button" class="err-copy-matches" hidden'
+                ' title="Copy only stack lines matching the current error filter">'
+                '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">'
+                '<path d="M2 8l3 3 5-7" fill="none" stroke="currentColor" stroke-width="1.5"/>'
+                '<path d="M8 12h6" fill="none" stroke="currentColor" stroke-width="1.5"/>'
+                '</svg> copy matches</button>'
                 if err_raw else ""
             )
             err_block = (
