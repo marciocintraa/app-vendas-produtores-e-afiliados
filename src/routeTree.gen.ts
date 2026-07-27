@@ -9,10 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as StatusAcessoRouteImport } from './routes/status-acesso'
-import { Route as EntregaRouteImport } from './routes/entrega'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
-import { Route as BemVindoRouteImport } from './routes/bem-vindo'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AcessoRouteImport } from './routes/acesso'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
@@ -21,24 +18,9 @@ import { Route as CatalogoProductIdRouteImport } from './routes/catalogo.$produc
 import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
 import { Route as ApiPublicHotmartWebhookRouteImport } from './routes/api/public/hotmart/webhook'
 
-const StatusAcessoRoute = StatusAcessoRouteImport.update({
-  id: '/status-acesso',
-  path: '/status-acesso',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EntregaRoute = EntregaRouteImport.update({
-  id: '/entrega',
-  path: '/entrega',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CatalogoRoute = CatalogoRouteImport.update({
   id: '/catalogo',
   path: '/catalogo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BemVindoRoute = BemVindoRouteImport.update({
-  id: '/bem-vindo',
-  path: '/bem-vindo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -81,10 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/acesso': typeof AcessoRoute
   '/auth': typeof AuthRoute
-  '/bem-vindo': typeof BemVindoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
-  '/entrega': typeof EntregaRoute
-  '/status-acesso': typeof StatusAcessoRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
@@ -93,10 +72,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/acesso': typeof AcessoRoute
   '/auth': typeof AuthRoute
-  '/bem-vindo': typeof BemVindoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
-  '/entrega': typeof EntregaRoute
-  '/status-acesso': typeof StatusAcessoRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
@@ -107,10 +83,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/acesso': typeof AcessoRoute
   '/auth': typeof AuthRoute
-  '/bem-vindo': typeof BemVindoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
-  '/entrega': typeof EntregaRoute
-  '/status-acesso': typeof StatusAcessoRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
@@ -121,10 +94,7 @@ export interface FileRouteTypes {
     | '/'
     | '/acesso'
     | '/auth'
-    | '/bem-vindo'
     | '/catalogo'
-    | '/entrega'
-    | '/status-acesso'
     | '/catalogo/$productId'
     | '/painel/produtos'
     | '/api/public/hotmart/webhook'
@@ -133,10 +103,7 @@ export interface FileRouteTypes {
     | '/'
     | '/acesso'
     | '/auth'
-    | '/bem-vindo'
     | '/catalogo'
-    | '/entrega'
-    | '/status-acesso'
     | '/catalogo/$productId'
     | '/painel/produtos'
     | '/api/public/hotmart/webhook'
@@ -146,10 +113,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/acesso'
     | '/auth'
-    | '/bem-vindo'
     | '/catalogo'
-    | '/entrega'
-    | '/status-acesso'
     | '/catalogo/$productId'
     | '/_authenticated/painel/produtos'
     | '/api/public/hotmart/webhook'
@@ -160,41 +124,17 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AcessoRoute: typeof AcessoRoute
   AuthRoute: typeof AuthRoute
-  BemVindoRoute: typeof BemVindoRoute
   CatalogoRoute: typeof CatalogoRouteWithChildren
-  EntregaRoute: typeof EntregaRoute
-  StatusAcessoRoute: typeof StatusAcessoRoute
   ApiPublicHotmartWebhookRoute: typeof ApiPublicHotmartWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/status-acesso': {
-      id: '/status-acesso'
-      path: '/status-acesso'
-      fullPath: '/status-acesso'
-      preLoaderRoute: typeof StatusAcessoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/entrega': {
-      id: '/entrega'
-      path: '/entrega'
-      fullPath: '/entrega'
-      preLoaderRoute: typeof EntregaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/catalogo': {
       id: '/catalogo'
       path: '/catalogo'
       fullPath: '/catalogo'
       preLoaderRoute: typeof CatalogoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bem-vindo': {
-      id: '/bem-vindo'
-      path: '/bem-vindo'
-      fullPath: '/bem-vindo'
-      preLoaderRoute: typeof BemVindoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -277,10 +217,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AcessoRoute: AcessoRoute,
   AuthRoute: AuthRoute,
-  BemVindoRoute: BemVindoRoute,
   CatalogoRoute: CatalogoRouteWithChildren,
-  EntregaRoute: EntregaRoute,
-  StatusAcessoRoute: StatusAcessoRoute,
   ApiPublicHotmartWebhookRoute: ApiPublicHotmartWebhookRoute,
 }
 export const routeTree = rootRouteImport
