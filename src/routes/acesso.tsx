@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { Loader2, Mail, AlertCircle, CheckCircle, RefreshCw, ArrowLeft } from "lucide-react";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { findUserByEmail, logDelivery } from "@/lib/hotmart.server";
-import { logAccessEvent } from "@/lib/access-journey";
+
 
 
 /**
@@ -131,15 +131,7 @@ function AccessPage() {
   const pollRef = useRef<number | null>(null);
 
   useEffect(() => {
-    logAccessEvent({
-      route: "/acesso",
-      state: initialState,
-      email: email || undefined,
-      detail:
-        initialState === "missing"
-          ? "email ausente — mostrando formulário"
-          : `estado inicial do loader: ${initialState}`,
-    });
+    // simplificado: sem logs de journey
   }, [initialState, email]);
 
   // Se o estado inicial for "no_purchase", faz polling por até ~30s.
@@ -240,11 +232,7 @@ function AccessPage() {
               </button>
             </form>
             <p className="text-xs text-muted-foreground mt-4">
-              Também pode conferir o status em{" "}
-              <Link to="/entrega" className="text-primary hover:underline">
-                /entrega
-              </Link>
-              .
+              Após a compra na Hotmart, use o mesmo email do checkout.
             </p>
           </>
         )}
