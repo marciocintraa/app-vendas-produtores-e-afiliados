@@ -1136,6 +1136,10 @@ function AdminProductsPage() {
                       Prévia no catálogo:
                     </p>
                     <CoverPreviewCard cover={confirm.selectedNext} {...confirm.preview} />
+                    <ValidationBadge
+                      state={coverValidation}
+                      selected={confirm.selectedNext}
+                    />
                   </div>
                 </div>
               ) : (
@@ -1164,11 +1168,23 @@ function AdminProductsPage() {
               <button
                 type="button"
                 onClick={requestFinalConfirm}
-                className="rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
+                disabled={
+                  coverValidation.status !== "valid" ||
+                  coverValidation.src !== confirm.selectedNext
+                }
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100"
               >
-                {confirm.actionLabel}
+                {coverValidation.status === "validating" &&
+                coverValidation.src === confirm.selectedNext ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" /> Validando…
+                  </>
+                ) : (
+                  confirm.actionLabel
+                )}
               </button>
             </div>
+
           </div>
         </div>
       )}
