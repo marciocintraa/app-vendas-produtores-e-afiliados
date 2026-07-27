@@ -13,6 +13,7 @@ import {
   EyeOff,
   GripVertical,
   Star,
+  AlertTriangle,
 } from "lucide-react";
 import { type Product } from "@/lib/catalog-data";
 import {
@@ -92,12 +93,35 @@ function productToDraft(p: Product): Draft {
   };
 }
 
+type ConfirmState = {
+  open: boolean;
+  title: string;
+  description: string;
+  actionLabel: string;
+  onConfirm: () => void;
+};
+
 function AdminProductsPage() {
   const products = useProducts();
   const [editing, setEditing] = useState<Draft | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [confirm, setConfirm] = useState<ConfirmState>({
+    open: false,
+    title: "",
+    description: "",
+    actionLabel: "",
+    onConfirm: () => {},
+  });
+
+  function openConfirm(opts: Omit<ConfirmState, "open">) {
+    setConfirm({ open: true, ...opts });
+  }
+
+  function closeConfirm() {
+    setConfirm((prev) => ({ ...prev, open: false }));
+  }
 
   function reorderGallery(from: number, to: number) {
     if (from === to) return;
@@ -489,17 +513,23 @@ function AdminProductsPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            if (
-                              typeof window !== "undefined" &&
-                              !window.confirm(
-                                "Esta imagem é a capa principal do produto. Removê-la trocará a capa automaticamente. Deseja continuar?",
-                              )
-                            ) {
+                            const next = editing.gallery.find((g) => g !== editing.cover) ?? "";
+                            if (!next) {
+                              setError(null);
+                              setEditing({ ...editing, cover: "" });
                               return;
                             }
-                            const next = editing.gallery.find((g) => g !== editing.cover) ?? "";
-                            setError(null);
-                            setEditing({ ...editing, cover: next });
+                            openConfirm({
+                              title: "Trocar capa principal?",
+                              description:
+                                "A imagem atual é a capa do produto. Removê-la promoverá automaticamente a próxima imagem da galeria como nova capa.",
+                              actionLabel: "Sim, trocar capa",
+                              onConfirm: () => {
+                                setError(null);
+                                setEditing({ ...editing, cover: next });
+                                closeConfirm();
+                              },
+                            });
                           }}
                           className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                           title={
@@ -608,24 +638,33 @@ function AdminProductsPage() {
                               <button
                                 type="button"
                                 onClick={() => {
-                                  if (
-                                    editing.cover === src &&
-                                    typeof window !== "undefined" &&
-                                    !window.confirm(
-                                      "Esta imagem é a capa principal do produto. Removê-la trocará a capa automaticamente. Deseja continuar?",
-                                    )
-                                  ) {
+                                  if (editing.cover !== src) {
+                                    setError(null);
+                                    setEditing((prev) =>
+                                      prev
+                                        ? { ...prev, gallery: prev.gallery.filter((_, j) => j !== i) }
+                                        : prev,
+                                    );
                                     return;
                                   }
-                                  setError(null);
-                                  setEditing((prev) => {
-                                    if (!prev) return prev;
-                                    const nextGallery = prev.gallery.filter((_, j) => j !== i);
-                                    const nextCover =
-                                      prev.cover === src
-                                        ? nextGallery[0] ?? ""
-                                        : prev.cover;
-                                    return { ...prev, gallery: nextGallery, cover: nextCover };
+                                  openConfirm({
+                                    title: "Trocar capa principal?",
+                                    description:
+                                      "Esta imagem é a capa atual do produto. Removê-la promoverá automaticamente a próxima imagem da galeria como nova capa.",
+                                    actionLabel: "Sim, trocar capa",
+                                    onConfirm: () => {
+                                      setError(null);
+                                      setEditing((prev) => {
+                                        if (!prev) return prev;
+                                        const nextGallery = prev.gallery.filter((_, j) => j !== i);
+                                        return {
+                                          ...prev,
+                                          gallery: nextGallery,
+                                          cover: nextGallery[0] ?? "",
+                                        };
+                                      });
+                                      closeConfirm();
+                                    },
                                   });
                                 }}
                                 className="rounded-md bg-background/80 p-1 text-muted-foreground backdrop-blur transition-colors hover:text-destructive"
@@ -772,6 +811,38 @@ function AdminProductsPage() {
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {confirm.open && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-border/70 bg-card p-6 shadow-card">
+            <div className="flex flex-col items-center text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500">
+                <AlertTriangle className="h-7 w-7" />
+              </div>
+              <h3 className="mt-4 font-display text-xl font-semibold">{confirm.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {confirm.description}
+              </p>
+            </div>
+            <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={closeConfirm}
+                className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirm.onConfirm}
+                className="rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
+              >
+                {confirm.actionLabel}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
