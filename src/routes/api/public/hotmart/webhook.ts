@@ -1,11 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from "@tanstack/react-router";
 import {
   hotmartWebhookPayloadSchema,
   logDelivery,
   upsertActiveSubscription,
   markSubscriptionCanceled,
   type HotmartWebhookPayload,
-} from '@/lib/hotmart.server';
+} from "@/lib/hotmart.server";
 
 /**
  * Webhook de compra da Hotmart.
@@ -22,34 +22,42 @@ import {
  * - SUBSCRIPTION_REACTIVATED → reativa assinatura
  */
 
-export const Route = createFileRoute('/api/public/hotmart/webhook')({
+export const Route = createFileRoute("/api/public/hotmart/webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
         const expected = process.env.HOTMART_HOTTOK;
         if (!expected) {
-          console.error('[HOTMART] HOTMART_HOTTOK not configured');
-          return new Response('server not configured', { status: 500 });
+          console.error("[HOTMART] HOTMART_HOTTOK not configured");
+          return new Response("server not configured", { status: 500 });
         }
 
         const url = new URL(request.url);
-        const got = request.headers.get('x-hotmart-hottok') ?? url.searchParams.get('hottok');
+        const got = request.headers.get("x-hotmart-hottok") ?? url.searchParams.get("hottok");
         if (got !== expected) {
-          logDelivery({ step: 'auth', event: 'unknown', success: false, detail: 'invalid hottok' });
-          return new Response('invalid hottok', { status: 401 });
+          logDelivery({ step: "auth", event: "unknown", success: false, detail: "invalid hottok" });
+          return new Response("invalid hottok", { status: 401 });
         }
 
         let raw: unknown;
         try {
           raw = await request.json();
         } catch {
-          return new Response('invalid json', { status: 400 });
+          return new Response("invalid json", { status: 400 });
         }
 
         const parse = hotmartWebhookPayloadSchema.safeParse(raw);
         if (!parse.success) {
-          logDelivery({ step: 'validate', event: 'unknown', success: false, detail: parse.error.message });
-          return Response.json({ received: false, error: 'invalid payload', details: parse.error.format() }, { status: 400 });
+          logDelivery({
+            step: "validate",
+            event: "unknown",
+            success: false,
+            detail: parse.error.message,
+          });
+          return Response.json(
+            { received: false, error: "invalid payload", details: parse.error.format() },
+            { status: 400 },
+          );
         }
 
         const payload: HotmartWebhookPayload = parse.data;
@@ -59,26 +67,35 @@ export const Route = createFileRoute('/api/public/hotmart/webhook')({
           let logs: ReturnType<typeof logDelivery>[] = [];
 
           switch (event) {
-            case 'PURCHASE_APPROVED':
-            case 'PURCHASE_COMPLETE':
-            case 'SUBSCRIPTION_REACTIVATED':
+            case "PURCHASE_APPROVED":
+            case "PURCHASE_COMPLETE":
+            case "SUBSCRIPTION_REACTIVATED":
               logs = await upsertActiveSubscription(payload);
               break;
-            case 'PURCHASE_BILLET_PRINTED':
+            case "PURCHASE_BILLET_PRINTED":
               // Boleto ainda não libera acesso — aguarda PURCHASE_APPROVED.
-              logs = [logDelivery({ step: 'ignore', event, success: true, detail: 'billet printed, awaiting approval' })];
+              logs = [
+                logDelivery({
+                  step: "ignore",
+                  event,
+                  success: true,
+                  detail: "billet printed, awaiting approval",
+                }),
+              ];
               break;
-            case 'PURCHASE_REFUNDED':
-            case 'PURCHASE_CHARGEBACK':
-            case 'PURCHASE_CANCELED':
-            case 'PURCHASE_EXPIRED':
+            case "PURCHASE_REFUNDED":
+            case "PURCHASE_CHARGEBACK":
+            case "PURCHASE_CANCELED":
+            case "PURCHASE_EXPIRED":
               logs = await markSubscriptionCanceled(payload, false);
               break;
-            case 'SUBSCRIPTION_CANCELLATION':
+            case "SUBSCRIPTION_CANCELLATION":
               logs = await markSubscriptionCanceled(payload, true);
               break;
             default:
-              logs = [logDelivery({ step: 'ignore', event, success: true, detail: 'event not handled' })];
+              logs = [
+                logDelivery({ step: "ignore", event, success: true, detail: "event not handled" }),
+              ];
           }
 
           const failed = logs.find((l) => !l.success);
@@ -90,9 +107,9 @@ export const Route = createFileRoute('/api/public/hotmart/webhook')({
           });
         } catch (e) {
           const detail = e instanceof Error ? e.message : String(e);
-          console.error('[HOTMART] webhook error', e);
-          logDelivery({ step: 'handler', event, success: false, detail });
-          return new Response('handler error', { status: 500 });
+          console.error("[HOTMART] webhook error", e);
+          logDelivery({ step: "handler", event, success: false, detail });
+          return new Response("handler error", { status: 500 });
         }
       },
     },
