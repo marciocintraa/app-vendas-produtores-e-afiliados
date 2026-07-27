@@ -489,23 +489,23 @@ function Pricing() {
 
   const plans = [
     {
-      name: "Starter",
-      price: "R$ 57",
+      name: "Individual",
+      price: "R$ 37",
       per: "/mês",
       desc: "Para começar a vender com um catálogo enxuto.",
       features: [
-        "Até 2 produtos",
+        "Até 1 produto",
         "Categorias básicas",
         "Tema padrão",
         "Estatísticas básicas",
       ],
-      cta: "Assinar Starter",
+      cta: "Assinar Individual",
       priceId: "starter_monthly" as PlanId,
       highlight: false,
     },
     {
-      name: "Pro",
-      price: "R$ 97",
+      name: "Familiar",
+      price: "R$ 57",
       per: "/mês",
       desc: "Para produtores em crescimento que querem escalar.",
       features: [
@@ -515,13 +515,13 @@ function Pricing() {
         "Notificações push",
         "Estatísticas completas",
       ],
-      cta: "Assinar Pro",
+      cta: "Assinar Familiar",
       priceId: "pro_monthly" as PlanId,
       highlight: true,
     },
     {
       name: "Premium",
-      price: "R$ 157",
+      price: "R$ 97",
       per: "/mês",
       desc: "Para operações profissionais com marca própria.",
       features: [
