@@ -365,6 +365,7 @@ async def main() -> int:
         await install_toast_capture(page)
 
         failures: list[str] = []
+        results: list[dict] = []
         scenarios = [
             scenario_shortcuts_ignored_before_modal,
             scenario_invalid_then_valid,
@@ -372,20 +373,31 @@ async def main() -> int:
             scenario_shortcuts_disabled_during_final_confirm,
             scenario_shortcuts_after_close,
         ]
+        suite_started = asyncio.get_event_loop().time()
         for i, sc in enumerate(scenarios, 1):
+            started = asyncio.get_event_loop().time()
+            entry = {"name": sc.__name__, "status": "passed", "error": None,
+                     "duration_ms": 0, "screenshot": None}
             try:
                 await sc(page)
             except (TestFailure, PWTimeoutError, AssertionError) as exc:
+                entry["status"] = "failed"
+                entry["error"] = f"{type(exc).__name__}: {exc}"
                 failures.append(f"{sc.__name__}: {exc}")
+                shot = SCREENSHOTS / f"fail_{i}_{sc.__name__}.png"
                 try:
-                    await page.screenshot(path=str(SCREENSHOTS / f"fail_{i}_{sc.__name__}.png"))
+                    await page.screenshot(path=str(shot))
+                    entry["screenshot"] = shot.name
                 except Exception:
                     pass
+            entry["duration_ms"] = int((asyncio.get_event_loop().time() - started) * 1000)
+            results.append(entry)
             # Nuclear reset between scenarios: reload page to guaranteed clean state.
             if i < len(scenarios):
                 await page.goto(f"{BASE_URL}/painel/produtos", wait_until="domcontentloaded")
                 await page.wait_for_selector("text=E2E Shortcut Test", timeout=8000)
                 await install_toast_capture(page)
+        suite_duration_ms = int((asyncio.get_event_loop().time() - suite_started) * 1000)
 
         if trace_enabled:
             # Only persist the trace when something failed — keeps CI artifacts small.
@@ -406,11 +418,13 @@ async def main() -> int:
         await context.close()
         await browser.close()
 
+        video_asset = None
         if video_enabled:
             if failures and video_src_path:
                 dest = SCREENSHOTS / f"video-{browser_name}.webm"
                 try:
                     Path(video_src_path).replace(dest)
+                    video_asset = dest.name
                     print(f"video saved: {dest}")
                 except Exception as exc:
                     print(f"failed to persist video: {exc}")
@@ -421,6 +435,19 @@ async def main() -> int:
                 video_tmp_dir.rmdir()
             except Exception:
                 pass
+
+        trace_asset = trace_path.name if (trace_enabled and failures and trace_path.exists()) else None
+
+        report_path = SCREENSHOTS / f"report-{browser_name}.html"
+        write_html_report(
+            report_path,
+            browser_name=browser_name,
+            results=results,
+            suite_duration_ms=suite_duration_ms,
+            trace_asset=trace_asset,
+            video_asset=video_asset,
+        )
+        print(f"report saved: {report_path}")
 
         print("")
         if failures:
