@@ -301,6 +301,12 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .failed-clear:hover {{ background: #334155; }}
   .failed-table tr.hidden {{ display: none; }}
   mark.hl {{ background: #fbbf24; color: #0b1120; padding: 0 2px; border-radius: 2px; }}
+  th.sortable {{ cursor: pointer; user-select: none; }}
+  th.sortable:hover {{ color: #e2e8f0; }}
+  th.sortable:focus {{ outline: 2px solid #38bdf8; outline-offset: -2px; }}
+  th.sortable .sort-arrow {{ color: #475569; font-size: 11px; margin-left: 4px; }}
+  th.sortable[aria-sort="ascending"] .sort-arrow,
+  th.sortable[aria-sort="descending"] .sort-arrow {{ color: #38bdf8; }}
 
   /* Asset modal */
   .modal-backdrop {{ position: fixed; inset: 0; background: rgba(2, 6, 23, .82);
