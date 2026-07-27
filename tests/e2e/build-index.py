@@ -152,6 +152,7 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
         <button type="button" id="failedCopyModeReset" class="failed-clear" title="Reset copy mode to default and clear saved preference (Shift+R)">Reset mode</button>
         <button type="button" id="failedCopyModeCancel" class="failed-clear failed-reset-cancel" title="Cancel reset and keep current copy mode" style="display:none">Cancel</button>
         <button type="button" id="failedCopyModeUndo" class="failed-clear failed-reset-undo" title="Undo reset and restore previous copy mode (Ctrl+Z or Shift+Z)" style="display:none">Undo</button>
+        <button type="button" id="failedCopyModeRedo" class="failed-clear failed-reset-redo" title="Redo the last undone reset (Ctrl+Shift+Z or Cmd+Shift+Z)" style="display:none">Redo</button>
       </span>
       <button type="button" id="failedCopyMatchesAll" class="failed-clear failed-copy-matches-global" title="Copy matching error lines from all visible rows">Copy from visible rows</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
