@@ -98,6 +98,7 @@ type ConfirmState = {
   title: string;
   description: string;
   actionLabel: string;
+  nextCover?: string;
   onConfirm: () => void;
 };
 
