@@ -749,13 +749,19 @@ function FAQ() {
       id: "compartilhar",
       question: "Como meus clientes acessam o catálogo?",
       answer:
-        "Seu catálogo recebe um link público próprio que pode ser compartilhado no Instagram, WhatsApp, TikTok, e-mail ou bio. O app também pode ser instalado na tela inicial de Android e iOS como um aplicativo nativo.",
+        "Você instala o Vende Fácil Pro no Android e compartilha seu catálogo pelo WhatsApp, Instagram, TikTok, e-mail ou bio. Seus clientes veem seus produtos direto no app.",
     },
     {
       id: "plataformas",
       question: "Funciona com Hotmart, Kiwify, Eduzz e outras plataformas?",
       answer:
         "Sim. Você cola o link de afiliado ou de produtor de qualquer plataforma — Hotmart, Kiwify, Eduzz, Monetizze, PerfectPay, Kirvano, Shopify, Stripe e outras. A venda final acontece na plataforma escolhida.",
+    },
+    {
+      id: "android",
+      question: "O app funciona apenas no Android?",
+      answer:
+        "Sim. O Vende Fácil Pro é entregue como um arquivo .apk para Android. Após a compra aprovada, você recebe o link de download e instala no celular em poucos toques.",
     },
     {
       id: "personalizacao",
