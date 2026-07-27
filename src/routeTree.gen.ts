@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as EntregaRouteImport } from './routes/entrega'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AcessoRouteImport } from './routes/acesso'
@@ -18,6 +19,11 @@ import { Route as CatalogoProductIdRouteImport } from './routes/catalogo.$produc
 import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
 import { Route as ApiPublicHotmartWebhookRouteImport } from './routes/api/public/hotmart/webhook'
 
+const EntregaRoute = EntregaRouteImport.update({
+  id: '/entrega',
+  path: '/entrega',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CatalogoRoute = CatalogoRouteImport.update({
   id: '/catalogo',
   path: '/catalogo',
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/acesso': typeof AcessoRoute
   '/auth': typeof AuthRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/entrega': typeof EntregaRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/acesso': typeof AcessoRoute
   '/auth': typeof AuthRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/entrega': typeof EntregaRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/acesso': typeof AcessoRoute
   '/auth': typeof AuthRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/entrega': typeof EntregaRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/acesso'
     | '/auth'
     | '/catalogo'
+    | '/entrega'
     | '/catalogo/$productId'
     | '/painel/produtos'
     | '/api/public/hotmart/webhook'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
     | '/acesso'
     | '/auth'
     | '/catalogo'
+    | '/entrega'
     | '/catalogo/$productId'
     | '/painel/produtos'
     | '/api/public/hotmart/webhook'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/acesso'
     | '/auth'
     | '/catalogo'
+    | '/entrega'
     | '/catalogo/$productId'
     | '/_authenticated/painel/produtos'
     | '/api/public/hotmart/webhook'
@@ -125,11 +137,19 @@ export interface RootRouteChildren {
   AcessoRoute: typeof AcessoRoute
   AuthRoute: typeof AuthRoute
   CatalogoRoute: typeof CatalogoRouteWithChildren
+  EntregaRoute: typeof EntregaRoute
   ApiPublicHotmartWebhookRoute: typeof ApiPublicHotmartWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/entrega': {
+      id: '/entrega'
+      path: '/entrega'
+      fullPath: '/entrega'
+      preLoaderRoute: typeof EntregaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/catalogo': {
       id: '/catalogo'
       path: '/catalogo'
@@ -218,6 +238,7 @@ const rootRouteChildren: RootRouteChildren = {
   AcessoRoute: AcessoRoute,
   AuthRoute: AuthRoute,
   CatalogoRoute: CatalogoRouteWithChildren,
+  EntregaRoute: EntregaRoute,
   ApiPublicHotmartWebhookRoute: ApiPublicHotmartWebhookRoute,
 }
 export const routeTree = rootRouteImport
