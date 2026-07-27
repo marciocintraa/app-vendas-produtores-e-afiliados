@@ -276,7 +276,7 @@ async def scenario_shortcuts_disabled_during_final_confirm(page: Page) -> None:
     await select_candidate(page, COVER_B)
     await wait_for_validation(page, "enabled")
     await press(page, "Enter")
-    await page.wait_for_selector("text=Comparar capas antes de salvar", timeout=4000)
+    await page.wait_for_selector("text=Confirmação final da troca de capa", timeout=4000)
     check(await final_modal_is_open(page), "final-confirm step is open")
 
     await clear_toasts(page)
@@ -288,12 +288,9 @@ async def scenario_shortcuts_disabled_during_final_confirm(page: Page) -> None:
                   for t in toasts),
           "Ctrl+Z is inert while final-confirm is open")
 
-    # Cleanup: cancel final step + main modal
-    cancels = page.locator("button:has-text('Cancelar')")
-    if await cancels.count() > 0:
-        await cancels.first.click()
-    if await modal_is_open(page):
-        await page.locator("button:has-text('Cancelar')").first.click()
+    # Cleanup: close final step, main modal, and editor.
+    await close_editor(page)
+
 
 
 async def scenario_shortcuts_after_close(page: Page) -> None:
