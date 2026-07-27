@@ -117,13 +117,22 @@ function BemVindoPage() {
           </div>
 
           {hasEmail ? (
-            <Link
-              to={accessHref}
-              className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90"
-            >
-              Acessar o Vende Fácil Pro
-              <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
-            </Link>
+            <div className="space-y-4">
+              <Link
+                to={accessHref}
+                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-base font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90"
+              >
+                Acessar o Vende Fácil Pro
+                <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
+              </Link>
+              <button
+                type="button"
+                onClick={handleEdit}
+                className="w-full text-center text-sm text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+              >
+                Não é {initialEmail}? Clique aqui para informar o email correto.
+              </button>
+            </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-3">
               <label htmlFor="buyer-email" className="block text-sm font-medium">
