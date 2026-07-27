@@ -638,24 +638,33 @@ function AdminProductsPage() {
                               <button
                                 type="button"
                                 onClick={() => {
-                                  if (
-                                    editing.cover === src &&
-                                    typeof window !== "undefined" &&
-                                    !window.confirm(
-                                      "Esta imagem é a capa principal do produto. Removê-la trocará a capa automaticamente. Deseja continuar?",
-                                    )
-                                  ) {
+                                  if (editing.cover !== src) {
+                                    setError(null);
+                                    setEditing((prev) =>
+                                      prev
+                                        ? { ...prev, gallery: prev.gallery.filter((_, j) => j !== i) }
+                                        : prev,
+                                    );
                                     return;
                                   }
-                                  setError(null);
-                                  setEditing((prev) => {
-                                    if (!prev) return prev;
-                                    const nextGallery = prev.gallery.filter((_, j) => j !== i);
-                                    const nextCover =
-                                      prev.cover === src
-                                        ? nextGallery[0] ?? ""
-                                        : prev.cover;
-                                    return { ...prev, gallery: nextGallery, cover: nextCover };
+                                  openConfirm({
+                                    title: "Trocar capa principal?",
+                                    description:
+                                      "Esta imagem é a capa atual do produto. Removê-la promoverá automaticamente a próxima imagem da galeria como nova capa.",
+                                    actionLabel: "Sim, trocar capa",
+                                    onConfirm: () => {
+                                      setError(null);
+                                      setEditing((prev) => {
+                                        if (!prev) return prev;
+                                        const nextGallery = prev.gallery.filter((_, j) => j !== i);
+                                        return {
+                                          ...prev,
+                                          gallery: nextGallery,
+                                          cover: nextGallery[0] ?? "",
+                                        };
+                                      });
+                                      closeConfirm();
+                                    },
                                   });
                                 }}
                                 className="rounded-md bg-background/80 p-1 text-muted-foreground backdrop-blur transition-colors hover:text-destructive"
