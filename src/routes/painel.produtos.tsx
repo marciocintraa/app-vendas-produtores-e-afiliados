@@ -1181,10 +1181,107 @@ function AdminProductsPage() {
                     />
                   </div>
                 </div>
+                  <div
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      if (!coverDropActive) setCoverDropActive(true);
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      setCoverDropActive(false);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setCoverDropActive(false);
+                      if (e.dataTransfer.files?.length) {
+                        handleCoverFileDrop(e.dataTransfer.files);
+                      }
+                    }}
+                    className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-6 text-center transition-all ${
+                      coverDropActive
+                        ? "border-primary bg-primary/10"
+                        : "border-border/70 bg-surface/40 hover:border-primary/50"
+                    }`}
+                  >
+                    <ImageIcon className="mb-2 h-6 w-6 text-muted-foreground" />
+                    <p className="text-sm font-medium">
+                      Arraste e solte uma imagem aqui
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      JPEG, PNG, WebP, GIF ou AVIF · até 5 MB · validação automática
+                    </p>
+                    <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border/70 bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-2">
+                      <Upload className="h-3.5 w-3.5" />
+                      Selecionar arquivo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          if (e.target.files?.length) handleCoverFileDrop(e.target.files);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    {coverDropError && (
+                      <p className="mt-2 text-xs text-destructive">{coverDropError}</p>
+                    )}
+                  </div>
+                  {confirm.candidates.length === 0 && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Nenhuma imagem restante na galeria. Solte uma imagem acima para definir como nova capa.
+                    </p>
+                  )}
+                </div>
               ) : (
-                <p className="mt-4 text-xs text-muted-foreground">
-                  Nenhuma imagem restante na galeria. A capa ficará vazia.
-                </p>
+                <div className="mt-5 w-full text-left">
+                  <div
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      if (!coverDropActive) setCoverDropActive(true);
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      setCoverDropActive(false);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setCoverDropActive(false);
+                      if (e.dataTransfer.files?.length) {
+                        handleCoverFileDrop(e.dataTransfer.files);
+                      }
+                    }}
+                    className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-8 text-center transition-all ${
+                      coverDropActive
+                        ? "border-primary bg-primary/10"
+                        : "border-border/70 bg-surface/40 hover:border-primary/50"
+                    }`}
+                  >
+                    <ImageIcon className="mb-2 h-6 w-6 text-muted-foreground" />
+                    <p className="text-sm font-medium">
+                      Arraste e solte uma imagem para definir como nova capa
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      JPEG, PNG, WebP, GIF ou AVIF · até 5 MB · validação automática
+                    </p>
+                    <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border/70 bg-surface px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-surface-2">
+                      <Upload className="h-3.5 w-3.5" />
+                      Selecionar arquivo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          if (e.target.files?.length) handleCoverFileDrop(e.target.files);
+                          e.target.value = "";
+                        }}
+                      />
+                    </label>
+                    {coverDropError && (
+                      <p className="mt-2 text-xs text-destructive">{coverDropError}</p>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
             <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
