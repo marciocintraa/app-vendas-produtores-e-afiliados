@@ -750,8 +750,25 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
 
     const fCopyMatchesAll = document.getElementById('failedCopyMatchesAll');
     const fCopyMode = document.getElementById('failedCopyMode');
+    const COPY_MODE_KEY = 'failedCopyMode';
 
     function getCopyMode() {{ return fCopyMode ? fCopyMode.value : 'matches'; }}
+
+    function saveCopyMode(mode) {{
+      try {{ localStorage.setItem(COPY_MODE_KEY, mode); }} catch (e) {{}}
+    }}
+
+    function restoreCopyMode() {{
+      try {{
+        const saved = localStorage.getItem(COPY_MODE_KEY);
+        if (saved && fCopyMode) {{
+          const valid = Array.from(fCopyMode.options).some(o => o.value === saved);
+          if (valid) {{
+            fCopyMode.value = saved;
+          }}
+        }}
+      }} catch (e) {{}}
+    }}
 
     function firstErrorMessage(errRaw) {{
       if (!errRaw) return '';
@@ -846,9 +863,13 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
 
     if (fCopyMode) {{
       fCopyMode.addEventListener('change', () => {{
+        saveCopyMode(getCopyMode());
         updateCopyMatchesAllState();
       }});
     }}
+
+    restoreCopyMode();
+    updateCopyMatchesAllState();
 
     applyFilters();
 
