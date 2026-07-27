@@ -489,23 +489,23 @@ function Pricing() {
 
   const plans = [
     {
-      name: "Starter",
-      price: "R$ 57",
+      name: "Individual",
+      price: "R$ 37",
       per: "/mês",
       desc: "Para começar a vender com um catálogo enxuto.",
       features: [
-        "Até 2 produtos",
+        "Até 1 produto",
         "Categorias básicas",
         "Tema padrão",
         "Estatísticas básicas",
       ],
-      cta: "Assinar Starter",
+      cta: "Assinar Individual",
       priceId: "starter_monthly" as PlanId,
       highlight: false,
     },
     {
-      name: "Pro",
-      price: "R$ 97",
+      name: "Familiar",
+      price: "R$ 57",
       per: "/mês",
       desc: "Para produtores em crescimento que querem escalar.",
       features: [
@@ -515,13 +515,13 @@ function Pricing() {
         "Notificações push",
         "Estatísticas completas",
       ],
-      cta: "Assinar Pro",
+      cta: "Assinar Familiar",
       priceId: "pro_monthly" as PlanId,
       highlight: true,
     },
     {
       name: "Premium",
-      price: "R$ 157",
+      price: "R$ 97",
       per: "/mês",
       desc: "Para operações profissionais com marca própria.",
       features: [
@@ -608,9 +608,9 @@ function CheckoutModal({ plan, onClose }: { plan: PlanId; onClose: () => void })
   const [error, setError] = useState<string | null>(null);
 
   const planLabel: Record<PlanId, string> = {
-    starter_monthly: "Starter — R$ 57/mês",
-    pro_monthly: "Pro — R$ 97/mês",
-    premium_monthly: "Premium — R$ 157/mês",
+    starter_monthly: "Individual — R$ 37/mês",
+    pro_monthly: "Familiar — R$ 57/mês",
+    premium_monthly: "Premium — R$ 97/mês",
   };
 
   const formatCpf = (v: string) => {
@@ -740,7 +740,7 @@ function FAQ() {
       id: "planos",
       question: "Quantos produtos posso cadastrar em cada plano?",
       answer:
-        "O plano Starter permite até 2 produtos, o Pro até 5 produtos, e o Premium é ilimitado. Você pode trocar de plano a qualquer momento conforme seu catálogo cresce.",
+        "O plano Individual permite até 1 produto, o Familiar até 5 produtos, e o Premium é ilimitado. Você pode trocar de plano a qualquer momento conforme seu catálogo cresce.",
     },
     {
       id: "produtos",
@@ -770,7 +770,7 @@ function FAQ() {
       id: "personalizacao",
       question: "Posso personalizar cores, logo e domínio?",
       answer:
-        "Sim. Nos planos Pro e Premium você pode alterar cores, tipografia, logotipo e ícone. No Premium também é possível usar domínio próprio e configurações white label completas.",
+        "Sim. Nos planos Familiar e Premium você pode alterar cores, tipografia, logotipo e ícone. No Premium também é possível usar domínio próprio e configurações white label completas.",
     },
     {
       id: "cancelamento",
