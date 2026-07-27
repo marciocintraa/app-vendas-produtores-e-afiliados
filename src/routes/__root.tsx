@@ -79,11 +79,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Vende Fácil Pro — App Builder para Produtos Digitais" },
+      { title: "Vende Fácil Pro — App Android para Produtos Digitais" },
       {
         name: "description",
         content:
-          "Transforme seu catálogo de infoprodutos em um app profissional. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
+          "Transforme seu catálogo de infoprodutos em um app profissional para Android. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
       },
       { name: "author", content: "Vende Fácil Pro" },
       { name: "theme-color", content: "#8B5CF6" },
