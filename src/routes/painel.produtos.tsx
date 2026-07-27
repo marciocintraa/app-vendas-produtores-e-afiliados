@@ -494,10 +494,12 @@ function AdminProductsPage() {
         }
         return;
       }
-      if (e.key === "Enter" && !e.shiftKey && !e.altKey && !isActionTarget(e.target)) {
+      if (e.key === "Enter" && !e.shiftKey && !e.altKey && !e.ctrlKey && !e.metaKey && !isActionTarget(e.target)) {
         e.preventDefault();
         requestFinalConfirm();
       }
+
+
     }
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
@@ -509,6 +511,20 @@ function AdminProductsPage() {
     finalConfirm.open,
     coverValidation,
   ]);
+
+  const confirmBtnRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!confirm.open || finalConfirm.open) return;
+    if (
+      coverValidation.status === "valid" &&
+      coverValidation.src === confirm.selectedNext &&
+      confirmBtnRef.current &&
+      !confirmBtnRef.current.disabled
+    ) {
+      confirmBtnRef.current.focus();
+    }
+  }, [confirm.open, confirm.selectedNext, coverValidation, finalConfirm.open]);
+
 
 
   function openConfirm(opts: Omit<ConfirmState, "open">) {
@@ -1428,6 +1444,7 @@ function AdminProductsPage() {
                 </button>
               )}
               <button
+                ref={confirmBtnRef}
                 type="button"
                 onClick={requestFinalConfirm}
                 disabled={
