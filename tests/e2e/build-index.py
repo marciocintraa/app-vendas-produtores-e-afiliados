@@ -49,7 +49,45 @@ def load_summary(json_path: Path, engine: str) -> dict:
     }
 
 
+def _render_failed_table(summaries: dict[str, dict | None]) -> str:
+    rows = []
+    for engine in ENGINES:
+        s = summaries.get(engine)
+        if not s:
+            continue
+        trace_href = s.get("trace_href")
+        video_href = s.get("video_href")
+        for sc in s.get("scenarios", []):
+            if sc.get("status") != "failed":
+                continue
+            name = _html.escape(sc.get("name", "(unnamed)"))
+            dur = sc.get("duration_ms", 0)
+            links = []
+            if trace_href:
+                links.append(f'<a class="inline-link trace" href="{trace_href}" download title="Download trace.zip">trace</a>')
+            if video_href:
+                links.append(f'<a class="inline-link video" href="{video_href}" download title="Download video.webm">video</a>')
+            links_html = f' <span class="inline-links">{" ".join(links)}</span>' if links else ""
+            rows.append(
+                f'<tr><td class="eng">{engine}</td>'
+                f'<td class="sc"><span class="scn">{name}</span>{links_html}</td>'
+                f'<td class="dur">{dur} ms</td></tr>'
+            )
+    if not rows:
+        return ""
+    return f"""
+  <h2>Failed scenarios</h2>
+  <div class="failed-table-wrap">
+    <table class="failed-table">
+      <thead><tr><th>Engine</th><th>Scenario</th><th>Duration</th></tr></thead>
+      <tbody>{''.join(rows)}</tbody>
+    </table>
+    <p class="muted">Trace/video assets are recorded per engine run and shared across its failed scenarios.</p>
+  </div>"""
+
+
 def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
+
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
 
     totals_passed = sum((s or {}).get("passed", 0) for s in summaries.values())
