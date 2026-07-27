@@ -19,7 +19,6 @@ import {
   HelpCircle,
   ChevronDown,
   Quote,
-  Download,
   Lock,
   X,
 } from "lucide-react";
@@ -56,7 +55,6 @@ function Landing() {
       <Nav />
       <main>
         <Hero />
-        <DownloadApp />
         <SocialProof />
         <Features />
         <Audience />
@@ -153,121 +151,6 @@ function Hero() {
             />
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
-
-function DownloadApp() {
-  const [showInstallHelp, setShowInstallHelp] = useState(false);
-
-  const installSteps = [
-    "Baixe o arquivo .apk no botão abaixo ou pela área de membros.",
-    "Abra o arquivo baixado no celular Android.",
-    "Toque em \"Instalar\" e, se solicitado, permita \"Fontes desconhecidas\".",
-    "Pronto. O ícone do Vende Fácil Pro aparecerá na sua tela inicial.",
-  ];
-
-  return (
-    <section id="baixar-app" className="py-16 bg-surface/30 border-y border-border">
-      <div className="container-page">
-        <div className="card-glass p-8 md:p-10 relative overflow-hidden">
-          <div
-            className="absolute inset-0 -z-10 opacity-60"
-            style={{
-              background:
-                "radial-gradient(circle at 20% 50%, oklch(0.72 0.2 295 / 0.35), transparent 55%)",
-            }}
-          />
-          <div className="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
-            <div>
-              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-3 py-1 text-xs font-medium text-accent">
-                <Smartphone className="w-3.5 h-3.5" />
-                App para Android
-              </span>
-              <h2 className="mt-4 text-2xl md:text-4xl font-bold">
-                Baixe o <span className="text-gradient">Vende Fácil Pro</span> no Android
-              </h2>
-              <p className="mt-3 text-muted-foreground max-w-xl">
-                Após a compra você recebe o link do arquivo .apk para instalar no seu celular Android.
-                Não precisa de loja, login complicado ou configuração técnica.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <a href="#planos" className="btn-primary">
-                  <Lock className="w-4 h-4" />
-                  Assinar para receber o .apk
-                </a>
-                <button
-                  type="button"
-                  onClick={() => setShowInstallHelp(true)}
-                  className="btn-ghost"
-                >
-                  Como instalar
-                </button>
-              </div>
-              <p className="mt-3 text-xs text-muted-foreground">
-                O download do arquivo .apk é liberado somente após a confirmação da compra na Hotmart.
-              </p>
-            </div>
-
-            <div className="hidden lg:flex items-center gap-4">
-              <div className="grid place-items-center w-20 h-20 rounded-2xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
-                <Smartphone className="w-9 h-9 text-accent" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {showInstallHelp && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="install-title"
-          >
-            <div className="card-glass w-full max-w-md p-6 md:p-8 relative">
-              <button
-                onClick={() => setShowInstallHelp(false)}
-                className="absolute top-4 right-4 p-1 rounded-md hover:bg-white/5 text-muted-foreground"
-                aria-label="Fechar instruções"
-              >
-                <X className="w-5 h-5" />
-              </button>
-              <div className="flex items-center gap-3">
-                <div className="grid place-items-center w-10 h-10 rounded-xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
-                  <Download className="w-5 h-5 text-accent" />
-                </div>
-                <h3 id="install-title" className="text-xl font-bold">
-                  Como instalar no Android
-                </h3>
-              </div>
-              <p className="mt-3 text-sm text-muted-foreground">
-                Siga os passos abaixo para instalar o app a partir do arquivo .apk:
-              </p>
-              <ol className="mt-5 space-y-3">
-                {installSteps.map((step, idx) => (
-                  <li key={idx} className="flex gap-3 text-sm">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-accent/10 text-accent text-xs font-semibold grid place-items-center">
-                      {idx + 1}
-                    </span>
-                    <span className="text-muted-foreground">{step}</span>
-                  </li>
-                ))}
-              </ol>
-              <a
-                href="#planos"
-                onClick={() => setShowInstallHelp(false)}
-                className="mt-7 w-full btn-primary inline-flex justify-center"
-              >
-                <Lock className="w-4 h-4" />
-                Assinar para receber o .apk
-              </a>
-              <p className="mt-3 text-xs text-muted-foreground text-center">
-                O link do arquivo .apk é enviado após a compra ser aprovada.
-              </p>
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );
