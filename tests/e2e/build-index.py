@@ -70,15 +70,20 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
             if video_href:
                 links.append(f'<a class="inline-link video" href="{video_href}" download title="Download video.webm">video</a>')
             links_html = f' <span class="inline-links">{" ".join(links)}</span>' if links else ""
+            err_preview = _html.escape(err_raw) if err_raw else ""
+            err_block = (
+                f'<pre class="err-text" hidden>{err_preview}</pre>' if err_raw else ""
+            )
             rows.append(
                 f'<tr data-engine="{engine}" data-name="{name.lower()}" data-duration="{dur}"'
                 f' data-trace="{"1" if trace_href else "0"}" data-video="{"1" if video_href else "0"}"'
                 f' data-trace-href="{trace_href or ""}" data-video-href="{video_href or ""}"'
                 f' data-error="{err_attr}">'
                 f'<td class="eng">{engine}</td>'
-                f'<td class="sc"><span class="scn">{name}</span>{links_html}</td>'
+                f'<td class="sc"><span class="scn">{name}</span>{links_html}{err_block}</td>'
                 f'<td class="dur">{dur} ms</td></tr>'
             )
+
     if not rows:
         return ""
     engines_with_failures = [
@@ -326,7 +331,16 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
                     color: #cbd5e1; cursor: pointer; user-select: none; }}
   .failed-check input {{ accent-color: #38bdf8; }}
   .failed-table tr.hidden {{ display: none; }}
+  .err-text {{ margin: 8px 0 0; padding: 8px 10px; background: #0b1120;
+               border: 1px solid #1f2937; border-left: 3px solid #7f1d1d;
+               border-radius: 6px; color: #cbd5e1; font-size: 11.5px;
+               font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+               white-space: pre-wrap; max-height: 220px; overflow: auto;
+               line-height: 1.45; }}
   mark.hl {{ background: #fbbf24; color: #0b1120; padding: 0 2px; border-radius: 2px; }}
+  mark.hl-err {{ background: #f87171; color: #0b1120; padding: 0 2px; border-radius: 2px;
+                 font-weight: 600; }}
+
   th.sortable {{ cursor: pointer; user-select: none; }}
   th.sortable:hover {{ color: #e2e8f0; }}
   th.sortable:focus {{ outline: 2px solid #38bdf8; outline-offset: -2px; }}
@@ -531,10 +545,15 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
       const hasErrOnly = fHasError.checked;
       let visible = 0;
       const re = q ? new RegExp('(' + escapeRe(q) + ')', 'ig') : null;
+      const reErr = errTerm ? new RegExp('(' + escapeRe(errTerm) + ')', 'ig') : null;
+      function escHtml(s) {{
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }}
       rows.forEach(r => {{
         const name = r.dataset.name || '';
         const engine = r.dataset.engine || '';
-        const err = (r.dataset.error || '').toLowerCase();
+        const errRaw = r.dataset.error || '';
+        const err = errRaw.toLowerCase();
         const errorOk = (!hasErrOnly || err.length > 0)
           && (!errTerm || err.includes(errTerm));
         const match = (!eng || engine === eng)
@@ -549,8 +568,20 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
             ? original.replace(re, '<mark class="hl">$1</mark>')
             : original;
         }}
+        const et = r.querySelector('.err-text');
+        if (et) {{
+          const showErr = match && errRaw && (errTerm || hasErrOnly);
+          if (showErr) {{
+            const esc = escHtml(errRaw);
+            et.innerHTML = reErr ? esc.replace(reErr, '<mark class="hl-err">$1</mark>') : esc;
+            et.hidden = false;
+          }} else {{
+            et.hidden = true;
+          }}
+        }}
         if (match) visible++;
       }});
+
       fCount.textContent = visible + ' of ' + totalRows + ' failure' + (totalRows === 1 ? '' : 's');
       fEmpty.style.display = visible === 0 ? '' : 'none';
     }}
