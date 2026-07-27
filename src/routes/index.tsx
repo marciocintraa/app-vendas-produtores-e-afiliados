@@ -547,10 +547,11 @@ function Pricing() {
             Planos
           </span>
           <h2 className="mt-3 text-3xl md:text-5xl font-bold">
-            Assinatura simples, receita recorrente.
+            Assinatura simples, app Android liberado.
           </h2>
           <p className="mt-4 text-muted-foreground text-lg">
-            Escolha o plano que acompanha o crescimento do seu catálogo.
+            Escolha o plano que acompanha o crescimento do seu catálogo. Após o pagamento você recebe
+            o link do .apk para instalar no Android.
           </p>
         </div>
 
