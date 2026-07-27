@@ -58,12 +58,21 @@ function CatalogPage() {
             <Sparkles className="h-5 w-5 text-primary" />
             Digital Store Pro
           </Link>
-          <Link
-            to="/"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            ← Voltar ao site
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/painel/produtos"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Settings className="h-4 w-4" /> Gerenciar
+            </Link>
+            <Link
+              to="/"
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              ← Voltar ao site
+            </Link>
+          </div>
+
         </div>
       </header>
 
