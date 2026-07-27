@@ -255,6 +255,45 @@ function AdminProductsPage() {
     meta?: CoverMeta;
   }>({ src: "", status: "idle" });
   const validationCtrlRef = useRef<AbortController | null>(null);
+  const [coverDropActive, setCoverDropActive] = useState(false);
+  const [coverDropError, setCoverDropError] = useState<string | null>(null);
+
+  function handleCoverFileDrop(files: FileList | File[]) {
+    setCoverDropError(null);
+    const list = Array.from(files);
+    const file = list.find((f) => f.type.startsWith("image/"));
+    if (!file) {
+      setCoverDropError("Arquivo inválido. Envie uma imagem (JPEG, PNG, WebP, GIF ou AVIF).");
+      toast.error("Formato não suportado", { description: "Solte um arquivo de imagem." });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setCoverDropError("A imagem excede 5 MB.");
+      toast.error("Imagem muito grande", { description: "Tamanho máximo permitido: 5 MB." });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onerror = () => {
+      setCoverDropError("Não foi possível ler o arquivo.");
+      toast.error("Falha ao ler o arquivo");
+    };
+    reader.onload = () => {
+      const url = typeof reader.result === "string" ? reader.result : null;
+      if (!url) return;
+      setEditing((prev) =>
+        prev && !prev.gallery.includes(url)
+          ? { ...prev, gallery: [url, ...prev.gallery].slice(0, MAX_GALLERY) }
+          : prev,
+      );
+      setConfirm((prev) => ({
+        ...prev,
+        candidates: prev.candidates.includes(url) ? prev.candidates : [url, ...prev.candidates],
+        selectedNext: url,
+      }));
+      toast.message("Imagem recebida", { description: "Validando automaticamente…" });
+    };
+    reader.readAsDataURL(file);
+  }
 
   function requestFinalConfirm() {
     if (coverValidation.status !== "valid" || coverValidation.src !== confirm.selectedNext) {
