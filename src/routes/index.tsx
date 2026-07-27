@@ -18,8 +18,13 @@ import {
   HelpCircle,
   ChevronDown,
   Quote,
+  Download,
+  Monitor,
+  Apple,
+  Plus,
+  X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import heroImg from "@/assets/hero-app.jpg";
 
 export const Route = createFileRoute("/")({
