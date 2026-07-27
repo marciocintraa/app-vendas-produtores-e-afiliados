@@ -571,21 +571,28 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   modalClose.addEventListener('click', closeModal);
   modal.addEventListener('click', (e) => {{ if (e.target === modal) closeModal(); }});
   document.addEventListener('keydown', (e) => {{
+    const inInput = !!(e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA'));
     if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
     if (e.key === '/' && !modal.classList.contains('open')) {{
-      const t = e.target;
-      if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) return;
+      if (inInput) return;
       const s = document.getElementById('failedSearch');
       if (s) {{ e.preventDefault(); s.focus(); s.select(); }}
     }}
     if (e.key === 'R' && e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && !modal.classList.contains('open')) {{
-      const t = e.target;
-      if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) return;
+      if (inInput) return;
       const resetBtn = document.getElementById('failedCopyModeReset');
-      if (resetBtn && resetBtn.textContent !== 'Confirm reset?') {{
+      if (resetBtn && resetBtn.style.display !== 'none' && resetBtn.textContent !== 'Confirm reset?') {{
         e.preventDefault();
         resetBtn.click();
         resetBtn.focus();
+      }}
+    }}
+    if ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey) && !e.altKey && !modal.classList.contains('open')) {{
+      if (inInput) return;
+      const undoBtn = document.getElementById('failedCopyModeUndo');
+      if (undoBtn && undoBtn.style.display !== 'none') {{
+        e.preventDefault();
+        undoBtn.click();
       }}
     }}
     if (e.key === 'Escape' && !modal.classList.contains('open')) {{
