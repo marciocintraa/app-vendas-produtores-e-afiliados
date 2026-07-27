@@ -69,7 +69,8 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
                 links.append(f'<a class="inline-link video" href="{video_href}" download title="Download video.webm">video</a>')
             links_html = f' <span class="inline-links">{" ".join(links)}</span>' if links else ""
             rows.append(
-                f'<tr data-engine="{engine}" data-name="{name.lower()}" data-duration="{dur}">'
+                f'<tr data-engine="{engine}" data-name="{name.lower()}" data-duration="{dur}"'
+                f' data-trace="{"1" if trace_href else "0"}" data-video="{"1" if video_href else "0"}">'
                 f'<td class="eng">{engine}</td>'
                 f'<td class="sc"><span class="scn">{name}</span>{links_html}</td>'
                 f'<td class="dur">{dur} ms</td></tr>'
@@ -89,6 +90,14 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
              placeholder="Search scenario name…" autocomplete="off" spellcheck="false">
       <select id="failedEngine" class="failed-select" aria-label="Filter by engine">
         <option value="">All engines</option>{engine_options}
+      </select>
+      <select id="failedAssets" class="failed-select" aria-label="Filter by assets">
+        <option value="">All assets</option>
+        <option value="any">With trace or video</option>
+        <option value="trace">With trace</option>
+        <option value="video">With video</option>
+        <option value="both">With trace and video</option>
+        <option value="none">Without assets</option>
       </select>
       <span class="failed-count muted" id="failedCount"></span>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
@@ -468,6 +477,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   // Failed scenarios filters
   const fSearch = document.getElementById('failedSearch');
   const fEngine = document.getElementById('failedEngine');
+  const fAssets = document.getElementById('failedAssets');
   const fClear = document.getElementById('failedClear');
   const fCount = document.getElementById('failedCount');
   const fEmpty = document.getElementById('failedEmpty');
@@ -481,15 +491,31 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     const totalRows = rows.length;
 
     function escapeRe(s) {{ return s.replace(/[.*+?^${{}}()|[\\]\\\\]/g, '\\\\$&'); }}
+    function assetMatch(r, mode) {{
+      const hasT = r.dataset.trace === '1';
+      const hasV = r.dataset.video === '1';
+      switch (mode) {{
+        case '':      return true;
+        case 'any':   return hasT || hasV;
+        case 'trace': return hasT;
+        case 'video': return hasV;
+        case 'both':  return hasT && hasV;
+        case 'none':  return !hasT && !hasV;
+        default:      return true;
+      }}
+    }}
     function applyFilters() {{
       const q = (fSearch.value || '').trim().toLowerCase();
       const eng = fEngine.value || '';
+      const assets = fAssets.value || '';
       let visible = 0;
       const re = q ? new RegExp('(' + escapeRe(q) + ')', 'ig') : null;
       rows.forEach(r => {{
         const name = r.dataset.name || '';
         const engine = r.dataset.engine || '';
-        const match = (!eng || engine === eng) && (!q || name.includes(q));
+        const match = (!eng || engine === eng)
+          && (!q || name.includes(q))
+          && assetMatch(r, assets);
         r.classList.toggle('hidden', !match);
         const scn = r.querySelector('.scn');
         if (scn) {{
@@ -505,8 +531,10 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     }}
     fSearch.addEventListener('input', applyFilters);
     fEngine.addEventListener('change', applyFilters);
+    fAssets.addEventListener('change', applyFilters);
     fClear.addEventListener('click', () => {{
-      fSearch.value = ''; fEngine.value = ''; applyFilters(); fSearch.focus();
+      fSearch.value = ''; fEngine.value = ''; fAssets.value = '';
+      applyFilters(); fSearch.focus();
     }});
     applyFilters();
 
