@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, Star, ArrowRight, Sparkles } from "lucide-react";
-import { PRODUCTS, CATEGORIES } from "@/lib/catalog-data";
+import { Search, Star, ArrowRight, Sparkles, Settings } from "lucide-react";
+import { useProducts } from "@/lib/catalog-store";
+
 
 export const Route = createFileRoute("/catalogo")({
   head: () => ({
