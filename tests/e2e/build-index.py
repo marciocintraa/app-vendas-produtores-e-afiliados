@@ -821,7 +821,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
           totalItems += 1;
         }}
 
-        chunks.push('[' + engine + '] ' + name + '\n' + payload);
+        chunks.push('[' + engine + '] ' + name + String.fromCharCode(10) + payload);
       }});
 
       if (!chunks.length) {{
