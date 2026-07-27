@@ -605,6 +605,31 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         applyFilters();
         return;
       }}
+      const copyMatchesBtn = e.target.closest('.err-copy-matches');
+      if (copyMatchesBtn) {{
+        const r = copyMatchesBtn.closest('tr');
+        const err = r ? (r.dataset.error || '') : '';
+        const term = (fError.value || '').trim();
+        if (!err || !term) return;
+        const termLower = term.toLowerCase();
+        const matches = err.split(/\\r?\\n/).filter(line => line.toLowerCase().includes(termLower));
+        if (!matches.length) {{
+          copyMatchesBtn.title = 'No matching lines';
+          return;
+        }}
+        navigator.clipboard.writeText(matches.join('\\n')).then(() => {{
+          copyMatchesBtn.classList.add('copied');
+          const original = copyMatchesBtn.innerHTML;
+          copyMatchesBtn.innerHTML = '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path d="M2 9l4 4 8-8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg> copied ' + matches.length;
+          setTimeout(() => {{
+            copyMatchesBtn.classList.remove('copied');
+            copyMatchesBtn.innerHTML = original;
+          }}, 1500);
+        }}).catch(() => {{
+          copyMatchesBtn.title = 'Unable to copy';
+        }});
+        return;
+      }}
       const copyBtn = e.target.closest('.err-copy');
       if (copyBtn) {{
         const r = copyBtn.closest('tr');
