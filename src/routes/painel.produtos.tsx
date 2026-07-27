@@ -935,9 +935,120 @@ function AdminProductsPage() {
               >
                 Cancelar
               </button>
+              {confirm.candidates.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setFullPreview(true)}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/50 bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
+                >
+                  <Eye className="h-4 w-4" /> Ver vitrine completa
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => confirm.onConfirm(confirm.selectedNext)}
+                className="rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
+              >
+                {confirm.actionLabel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {fullPreview && confirm.open && (
+        <div className="fixed inset-0 z-[70] flex flex-col bg-background/95 backdrop-blur-sm">
+          <div className="flex items-center justify-between border-b border-border/60 bg-surface/60 px-6 py-4">
+            <div>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                Prévia da vitrine
+              </p>
+              <h3 className="font-display text-lg font-semibold">
+                Como o catálogo ficará com a nova capa
+              </h3>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFullPreview(false)}
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+            >
+              <X className="h-4 w-4" /> Fechar prévia
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-6 py-8">
+            <div className="mx-auto max-w-6xl">
+              <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-surface px-3 py-1 text-xs text-muted-foreground">
+                <Sparkles className="h-3.5 w-3.5 text-primary" /> Catálogo do assinante
+              </span>
+              <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight md:text-4xl">
+                Produtos que convertem, prontos para divulgar.
+              </h1>
+              <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {(() => {
+                  const editedId = editing?.id ?? "";
+                  const previewCard = (
+                    <div
+                      key="__preview__"
+                      className="group relative flex flex-col overflow-hidden rounded-2xl border-2 border-primary bg-card shadow-card ring-2 ring-primary/30"
+                    >
+                      <span className="absolute right-3 top-3 z-10 rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">
+                        PRÉVIA
+                      </span>
+                      <StorefrontCard
+                        cover={confirm.selectedNext}
+                        title={confirm.preview.title}
+                        tagline={confirm.preview.tagline}
+                        category={confirm.preview.category}
+                        platform={confirm.preview.platform}
+                        price={confirm.preview.price}
+                        originalPrice={confirm.preview.originalPrice}
+                        rating={confirm.preview.rating}
+                        reviews={confirm.preview.reviews}
+                        gallery={confirm.preview.gallery}
+                      />
+                    </div>
+                  );
+                  const others = sorted
+                    .filter((p) => p.published !== false && p.id !== editedId)
+                    .map((p) => (
+                      <div
+                        key={p.id}
+                        className="flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card opacity-70"
+                      >
+                        <StorefrontCard
+                          cover={p.cover}
+                          title={p.title}
+                          tagline={p.tagline}
+                          category={p.category}
+                          platform={p.platform}
+                          price={p.price}
+                          originalPrice={p.originalPrice}
+                          rating={p.rating}
+                          reviews={p.reviews}
+                          gallery={p.gallery ?? []}
+                        />
+                      </div>
+                    ));
+                  return [previewCard, ...others];
+                })()}
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-border/60 bg-surface/60 px-6 py-4">
+            <div className="mx-auto flex max-w-6xl flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setFullPreview(false)}
+                className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+              >
+                Voltar ao modal
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setFullPreview(false);
+                  confirm.onConfirm(confirm.selectedNext);
+                }}
                 className="rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
               >
                 {confirm.actionLabel}
