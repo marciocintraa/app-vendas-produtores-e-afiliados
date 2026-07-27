@@ -1,0 +1,32 @@
+{
+  "name": "Vende Fácil Pro",
+  "short_name": "Vende Fácil",
+  "description": "Transforme seu catálogo de infoprodutos em um app profissional. Ideal para produtores, afiliados e criadores digitais.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B0814",
+  "theme_color": "#8B5CF6",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

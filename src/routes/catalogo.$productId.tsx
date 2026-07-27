@@ -6,11 +6,11 @@ import { useProduct, useProducts } from "@/lib/catalog-store";
 
 export const Route = createFileRoute("/catalogo/$productId")({
   head: ({ params }) => {
-    const title = `Produto — Digital Store Pro`;
+    const title = `Produto — Vende Fácil Pro`;
     return {
       meta: [
         { title },
-        { name: "description", content: "Detalhes do produto no catálogo Digital Store Pro." },
+        { name: "description", content: "Detalhes do produto no catálogo Vende Fácil Pro." },
         { property: "og:title", content: title },
         { property: "og:type", content: "product" },
         { name: "twitter:card", content: "summary_large_image" },
@@ -64,7 +64,7 @@ function ProductPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <Link to="/" className="flex items-center gap-2 font-display text-lg font-semibold">
             <Sparkles className="h-5 w-5 text-primary" />
-            Digital Store Pro
+            Vende Fácil Pro
           </Link>
           <Link
             to="/catalogo"

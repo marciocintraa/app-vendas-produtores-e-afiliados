@@ -7,13 +7,13 @@ import { useProducts } from "@/lib/catalog-store";
 export const Route = createFileRoute("/catalogo")({
   head: () => ({
     meta: [
-      { title: "Catálogo — Digital Store Pro" },
+      { title: "Catálogo — Vende Fácil Pro" },
       {
         name: "description",
         content:
           "Explore produtos digitais selecionados: cursos, mentorias e ferramentas para acelerar seu negócio online.",
       },
-      { property: "og:title", content: "Catálogo — Digital Store Pro" },
+      { property: "og:title", content: "Catálogo — Vende Fácil Pro" },
       {
         property: "og:description",
         content:
@@ -58,7 +58,7 @@ function CatalogPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <Link to="/" className="flex items-center gap-2 font-display text-lg font-semibold">
             <Sparkles className="h-5 w-5 text-primary" />
-            Digital Store Pro
+            Vende Fácil Pro
           </Link>
           <div className="flex items-center gap-4">
             <Link

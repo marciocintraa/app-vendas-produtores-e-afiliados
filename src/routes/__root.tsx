@@ -79,17 +79,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Digital Store Pro — App Builder para Produtos Digitais" },
+      { title: "Vende Fácil Pro — App Builder para Produtos Digitais" },
       {
         name: "description",
         content:
           "Transforme seu catálogo de infoprodutos em um app profissional. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
       },
-      { name: "author", content: "Digital Store Pro" },
+      { name: "author", content: "Vende Fácil Pro" },
+      { name: "theme-color", content: "#8B5CF6" },
+      { name: "msapplication-TileColor", content: "#8B5CF6" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "Vende Fácil Pro" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: "Digital Store Pro — App Builder para Produtos Digitais" },
-      { name: "twitter:title", content: "Digital Store Pro — App Builder para Produtos Digitais" },
+      { property: "og:title", content: "Vende Fácil Pro — App Builder para Produtos Digitais" },
+      { name: "twitter:title", content: "Vende Fácil Pro — App Builder para Produtos Digitais" },
       { property: "og:description", content: "Transforme seu catálogo de infoprodutos em um app profissional. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais." },
       { name: "twitter:description", content: "Transforme seu catálogo de infoprodutos em um app profissional. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais." },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/OCHVuUZ4KwYgyIwNrW7Fe5QlrKA3/social-images/social-1785133673630-Capturar.webp" },
@@ -97,6 +102,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
