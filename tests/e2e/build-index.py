@@ -354,6 +354,10 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .failed-clear:hover {{ background: #334155; }}
   .failed-export {{ background: #052e1a; color: #4ade80; }}
   .failed-export:hover {{ background: #064e2c; }}
+  .failed-copy-matches-global {{ background: #0c1a33; color: #93c5fd; border: 1px dashed #1e3a8a; }}
+  .failed-copy-matches-global:hover {{ background: #13254a; color: #e0f2fe; border-color: #38bdf8; }}
+  .failed-copy-matches-global.copied {{ background: #052e1a; color: #34d399; border-style: solid; border-color: #14532d; }}
+  .failed-copy-matches-global:disabled {{ opacity: .45; cursor: not-allowed; }}
   .failed-error-input {{ flex: 0 1 200px; min-width: 160px; }}
   .failed-check {{ display: inline-flex; align-items: center; gap: 6px; font-size: 12px;
                     color: #cbd5e1; cursor: pointer; user-select: none; }}
