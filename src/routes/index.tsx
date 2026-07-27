@@ -127,7 +127,7 @@ function Hero() {
           <div className="card-glass p-3 rotate-1">
             <img
               src={heroImg}
-              alt="Preview do aplicativo Digital Store Pro em um smartphone"
+              alt="Preview do aplicativo Vende Fácil Pro em um smartphone"
               width={1600}
               height={1200}
               className="rounded-xl w-full h-auto"
@@ -243,7 +243,7 @@ function Audience() {
           </h2>
           <p className="mt-4 text-muted-foreground text-lg">
             Se você vende cursos, mentorias, ebooks, comunidades ou qualquer produto digital, o
-            Digital Store Pro concentra sua audiência em um único app com a sua marca.
+            Vende Fácil Pro concentra sua audiência em um único app com a sua marca.
           </p>
           <div className="mt-8 flex items-center gap-3 text-sm">
             <Users className="w-4 h-4 text-accent" />
@@ -410,7 +410,7 @@ function Footer() {
           <span className="grid place-items-center w-6 h-6 rounded-md bg-gradient-to-br from-brand to-brand-2">
             <Store className="w-3 h-3 text-primary-foreground" strokeWidth={2.5} />
           </span>
-          <span>© {new Date().getFullYear()} Digital Store Pro</span>
+          <span>© {new Date().getFullYear()} Vende Fácil Pro</span>
         </div>
         <div className="flex gap-6">
           <a href="#" className="hover:text-foreground">Termos</a>
