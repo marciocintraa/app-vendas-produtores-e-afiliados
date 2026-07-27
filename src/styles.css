@@ -163,3 +163,26 @@
   box-shadow: var(--shadow-card);
   backdrop-filter: blur(10px);
 }
+
+@utility input {
+  height: 2.5rem;
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--foreground);
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+
+  &::placeholder { color: var(--muted-foreground); }
+  &:focus {
+    border-color: color-mix(in oklab, var(--primary) 60%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 20%, transparent);
+  }
+  textarea& { height: auto; padding: 0.625rem 0.75rem; line-height: 1.4; }
+  select& { padding-right: 2rem; }
+}
+
+

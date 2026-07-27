@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, Star, ArrowRight, Sparkles } from "lucide-react";
-import { PRODUCTS, CATEGORIES } from "@/lib/catalog-data";
+import { Search, Star, ArrowRight, Sparkles, Settings } from "lucide-react";
+import { useProducts } from "@/lib/catalog-store";
+
 
 export const Route = createFileRoute("/catalogo")({
   head: () => ({
@@ -26,12 +27,19 @@ export const Route = createFileRoute("/catalogo")({
 });
 
 function CatalogPage() {
+  const allProducts = useProducts();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
 
+  const categories = useMemo(
+    () => Array.from(new Set(allProducts.map((p) => p.category))),
+    [allProducts],
+  );
+
   const products = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return PRODUCTS.filter((p) => {
+    return allProducts.filter((p) => {
+      if (p.published === false) return false;
       if (category && p.category !== category) return false;
       if (!q) return true;
       return (
@@ -40,7 +48,9 @@ function CatalogPage() {
         p.category.toLowerCase().includes(q)
       );
     });
-  }, [query, category]);
+  }, [allProducts, query, category]);
+
+
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -50,12 +60,21 @@ function CatalogPage() {
             <Sparkles className="h-5 w-5 text-primary" />
             Digital Store Pro
           </Link>
-          <Link
-            to="/"
-            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-          >
-            ← Voltar ao site
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/painel/produtos"
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Settings className="h-4 w-4" /> Gerenciar
+            </Link>
+            <Link
+              to="/"
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+            >
+              ← Voltar ao site
+            </Link>
+          </div>
+
         </div>
       </header>
 
@@ -92,7 +111,7 @@ function CatalogPage() {
             >
               Todas
             </button>
-            {CATEGORIES.map((c) => (
+            {categories.map((c: string) => (
               <button
                 key={c}
                 onClick={() => setCategory(c)}

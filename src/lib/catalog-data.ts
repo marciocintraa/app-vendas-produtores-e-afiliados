@@ -13,7 +13,9 @@ export type Product = {
   cover: string;
   highlights: string[];
   modules: { title: string; lessons: number }[];
+  published?: boolean;
 };
+
 
 const grad = (from: string, to: string, label: string) =>
   `data:image/svg+xml;utf8,${encodeURIComponent(

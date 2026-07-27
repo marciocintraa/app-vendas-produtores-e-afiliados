@@ -1,0 +1,516 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState, useEffect } from "react";
+import {
+  ArrowLeft,
+  Plus,
+  Pencil,
+  Trash2,
+  Save,
+  X,
+  Sparkles,
+  ExternalLink,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import { type Product } from "@/lib/catalog-data";
+import {
+  useProducts,
+  saveProduct,
+  deleteProduct,
+  slugify,
+  makeCoverPlaceholder,
+} from "@/lib/catalog-store";
+
+export const Route = createFileRoute("/painel/produtos")({
+  head: () => ({
+    meta: [
+      { title: "Meus produtos — Digital Store Pro" },
+      {
+        name: "description",
+        content: "Crie, edite e publique produtos do seu catálogo digital.",
+      },
+      { name: "robots", content: "noindex" },
+    ],
+  }),
+  component: AdminProductsPage,
+});
+
+type Draft = {
+  id: string;
+  title: string;
+  tagline: string;
+  description: string;
+  category: string;
+  platform: Product["platform"];
+  price: string;
+  originalPrice: string;
+  affiliateUrl: string;
+  cover: string;
+  highlights: string;
+  published: boolean;
+};
+
+const PLATFORMS: Product["platform"][] = ["Hotmart", "Kiwify", "Eduzz", "Monetizze"];
+
+function emptyDraft(): Draft {
+  return {
+    id: "",
+    title: "",
+    tagline: "",
+    description: "",
+    category: "",
+    platform: "Hotmart",
+    price: "",
+    originalPrice: "",
+    affiliateUrl: "",
+    cover: "",
+    highlights: "",
+    published: true,
+  };
+}
+
+function productToDraft(p: Product): Draft {
+  return {
+    id: p.id,
+    title: p.title,
+    tagline: p.tagline,
+    description: p.description,
+    category: p.category,
+    platform: p.platform,
+    price: String(p.price ?? ""),
+    originalPrice: p.originalPrice ? String(p.originalPrice) : "",
+    affiliateUrl: p.affiliateUrl,
+    cover: p.cover,
+    highlights: p.highlights.join("\n"),
+    published: p.published !== false,
+  };
+}
+
+function AdminProductsPage() {
+  const products = useProducts();
+  const [editing, setEditing] = useState<Draft | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const sorted = useMemo(
+    () => [...products].sort((a, b) => a.title.localeCompare(b.title, "pt-BR")),
+    [products],
+  );
+
+  useEffect(() => {
+    if (!editing) setError(null);
+  }, [editing]);
+
+  function startCreate() {
+    setEditing(emptyDraft());
+  }
+
+  function startEdit(p: Product) {
+    setEditing(productToDraft(p));
+  }
+
+  function handleDelete(p: Product) {
+    if (typeof window === "undefined") return;
+    if (window.confirm(`Remover "${p.title}" do catálogo?`)) {
+      deleteProduct(p.id);
+    }
+  }
+
+  function togglePublish(p: Product) {
+    saveProduct({ ...p, published: !(p.published !== false) });
+  }
+
+  function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editing) return;
+    const title = editing.title.trim();
+    const category = editing.category.trim();
+    const priceNum = Number(editing.price.replace(",", "."));
+    const originalNum = editing.originalPrice
+      ? Number(editing.originalPrice.replace(",", "."))
+      : undefined;
+    const affiliateUrl = editing.affiliateUrl.trim();
+
+    if (!title) return setError("Informe o título do produto.");
+    if (!category) return setError("Informe a categoria.");
+    if (!Number.isFinite(priceNum) || priceNum < 0) return setError("Preço inválido.");
+    if (originalNum !== undefined && (!Number.isFinite(originalNum) || originalNum < 0))
+      return setError("Preço original inválido.");
+    if (!affiliateUrl) return setError("Informe o link de compra.");
+    try {
+      // eslint-disable-next-line no-new
+      new URL(affiliateUrl);
+    } catch {
+      return setError("O link de compra deve ser uma URL válida (https://…).");
+    }
+
+    const id = editing.id || slugify(title) || `produto-${Date.now()}`;
+    const existing = products.find((p) => p.id === id);
+    const highlights = editing.highlights
+      .split("\n")
+      .map((h) => h.trim())
+      .filter(Boolean);
+
+    const product: Product = {
+      id,
+      title,
+      tagline: editing.tagline.trim() || title,
+      description: editing.description.trim(),
+      price: priceNum,
+      originalPrice: originalNum,
+      category,
+      platform: editing.platform,
+      rating: existing?.rating ?? 5,
+      reviews: existing?.reviews ?? 0,
+      affiliateUrl,
+      cover: editing.cover.trim() || existing?.cover || makeCoverPlaceholder(title),
+      highlights: highlights.length ? highlights : existing?.highlights ?? [],
+      modules: existing?.modules ?? [],
+      published: editing.published,
+    };
+
+    saveProduct(product);
+    setEditing(null);
+  }
+
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border/60 bg-surface/40 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+          <Link to="/" className="flex items-center gap-2 font-display text-lg font-semibold">
+            <Sparkles className="h-5 w-5 text-primary" />
+            Digital Store Pro
+          </Link>
+          <Link
+            to="/catalogo"
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" /> Voltar ao catálogo
+          </Link>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-6xl px-4 py-10">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-surface px-3 py-1 text-xs text-muted-foreground">
+              <Sparkles className="h-3.5 w-3.5 text-primary" /> Painel do assinante
+            </span>
+            <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight md:text-4xl">
+              Meus produtos
+            </h1>
+            <p className="mt-2 max-w-xl text-muted-foreground">
+              Cadastre novos produtos, edite os existentes e controle o que fica publicado no
+              seu catálogo.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={startCreate}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.01]"
+          >
+            <Plus className="h-4 w-4" /> Novo produto
+          </button>
+        </div>
+
+        <div className="mt-8 overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card">
+          <div className="grid grid-cols-[1.5fr_1fr_0.8fr_0.8fr_auto] gap-4 border-b border-border/60 bg-surface/60 px-5 py-3 text-xs uppercase tracking-wide text-muted-foreground">
+            <div>Produto</div>
+            <div>Categoria</div>
+            <div>Preço</div>
+            <div>Status</div>
+            <div className="text-right">Ações</div>
+          </div>
+          {sorted.length === 0 ? (
+            <div className="p-10 text-center text-muted-foreground">
+              Nenhum produto cadastrado ainda. Clique em <b>Novo produto</b> para começar.
+            </div>
+          ) : (
+            <ul className="divide-y divide-border/60">
+              {sorted.map((p) => {
+                const isPublished = p.published !== false;
+                return (
+                  <li
+                    key={p.id}
+                    className="grid grid-cols-[1.5fr_1fr_0.8fr_0.8fr_auto] items-center gap-4 px-5 py-4"
+                  >
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={p.cover}
+                        alt=""
+                        className="h-12 w-16 rounded-lg object-cover"
+                      />
+                      <div className="min-w-0">
+                        <div className="truncate font-medium">{p.title}</div>
+                        <div className="truncate text-xs text-muted-foreground">
+                          {p.platform} · /{p.id}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="truncate text-sm text-muted-foreground">{p.category}</div>
+                    <div className="font-display text-sm font-semibold">
+                      R$ {p.price.toFixed(2).replace(".", ",")}
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => togglePublish(p)}
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs transition-colors ${
+                          isPublished
+                            ? "border-accent/40 bg-accent/10 text-accent"
+                            : "border-border bg-surface text-muted-foreground"
+                        }`}
+                        title={isPublished ? "Publicado" : "Rascunho"}
+                      >
+                        {isPublished ? (
+                          <>
+                            <Eye className="h-3.5 w-3.5" /> Publicado
+                          </>
+                        ) : (
+                          <>
+                            <EyeOff className="h-3.5 w-3.5" /> Rascunho
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-end gap-1">
+                      <Link
+                        to="/catalogo/$productId"
+                        params={{ productId: p.id }}
+                        className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+                        title="Ver página"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => startEdit(p)}
+                        className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+                        title="Editar"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(p)}
+                        className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                        title="Excluir"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </main>
+
+      {editing && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/80 p-4 backdrop-blur-sm">
+          <form
+            onSubmit={handleSave}
+            className="my-8 w-full max-w-2xl rounded-2xl border border-border/70 bg-card p-6 shadow-card"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="font-display text-xl font-semibold">
+                  {editing.id ? "Editar produto" : "Novo produto"}
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Preencha os campos abaixo e salve para atualizar o catálogo.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditing(null)}
+                className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+                aria-label="Fechar"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <Field label="Título" className="sm:col-span-2">
+                <input
+                  required
+                  value={editing.title}
+                  onChange={(e) => setEditing({ ...editing, title: e.target.value })}
+                  className="input"
+                  placeholder="Ex: Renda Extra Digital"
+                />
+              </Field>
+              <Field label="Subtítulo" className="sm:col-span-2">
+                <input
+                  value={editing.tagline}
+                  onChange={(e) => setEditing({ ...editing, tagline: e.target.value })}
+                  className="input"
+                  placeholder="Uma frase curta que resume a promessa"
+                />
+              </Field>
+              <Field label="Categoria">
+                <input
+                  required
+                  value={editing.category}
+                  onChange={(e) => setEditing({ ...editing, category: e.target.value })}
+                  className="input"
+                  placeholder="Ex: Marketing Digital"
+                  list="dsp-categories"
+                />
+                <datalist id="dsp-categories">
+                  {Array.from(new Set(products.map((p) => p.category))).map((c) => (
+                    <option key={c} value={c} />
+                  ))}
+                </datalist>
+              </Field>
+              <Field label="Plataforma">
+                <select
+                  value={editing.platform}
+                  onChange={(e) =>
+                    setEditing({
+                      ...editing,
+                      platform: e.target.value as Product["platform"],
+                    })
+                  }
+                  className="input"
+                >
+                  {PLATFORMS.map((pl) => (
+                    <option key={pl} value={pl}>
+                      {pl}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Preço (R$)">
+                <input
+                  required
+                  inputMode="decimal"
+                  value={editing.price}
+                  onChange={(e) => setEditing({ ...editing, price: e.target.value })}
+                  className="input"
+                  placeholder="197"
+                />
+              </Field>
+              <Field label="Preço original (opcional)">
+                <input
+                  inputMode="decimal"
+                  value={editing.originalPrice}
+                  onChange={(e) =>
+                    setEditing({ ...editing, originalPrice: e.target.value })
+                  }
+                  className="input"
+                  placeholder="497"
+                />
+              </Field>
+              <Field label="Link de compra" className="sm:col-span-2">
+                <input
+                  required
+                  type="url"
+                  value={editing.affiliateUrl}
+                  onChange={(e) =>
+                    setEditing({ ...editing, affiliateUrl: e.target.value })
+                  }
+                  className="input"
+                  placeholder="https://hotmart.com/…"
+                />
+              </Field>
+              <Field label="URL da capa (opcional)" className="sm:col-span-2">
+                <input
+                  value={editing.cover}
+                  onChange={(e) => setEditing({ ...editing, cover: e.target.value })}
+                  className="input"
+                  placeholder="https://…/capa.jpg (deixe em branco para gerar automaticamente)"
+                />
+              </Field>
+              <Field label="Descrição" className="sm:col-span-2">
+                <textarea
+                  value={editing.description}
+                  onChange={(e) =>
+                    setEditing({ ...editing, description: e.target.value })
+                  }
+                  className="input min-h-[110px] resize-y"
+                  placeholder="Descreva o que o aluno vai aprender e para quem é o produto."
+                />
+              </Field>
+              <Field
+                label="Destaques (um por linha)"
+                className="sm:col-span-2"
+                hint="Aparecem na página do produto como itens inclusos."
+              >
+                <textarea
+                  value={editing.highlights}
+                  onChange={(e) =>
+                    setEditing({ ...editing, highlights: e.target.value })
+                  }
+                  className="input min-h-[90px] resize-y"
+                  placeholder={"Acesso vitalício\nComunidade privada\nCertificado"}
+                />
+              </Field>
+
+              <label className="sm:col-span-2 flex items-center gap-3 rounded-xl border border-border/60 bg-surface/60 px-4 py-3 text-sm">
+                <input
+                  type="checkbox"
+                  checked={editing.published}
+                  onChange={(e) =>
+                    setEditing({ ...editing, published: e.target.checked })
+                  }
+                  className="h-4 w-4 accent-[color:var(--color-primary)]"
+                />
+                <span>
+                  <span className="font-medium">Publicar no catálogo</span>
+                  <span className="ml-2 text-muted-foreground">
+                    Desmarque para salvar como rascunho.
+                  </span>
+                </span>
+              </label>
+            </div>
+
+            {error && (
+              <div className="mt-4 rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {error}
+              </div>
+            )}
+
+            <div className="mt-6 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setEditing(null)}
+                className="rounded-xl border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.01]"
+              >
+                <Save className="h-4 w-4" />
+                {editing.id ? "Salvar alterações" : "Criar produto"}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Field({
+  label,
+  children,
+  className = "",
+  hint,
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+  hint?: string;
+}) {
+  return (
+    <label className={`flex flex-col gap-1.5 ${className}`}>
+      <span className="text-xs font-medium text-muted-foreground">{label}</span>
+      {children}
+      {hint && <span className="text-[11px] text-muted-foreground/80">{hint}</span>}
+    </label>
+  );
+}
