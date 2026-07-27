@@ -374,6 +374,116 @@ function Pricing() {
   );
 }
 
+function FAQ() {
+  const [open, setOpen] = useState<string[]>(["planos"]);
+
+  const toggle = (id: string) => {
+    setOpen((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
+  };
+
+  const items = [
+    {
+      id: "planos",
+      question: "Quantos produtos posso cadastrar em cada plano?",
+      answer:
+        "O plano Starter permite até 2 produtos, o Pro até 5 produtos, e o Premium é ilimitado. Você pode trocar de plano a qualquer momento conforme seu catálogo cresce.",
+    },
+    {
+      id: "produtos",
+      question: "Que tipo de produto digital posso vender no app?",
+      answer:
+        "Cursos, ebooks, mentorias, comunidades, planilhas, templates, áudios, podcasts e qualquer produto digital que tenha um link de checkout ou página de vendas. Basta cadastrar o título, descrição, imagem e link de compra.",
+    },
+    {
+      id: "compartilhar",
+      question: "Como meus clientes acessam o catálogo?",
+      answer:
+        "Seu catálogo recebe um link público próprio que pode ser compartilhado no Instagram, WhatsApp, TikTok, e-mail ou bio. O app também pode ser instalado na tela inicial de Android e iOS como um aplicativo nativo.",
+    },
+    {
+      id: "plataformas",
+      question: "Funciona com Hotmart, Kiwify, Eduzz e outras plataformas?",
+      answer:
+        "Sim. Você cola o link de afiliado ou de produtor de qualquer plataforma — Hotmart, Kiwify, Eduzz, Monetizze, PerfectPay, Kirvano, Shopify, Stripe e outras. A venda final acontece na plataforma escolhida.",
+    },
+    {
+      id: "personalizacao",
+      question: "Posso personalizar cores, logo e domínio?",
+      answer:
+        "Sim. Nos planos Pro e Premium você pode alterar cores, tipografia, logotipo e ícone. No Premium também é possível usar domínio próprio e configurações white label completas.",
+    },
+    {
+      id: "teste",
+      question: "Tem teste grátis?",
+      answer:
+        "Sim. Você pode começar a testar gratuitamente e só assinar quando estiver pronto para publicar seu catálogo. Não é necessário cartão de crédito para começar.",
+    },
+  ];
+
+  return (
+    <section id="faq" className="py-24 bg-surface/30 border-y border-border">
+      <div className="container-page max-w-3xl">
+        <div className="text-center mb-14">
+          <span className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-3 py-1 text-xs font-medium text-muted-foreground">
+            <HelpCircle className="w-3.5 h-3.5 text-accent" />
+            Dúvidas frequentes
+          </span>
+          <h2 className="mt-4 text-3xl md:text-5xl font-bold">
+            Tudo o que você precisa saber
+          </h2>
+          <p className="mt-4 text-muted-foreground text-lg">
+            Respostas rápidas sobre planos, produtos digitais e como compartilhar seu catálogo.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          {items.map((item) => {
+            const isOpen = open.includes(item.id);
+            return (
+              <div
+                key={item.id}
+                className={`card-glass overflow-hidden transition-all ${
+                  isOpen ? "ring-1 ring-brand/30" : ""
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => toggle(item.id)}
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-answer-${item.id}`}
+                  className="w-full flex items-center justify-between gap-4 p-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/50 rounded-xl"
+                >
+                  <span className="font-semibold text-foreground">{item.question}</span>
+                  <ChevronDown
+                    className={`w-5 h-5 text-accent shrink-0 transition-transform duration-300 ${
+                      isOpen ? "rotate-180" : ""
+                    }`}
+                    aria-hidden="true"
+                  />
+                </button>
+                <div
+                  id={`faq-answer-${item.id}`}
+                  role="region"
+                  aria-labelledby={`faq-question-${item.id}`}
+                  className={`grid transition-all duration-300 ease-out ${
+                    isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <p className="px-5 pb-5 text-muted-foreground leading-relaxed">
+                      {item.answer}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function FinalCTA() {
   return (
     <section className="py-24">
