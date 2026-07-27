@@ -21,17 +21,17 @@ import heroImg from "@/assets/hero-app.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Digital Store Pro — App Builder para Produtos Digitais" },
+      { title: "Vende Fácil Pro — App Builder para Produtos Digitais" },
       {
         name: "description",
         content:
-          "Transforme seu catálogo de infoprodutos em um app profissional. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
+          "Transforme seu catálogo de infoprodutos em um app profissional com o Vende Fácil Pro. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
       },
-      { property: "og:title", content: "Digital Store Pro — App Builder para Produtos Digitais" },
+      { property: "og:title", content: "Vende Fácil Pro — App Builder para Produtos Digitais" },
       {
         property: "og:description",
         content:
-          "Transforme seu catálogo de infoprodutos em um app profissional. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
+          "Transforme seu catálogo de infoprodutos em um app profissional com o Vende Fácil Pro. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -65,7 +65,7 @@ function Nav() {
           <span className="grid place-items-center w-8 h-8 rounded-lg bg-gradient-to-br from-brand to-brand-2 text-primary-foreground">
             <Store className="w-4 h-4" strokeWidth={2.5} />
           </span>
-          Digital Store <span className="text-gradient">Pro</span>
+          Vende Fácil <span className="text-gradient">Pro</span>
         </a>
         <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
           <a href="#recursos" className="hover:text-foreground transition-colors">Recursos</a>
@@ -90,8 +90,8 @@ function Hero() {
             App Builder para Produtos Digitais
           </span>
           <h1 className="mt-6 text-4xl md:text-6xl font-bold leading-[1.05]">
-            Seu catálogo de infoprodutos em um{" "}
-            <span className="text-gradient">app profissional</span>.
+            Seu catálogo de infoprodutos em um app profissional com o{" "}
+            <span className="text-gradient">Vende Fácil Pro</span>.
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-xl">
             Produtores e afiliados agora têm sua própria vitrine de vendas. Concentre todos os seus
@@ -127,7 +127,7 @@ function Hero() {
           <div className="card-glass p-3 rotate-1">
             <img
               src={heroImg}
-              alt="Preview do aplicativo Digital Store Pro em um smartphone"
+              alt="Preview do aplicativo Vende Fácil Pro em um smartphone"
               width={1600}
               height={1200}
               className="rounded-xl w-full h-auto"
@@ -243,7 +243,7 @@ function Audience() {
           </h2>
           <p className="mt-4 text-muted-foreground text-lg">
             Se você vende cursos, mentorias, ebooks, comunidades ou qualquer produto digital, o
-            Digital Store Pro concentra sua audiência em um único app com a sua marca.
+            Vende Fácil Pro concentra sua audiência em um único app com a sua marca.
           </p>
           <div className="mt-8 flex items-center gap-3 text-sm">
             <Users className="w-4 h-4 text-accent" />
@@ -410,7 +410,7 @@ function Footer() {
           <span className="grid place-items-center w-6 h-6 rounded-md bg-gradient-to-br from-brand to-brand-2">
             <Store className="w-3 h-3 text-primary-foreground" strokeWidth={2.5} />
           </span>
-          <span>© {new Date().getFullYear()} Digital Store Pro</span>
+          <span>© {new Date().getFullYear()} Vende Fácil Pro</span>
         </div>
         <div className="flex gap-6">
           <a href="#" className="hover:text-foreground">Termos</a>
