@@ -477,6 +477,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   // Failed scenarios filters
   const fSearch = document.getElementById('failedSearch');
   const fEngine = document.getElementById('failedEngine');
+  const fAssets = document.getElementById('failedAssets');
   const fClear = document.getElementById('failedClear');
   const fCount = document.getElementById('failedCount');
   const fEmpty = document.getElementById('failedEmpty');
@@ -490,15 +491,31 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     const totalRows = rows.length;
 
     function escapeRe(s) {{ return s.replace(/[.*+?^${{}}()|[\\]\\\\]/g, '\\\\$&'); }}
+    function assetMatch(r, mode) {{
+      const hasT = r.dataset.trace === '1';
+      const hasV = r.dataset.video === '1';
+      switch (mode) {{
+        case '':      return true;
+        case 'any':   return hasT || hasV;
+        case 'trace': return hasT;
+        case 'video': return hasV;
+        case 'both':  return hasT && hasV;
+        case 'none':  return !hasT && !hasV;
+        default:      return true;
+      }}
+    }}
     function applyFilters() {{
       const q = (fSearch.value || '').trim().toLowerCase();
       const eng = fEngine.value || '';
+      const assets = fAssets.value || '';
       let visible = 0;
       const re = q ? new RegExp('(' + escapeRe(q) + ')', 'ig') : null;
       rows.forEach(r => {{
         const name = r.dataset.name || '';
         const engine = r.dataset.engine || '';
-        const match = (!eng || engine === eng) && (!q || name.includes(q));
+        const match = (!eng || engine === eng)
+          && (!q || name.includes(q))
+          && assetMatch(r, assets);
         r.classList.toggle('hidden', !match);
         const scn = r.querySelector('.scn');
         if (scn) {{
@@ -514,8 +531,10 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     }}
     fSearch.addEventListener('input', applyFilters);
     fEngine.addEventListener('change', applyFilters);
+    fAssets.addEventListener('change', applyFilters);
     fClear.addEventListener('click', () => {{
-      fSearch.value = ''; fEngine.value = ''; applyFilters(); fSearch.focus();
+      fSearch.value = ''; fEngine.value = ''; fAssets.value = '';
+      applyFilters(); fSearch.focus();
     }});
     applyFilters();
 
