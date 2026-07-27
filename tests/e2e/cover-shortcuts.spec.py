@@ -161,8 +161,9 @@ async def close_editor(page: Page) -> None:
 
 async def validation_status(page: Page) -> str:
     """Read the confirm button's disabled attribute as a proxy for validation state."""
-    btn = page.get_by_role("button", name="Confirmar troca de capa")
+    btn = page.get_by_role("button", name="Sim, trocar capa")
     if await btn.count() == 0:
+
         return "missing"
     disabled = await btn.first.is_disabled()
     return "disabled" if disabled else "enabled"
