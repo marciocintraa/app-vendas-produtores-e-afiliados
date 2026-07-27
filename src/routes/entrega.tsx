@@ -37,9 +37,8 @@ const checkDelivery = createServerFn({ method: "GET" })
 
     const { data: sub } = await supabaseAdmin
       .from("subscriptions")
-      .select("status,current_period_end,price_id")
+      .select("status,current_period_end,price_id,environment")
       .eq("user_id", userId)
-      .eq("environment", "hotmart")
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();

@@ -27,9 +27,8 @@ interface AccessResult {
 async function getLatestSubscription(userId: string) {
   const { data } = await supabaseAdmin
     .from("subscriptions")
-    .select("status,current_period_end")
+    .select("status,current_period_end,environment,price_id")
     .eq("user_id", userId)
-    .eq("environment", "hotmart")
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
