@@ -152,6 +152,7 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
         <button type="button" id="failedCopyModeReset" class="failed-clear" title="Reset copy mode to default and clear saved preference (Shift+R)">Reset mode</button>
         <button type="button" id="failedCopyModeCancel" class="failed-clear failed-reset-cancel" title="Cancel reset and keep current copy mode" style="display:none">Cancel</button>
         <button type="button" id="failedCopyModeUndo" class="failed-clear failed-reset-undo" title="Undo reset and restore previous copy mode (Ctrl+Z or Shift+Z)" style="display:none">Undo</button>
+        <button type="button" id="failedCopyModeRedo" class="failed-clear failed-reset-redo" title="Redo the last undone reset (Ctrl+Shift+Z or Cmd+Shift+Z)" style="display:none">Redo</button>
       </span>
       <button type="button" id="failedCopyMatchesAll" class="failed-clear failed-copy-matches-global" title="Copy matching error lines from all visible rows">Copy from visible rows</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
@@ -369,6 +370,8 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .failed-reset-cancel:hover {{ background: #334155; color: #e2e8f0; }}
   .failed-reset-undo {{ background: #422006; color: #fbbf24; border: 1px solid #78350f; display: none; }}
   .failed-reset-undo:hover {{ background: #713f12; color: #fde68a; }}
+  .failed-reset-redo {{ background: #052e16; color: #6ee7b7; border: 1px solid #065f46; display: none; }}
+  .failed-reset-redo:hover {{ background: #064e3b; color: #a7f3d0; }}
   .failed-export {{ background: #052e1a; color: #4ade80; }}
   .failed-export:hover {{ background: #064e2c; }}
   .failed-copy-matches-global {{ background: #0c1a33; color: #93c5fd; border: 1px dashed #1e3a8a; }}
@@ -585,6 +588,16 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         e.preventDefault();
         resetBtn.click();
         resetBtn.focus();
+      }}
+    }}
+    const isRedoShortcut = (e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey) && e.shiftKey && !e.altKey;
+    if (isRedoShortcut && !modal.classList.contains('open')) {{
+      if (inInput) return;
+      const redoBtn = document.getElementById('failedCopyModeRedo');
+      if (redoBtn && redoBtn.style.display !== 'none') {{
+        e.preventDefault();
+        redoBtn.click();
+        return;
       }}
     }}
     const isUndoShortcut = ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) || (e.key === 'Z' && e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey);
@@ -908,21 +921,30 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     const fCopyModeReset = document.getElementById('failedCopyModeReset');
     const fCopyModeCancel = document.getElementById('failedCopyModeCancel');
     const fCopyModeUndo = document.getElementById('failedCopyModeUndo');
+    const fCopyModeRedo = document.getElementById('failedCopyModeRedo');
     const fCopyModeResetGroup = document.getElementById('failedCopyModeResetGroup');
-    if (fCopyModeReset && fCopyModeCancel && fCopyModeUndo && fCopyModeResetGroup) {{
+    if (fCopyModeReset && fCopyModeCancel && fCopyModeUndo && fCopyModeRedo && fCopyModeResetGroup) {{
       let resetConfirmTimer = null;
       let undoTimer = null;
+      let redoTimer = null;
       let previousMode = null;
+      let redoMode = null;
       const DEFAULT_LABEL = 'Reset mode';
       const CONFIRM_LABEL = 'Confirm reset?';
       const UNDO_LABEL = 'Undo';
+      const REDO_LABEL = 'Redo';
+      const DEFAULT_MODE = 'matches';
 
       function clearUndoTimer() {{
         if (undoTimer) {{ clearTimeout(undoTimer); undoTimer = null; }}
       }}
+      function clearRedoTimer() {{
+        if (redoTimer) {{ clearTimeout(redoTimer); redoTimer = null; }}
+      }}
 
       function showUndo(modeToRestore) {{
         clearUndoTimer();
+        hideRedo();
         previousMode = modeToRestore;
         fCopyModeUndo.style.display = 'inline-block';
         fCopyModeReset.style.display = 'none';
@@ -936,17 +958,53 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         clearUndoTimer();
         previousMode = null;
         fCopyModeUndo.style.display = 'none';
-        fCopyModeReset.style.display = '';
+        if (fCopyModeRedo.style.display === 'none') fCopyModeReset.style.display = '';
+      }}
+
+      function showRedo(modeToReset) {{
+        clearRedoTimer();
+        redoMode = modeToReset;
+        fCopyModeRedo.style.display = 'inline-block';
+        fCopyModeReset.style.display = 'none';
+        fCopyModeCancel.style.display = 'none';
+        fCopyModeRedo.textContent = REDO_LABEL;
+        fCopyModeRedo.classList.remove('copied');
+        redoTimer = setTimeout(() => hideRedo(), 8000);
+      }}
+
+      function hideRedo() {{
+        clearRedoTimer();
+        redoMode = null;
+        fCopyModeRedo.style.display = 'none';
+        if (fCopyModeUndo.style.display === 'none') fCopyModeReset.style.display = '';
       }}
 
       function undoReset() {{
         if (!previousMode || !fCopyMode) return;
-        fCopyMode.value = previousMode;
-        saveCopyMode(previousMode);
+        const modeToRedo = previousMode;
+        fCopyMode.value = modeToRedo;
+        saveCopyMode(modeToRedo);
         updateCopyMatchesAllState();
         hideUndo();
+        showRedo(modeToRedo);
         fCopyModeReset.classList.add('copied');
         fCopyModeReset.textContent = 'undone';
+        setTimeout(() => {{
+          fCopyModeReset.classList.remove('copied');
+          fCopyModeReset.textContent = DEFAULT_LABEL;
+        }}, 1200);
+      }}
+
+      function redoReset() {{
+        if (!redoMode || !fCopyMode) return;
+        const modeBeforeReset = redoMode;
+        fCopyMode.value = DEFAULT_MODE;
+        try {{ localStorage.removeItem(COPY_MODE_KEY); }} catch (e) {{}}
+        updateCopyMatchesAllState();
+        hideRedo();
+        showUndo(modeBeforeReset);
+        fCopyModeReset.classList.add('copied');
+        fCopyModeReset.textContent = 'redone';
         setTimeout(() => {{
           fCopyModeReset.classList.remove('copied');
           fCopyModeReset.textContent = DEFAULT_LABEL;
@@ -956,6 +1014,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
       function setConfirming(isConfirming) {{
         if (isConfirming) {{
           hideUndo();
+          hideRedo();
           fCopyModeResetGroup.classList.add('confirming');
           fCopyModeReset.textContent = CONFIRM_LABEL;
           fCopyModeReset.title = 'Click again to reset the copy mode and clear localStorage';
@@ -978,8 +1037,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
 
       function performReset() {{
         cancelResetConfirm();
-        const modeBeforeReset = fCopyMode ? fCopyMode.value : 'matches';
-        const DEFAULT_MODE = 'matches';
+        const modeBeforeReset = fCopyMode ? fCopyMode.value : DEFAULT_MODE;
         if (fCopyMode) fCopyMode.value = DEFAULT_MODE;
         try {{ localStorage.removeItem(COPY_MODE_KEY); }} catch (e) {{}}
         updateCopyMatchesAllState();
@@ -991,7 +1049,6 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
           performReset();
           return;
         }}
-        // First click: ask for confirmation.
         setConfirming(true);
         resetConfirmTimer = setTimeout(() => {{
           cancelResetConfirm();
@@ -1006,6 +1063,10 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         undoReset();
       }});
 
+      fCopyModeRedo.addEventListener('click', () => {{
+        redoReset();
+      }});
+
       // Cancel confirmation if the user interacts with other toolbar controls.
       ['click', 'input', 'change'].forEach(evt => {{
         fCopyModeResetGroup.parentElement.addEventListener(evt, (e) => {{
@@ -1017,10 +1078,11 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         }}, true);
       }});
 
-      // Hide undo when the user manually changes the copy mode.
+      // Hide undo/redo when the user manually changes the copy mode.
       if (fCopyMode) {{
         fCopyMode.addEventListener('change', () => {{
           if (fCopyModeUndo.style.display !== 'none') hideUndo();
+          if (fCopyModeRedo.style.display !== 'none') hideRedo();
         }});
       }}
     }}
