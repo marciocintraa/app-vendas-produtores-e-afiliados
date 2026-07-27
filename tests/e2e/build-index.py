@@ -772,7 +772,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         const matches = errRaw.split('\\n').map(line => line.trimEnd()).filter(line => line.toLowerCase().includes(termLower));
         if (!matches.length) return;
         totalMatches += matches.length;
-        chunks.push('[' + engine + '] ' + name + '\n' + matches.join('\n'));
+        chunks.push('[' + engine + '] ' + name + '\\n' + matches.join('\\n'));
       }});
       if (!chunks.length) {{
         fCopyMatchesAll.title = 'No matching lines in visible rows';
