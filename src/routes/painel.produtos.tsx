@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import {
   ArrowLeft,
+  ArrowRight,
   Plus,
   Pencil,
   Trash2,
