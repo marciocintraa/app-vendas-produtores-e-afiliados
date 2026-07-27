@@ -878,51 +878,71 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     }}
 
     const fCopyModeReset = document.getElementById('failedCopyModeReset');
-    if (fCopyModeReset) {{
+    const fCopyModeCancel = document.getElementById('failedCopyModeCancel');
+    const fCopyModeResetGroup = document.getElementById('failedCopyModeResetGroup');
+    if (fCopyModeReset && fCopyModeCancel && fCopyModeResetGroup) {{
       let resetConfirmTimer = null;
       const DEFAULT_LABEL = 'Reset mode';
       const CONFIRM_LABEL = 'Confirm reset?';
+
+      function setConfirming(isConfirming) {{
+        if (isConfirming) {{
+          fCopyModeResetGroup.classList.add('confirming');
+          fCopyModeReset.textContent = CONFIRM_LABEL;
+          fCopyModeReset.title = 'Click again to reset the copy mode and clear localStorage';
+          fCopyModeCancel.style.display = 'inline-block';
+        }} else {{
+          fCopyModeResetGroup.classList.remove('confirming');
+          fCopyModeReset.textContent = DEFAULT_LABEL;
+          fCopyModeReset.title = 'Reset copy mode to default and clear saved preference';
+          fCopyModeCancel.style.display = 'none';
+        }}
+      }}
 
       function cancelResetConfirm() {{
         if (resetConfirmTimer) {{
           clearTimeout(resetConfirmTimer);
           resetConfirmTimer = null;
         }}
-        fCopyModeReset.classList.remove('confirming');
-        fCopyModeReset.textContent = DEFAULT_LABEL;
-        fCopyModeReset.title = 'Reset copy mode to default and clear saved preference';
+        setConfirming(false);
+      }}
+
+      function performReset() {{
+        cancelResetConfirm();
+        const DEFAULT_MODE = 'matches';
+        if (fCopyMode) fCopyMode.value = DEFAULT_MODE;
+        try {{ localStorage.removeItem(COPY_MODE_KEY); }} catch (e) {{}}
+        updateCopyMatchesAllState();
+        fCopyModeReset.classList.add('copied');
+        fCopyModeReset.textContent = 'reset';
+        setTimeout(() => {{
+          fCopyModeReset.classList.remove('copied');
+          setConfirming(false);
+        }}, 1200);
       }}
 
       fCopyModeReset.addEventListener('click', () => {{
         if (fCopyModeReset.textContent === CONFIRM_LABEL) {{
-          // Confirmed: reset mode and clear saved preference.
-          cancelResetConfirm();
-          const DEFAULT_MODE = 'matches';
-          if (fCopyMode) fCopyMode.value = DEFAULT_MODE;
-          try {{ localStorage.removeItem(COPY_MODE_KEY); }} catch (e) {{}}
-          updateCopyMatchesAllState();
-          fCopyModeReset.classList.add('copied');
-          fCopyModeReset.textContent = 'reset';
-          setTimeout(() => {{
-            fCopyModeReset.classList.remove('copied');
-            fCopyModeReset.textContent = DEFAULT_LABEL;
-          }}, 1200);
+          performReset();
           return;
         }}
-
         // First click: ask for confirmation.
-        fCopyModeReset.classList.add('confirming');
-        fCopyModeReset.textContent = CONFIRM_LABEL;
-        fCopyModeReset.title = 'Click again to reset the copy mode and clear localStorage';
+        setConfirming(true);
         resetConfirmTimer = setTimeout(() => {{
           cancelResetConfirm();
         }}, 3500);
       }});
 
+      fCopyModeCancel.addEventListener('click', () => {{
+        cancelResetConfirm();
+      }});
+
       // Cancel confirmation if the user interacts with other toolbar controls.
       ['click', 'input', 'change'].forEach(evt => {{
-        fCopyModeReset.parentElement.addEventListener(evt, (e) => {{
-          if (e.target !== fCopyModeReset && fCopyModeReset.textContent === CONFIRM_LABEL) {{
+        fCopyModeResetGroup.parentElement.addEventListener(evt, (e) => {{
+          const target = e.target;
+          const insideGroup = fCopyModeResetGroup.contains(target);
+          if (!insideGroup && fCopyModeReset.textContent === CONFIRM_LABEL) {{
             cancelResetConfirm();
           }}
         }}, true);
