@@ -863,9 +863,13 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
 
     if (fCopyMode) {{
       fCopyMode.addEventListener('change', () => {{
+        saveCopyMode(getCopyMode());
         updateCopyMatchesAllState();
       }});
     }}
+
+    restoreCopyMode();
+    updateCopyMatchesAllState();
 
     applyFilters();
 
