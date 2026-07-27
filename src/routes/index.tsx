@@ -17,6 +17,7 @@ import {
   Users,
   HelpCircle,
   ChevronDown,
+  Quote,
 } from "lucide-react";
 import { useState } from "react";
 import heroImg from "@/assets/hero-app.jpg";
