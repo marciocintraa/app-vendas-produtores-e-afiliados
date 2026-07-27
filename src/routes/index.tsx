@@ -20,33 +20,28 @@ import {
   ChevronDown,
   Quote,
   Download,
-  Monitor,
-  Apple,
-  Plus,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import heroImg from "@/assets/hero-app.jpg";
 
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
-}
+// 🔁 Substitua pelo link direto do Google Drive do seu .apk
+const APK_DOWNLOAD_URL = "https://drive.google.com/uc?export=download&id=SEU_ID_DO_ARQUIVO";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Vende Fácil Pro — App Builder para Produtos Digitais" },
+      { title: "Vende Fácil Pro — App Android para Produtos Digitais" },
       {
         name: "description",
         content:
-          "Transforme seu catálogo de infoprodutos em um app profissional com o Vende Fácil Pro. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
+          "Transforme seu catálogo de infoprodutos em um app profissional para Android com o Vende Fácil Pro. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
       },
-      { property: "og:title", content: "Vende Fácil Pro — App Builder para Produtos Digitais" },
+      { property: "og:title", content: "Vende Fácil Pro — App Android para Produtos Digitais" },
       {
         property: "og:description",
         content:
-          "Transforme seu catálogo de infoprodutos em um app profissional com o Vende Fácil Pro. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
+          "Transforme seu catálogo de infoprodutos em um app profissional para Android com o Vende Fácil Pro. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -111,16 +106,16 @@ function Hero() {
         <div>
           <span className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-3 py-1 text-xs font-medium text-muted-foreground">
             <Sparkles className="w-3.5 h-3.5 text-accent" />
-            App Builder para Produtos Digitais
+            App Android para Produtos Digitais
           </span>
           <h1 className="mt-6 text-4xl md:text-6xl font-bold leading-[1.05]">
             Seu catálogo de infoprodutos em um app profissional com o{" "}
             <span className="text-gradient">Vende Fácil Pro</span>.
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-xl">
-            Produtores e afiliados agora têm sua própria vitrine de vendas. Concentre todos os seus
-            produtos da Hotmart, Kiwify, Eduzz e outras plataformas em um único aplicativo — com IA,
-            analytics e notificações push para converter mais.
+            Produtores e afiliados agora têm seu próprio app de vendas para Android. Concentre todos
+            os seus produtos da Hotmart, Kiwify, Eduzz e outras plataformas em um único aplicativo
+            instalável — com IA, analytics e notificações push para converter mais.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#planos" className="btn-primary">
@@ -132,10 +127,10 @@ function Hero() {
           </div>
           <div className="mt-10 flex items-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-accent" /> Sem cartão
+              <ShieldCheck className="w-4 h-4 text-accent" /> Pagamento na Hotmart
             </div>
             <div className="flex items-center gap-2">
-              <Smartphone className="w-4 h-4 text-accent" /> Android, iOS e Web
+              <Smartphone className="w-4 h-4 text-accent" /> App para Android
             </div>
           </div>
         </div>
@@ -164,71 +159,14 @@ function Hero() {
 }
 
 function DownloadApp() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstalled, setIsInstalled] = useState(false);
-  const [showIOSHelp, setShowIOSHelp] = useState(false);
-  const [platform, setPlatform] = useState<"android" | "ios" | "desktop" | "other">("other");
+  const [showInstallHelp, setShowInstallHelp] = useState(false);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const ua = window.navigator.userAgent.toLowerCase();
-    const isIOS = /iphone|ipad|ipod/.test(ua);
-    const isAndroid = /android/.test(ua);
-    const isDesktop = !isIOS && !isAndroid && (window.innerWidth >= 1024 || /windows|macintosh|linux/.test(ua));
-
-    if (isIOS) setPlatform("ios");
-    else if (isAndroid) setPlatform("android");
-    else if (isDesktop) setPlatform("desktop");
-
-    if (window.matchMedia("(display-mode: standalone)").matches) {
-      setIsInstalled(true);
-    }
-
-    const handler = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-    };
-
-    window.addEventListener("beforeinstallprompt", handler);
-    window.addEventListener("appinstalled", () => {
-      setDeferredPrompt(null);
-      setIsInstalled(true);
-    });
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handler);
-    };
-  }, []);
-
-  const handleInstall = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") {
-      setDeferredPrompt(null);
-    }
-  };
-
-  const platformSteps: Record<string, string[]> = {
-    android: [
-      "Toque no menu do Chrome (⋮) e escolha \"Adicionar à tela inicial\".",
-      "Confirme em \"Adicionar\". O ícone do Vende Fácil Pro aparecerá como um app.",
-    ],
-    ios: [
-      "Toque no botão Compartilhar (□⬆) na barra do Safari.",
-      "Role e selecione \"Adicionar à Tela de Início\".",
-      "Toque em \"Adicionar\". Pronto, seu app está instalado.",
-    ],
-    desktop: [
-      "No Chrome/Edge, clique no ícone de instalação na barra de endereço (ou menu ⋮ → Instalar Vende Fácil Pro).",
-      "Confirme a instalação. O app abrirá em uma janela própria, como um programa nativo.",
-    ],
-    other: [
-      "No menu do navegador, procure por \"Adicionar à tela inicial\" ou \"Instalar aplicativo\".",
-      "Confirme a instalação. O Vende Fácil Pro ficará disponível como um app.",
-    ],
-  };
+  const installSteps = [
+    "Baixe o arquivo .apk no botão abaixo ou pela área de membros.",
+    "Abra o arquivo baixado no celular Android.",
+    "Toque em \"Instalar\" e, se solicitado, permita \"Fontes desconhecidas\".",
+    "Pronto. O ícone do Vende Fácil Pro aparecerá na sua tela inicial.",
+  ];
 
   return (
     <section id="baixar-app" className="py-16 bg-surface/30 border-y border-border">
@@ -245,61 +183,44 @@ function DownloadApp() {
             <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-3 py-1 text-xs font-medium text-accent">
                 <Smartphone className="w-3.5 h-3.5" />
-                App instalável
+                App para Android
               </span>
               <h2 className="mt-4 text-2xl md:text-4xl font-bold">
-                Baixe o <span className="text-gradient">Vende Fácil Pro</span> no seu dispositivo
+                Baixe o <span className="text-gradient">Vende Fácil Pro</span> no Android
               </h2>
               <p className="mt-3 text-muted-foreground max-w-xl">
-                Instale direto pelo navegador — sem lojas, sem burocracia. Acesse seu catálogo como
-                um app nativo no Android, iPhone ou computador.
+                Após a compra você recebe o link do arquivo .apk para instalar no seu celular Android.
+                Não precisa de loja, login complicado ou configuração técnica.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                {isInstalled ? (
-                  <div className="inline-flex items-center gap-2 text-sm font-medium text-emerald-400">
-                    <Check className="w-4 h-4" />
-                    App já instalado
-                  </div>
-                ) : deferredPrompt ? (
-                  <button onClick={handleInstall} className="btn-primary">
-                    <Download className="w-4 h-4" />
-                    Instalar agora
-                  </button>
-                ) : platform === "ios" ? (
-                  <button onClick={() => setShowIOSHelp(true)} className="btn-primary">
-                    <Apple className="w-4 h-4" />
-                    Ver como instalar no iPhone
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => setShowIOSHelp(true)}
-                    className="btn-primary"
-                  >
-                    <Download className="w-4 h-4" />
-                    Como instalar
-                  </button>
-                )}
-                <a href="#planos" className="btn-ghost">
-                  Ver planos <ArrowRight className="w-4 h-4" />
+                <a
+                  href={APK_DOWNLOAD_URL}
+                  className="btn-primary"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Download className="w-4 h-4" />
+                  Baixar .apk para Android
                 </a>
+                <button
+                  type="button"
+                  onClick={() => setShowInstallHelp(true)}
+                  className="btn-ghost"
+                >
+                  Como instalar
+                </button>
               </div>
             </div>
 
             <div className="hidden lg:flex items-center gap-4">
-              <div className="grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
-                <Smartphone className="w-7 h-7 text-accent" />
-              </div>
-              <div className="grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
-                <Apple className="w-7 h-7 text-accent" />
-              </div>
-              <div className="grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
-                <Monitor className="w-7 h-7 text-accent" />
+              <div className="grid place-items-center w-20 h-20 rounded-2xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
+                <Smartphone className="w-9 h-9 text-accent" />
               </div>
             </div>
           </div>
         </div>
 
-        {showIOSHelp && (
+        {showInstallHelp && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
             role="dialog"
@@ -308,7 +229,7 @@ function DownloadApp() {
           >
             <div className="card-glass w-full max-w-md p-6 md:p-8 relative">
               <button
-                onClick={() => setShowIOSHelp(false)}
+                onClick={() => setShowInstallHelp(false)}
                 className="absolute top-4 right-4 p-1 rounded-md hover:bg-white/5 text-muted-foreground"
                 aria-label="Fechar instruções"
               >
@@ -316,17 +237,17 @@ function DownloadApp() {
               </button>
               <div className="flex items-center gap-3">
                 <div className="grid place-items-center w-10 h-10 rounded-xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
-                  <Plus className="w-5 h-5 text-accent" />
+                  <Download className="w-5 h-5 text-accent" />
                 </div>
                 <h3 id="install-title" className="text-xl font-bold">
-                  Instale o Vende Fácil Pro
+                  Como instalar no Android
                 </h3>
               </div>
               <p className="mt-3 text-sm text-muted-foreground">
-                Siga os passos abaixo para adicionar o app à sua tela inicial:
+                Siga os passos abaixo para instalar o app a partir do arquivo .apk:
               </p>
               <ol className="mt-5 space-y-3">
-                {platformSteps[platform].map((step, idx) => (
+                {installSteps.map((step, idx) => (
                   <li key={idx} className="flex gap-3 text-sm">
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-accent/10 text-accent text-xs font-semibold grid place-items-center">
                       {idx + 1}
@@ -335,12 +256,15 @@ function DownloadApp() {
                   </li>
                 ))}
               </ol>
-              <button
-                onClick={() => setShowIOSHelp(false)}
-                className="mt-7 w-full btn-primary"
+              <a
+                href={APK_DOWNLOAD_URL}
+                className="mt-7 w-full btn-primary inline-flex justify-center"
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                Entendi
-              </button>
+                <Download className="w-4 h-4" />
+                Baixar .apk
+              </a>
             </div>
           </div>
         )}
@@ -623,10 +547,11 @@ function Pricing() {
             Planos
           </span>
           <h2 className="mt-3 text-3xl md:text-5xl font-bold">
-            Assinatura simples, receita recorrente.
+            Assinatura simples, app Android liberado.
           </h2>
           <p className="mt-4 text-muted-foreground text-lg">
-            Escolha o plano que acompanha o crescimento do seu catálogo.
+            Escolha o plano que acompanha o crescimento do seu catálogo. Após o pagamento você recebe
+            o link do .apk para instalar no Android.
           </p>
         </div>
 
@@ -738,6 +663,9 @@ function CheckoutModal({ plan, onClose }: { plan: PlanId; onClose: () => void })
         </button>
         <h3 className="text-xl font-bold">Finalizar assinatura</h3>
         <p className="text-sm text-muted-foreground mt-1">Plano {planLabel[plan]}</p>
+        <p className="text-xs text-accent mt-2">
+          Após o pagamento aprovado você receberá o link do app Android por e-mail.
+        </p>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
@@ -763,7 +691,7 @@ function CheckoutModal({ plan, onClose }: { plan: PlanId; onClose: () => void })
               className="w-full px-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              É por este e-mail que você acessará o app após o pagamento.
+              É por este e-mail que você receberá o link para baixar o app Android após o pagamento.
             </p>
           </div>
           <div>
@@ -825,13 +753,19 @@ function FAQ() {
       id: "compartilhar",
       question: "Como meus clientes acessam o catálogo?",
       answer:
-        "Seu catálogo recebe um link público próprio que pode ser compartilhado no Instagram, WhatsApp, TikTok, e-mail ou bio. O app também pode ser instalado na tela inicial de Android e iOS como um aplicativo nativo.",
+        "Você instala o Vende Fácil Pro no Android e compartilha seu catálogo pelo WhatsApp, Instagram, TikTok, e-mail ou bio. Seus clientes veem seus produtos direto no app.",
     },
     {
       id: "plataformas",
       question: "Funciona com Hotmart, Kiwify, Eduzz e outras plataformas?",
       answer:
         "Sim. Você cola o link de afiliado ou de produtor de qualquer plataforma — Hotmart, Kiwify, Eduzz, Monetizze, PerfectPay, Kirvano, Shopify, Stripe e outras. A venda final acontece na plataforma escolhida.",
+    },
+    {
+      id: "android",
+      question: "O app funciona apenas no Android?",
+      answer:
+        "Sim. O Vende Fácil Pro é entregue como um arquivo .apk para Android. Após a compra aprovada, você recebe o link de download e instala no celular em poucos toques.",
     },
     {
       id: "personalizacao",
@@ -925,10 +859,10 @@ function FinalCTA() {
           />
           <Rocket className="w-10 h-10 mx-auto text-accent" />
           <h2 className="mt-4 text-3xl md:text-5xl font-bold max-w-2xl mx-auto">
-            Lance seu <span className="text-gradient">próprio app</span> nesta semana.
+            Tenha seu <span className="text-gradient">app de vendas</span> no Android.
           </h2>
           <p className="mt-4 text-muted-foreground max-w-xl mx-auto">
-            Sem código. Sem depender de uma única plataforma. Sua marca, seus produtos, sua base.
+            Sem código. Sem loja. Sua marca, seus produtos, seus clientes instalando direto no Android.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <a href="#planos" className="btn-primary">
