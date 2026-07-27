@@ -21,18 +21,11 @@ import {
   ChevronDown,
   Quote,
   Download,
-  Monitor,
-  Apple,
   Plus,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import heroImg from "@/assets/hero-app.jpg";
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
-}
 
 export const Route = createFileRoute("/")({
   head: () => ({
