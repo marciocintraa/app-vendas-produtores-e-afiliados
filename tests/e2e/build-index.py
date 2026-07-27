@@ -310,6 +310,8 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .failed-clear {{ background: #1e293b; border: none; color: #cbd5e1; padding: 6px 12px;
                    border-radius: 8px; font-size: 12px; cursor: pointer; }}
   .failed-clear:hover {{ background: #334155; }}
+  .failed-export {{ background: #052e1a; color: #4ade80; }}
+  .failed-export:hover {{ background: #064e2c; }}
   .failed-table tr.hidden {{ display: none; }}
   mark.hl {{ background: #fbbf24; color: #0b1120; padding: 0 2px; border-radius: 2px; }}
   th.sortable {{ cursor: pointer; user-select: none; }}
