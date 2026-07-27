@@ -489,16 +489,16 @@ function AdminProductsPage() {
                         <button
                           type="button"
                           onClick={() => {
-                            if (editing.gallery.some((g) => g === editing.cover)) {
-                              setError(
-                                "Escolha outra imagem da galeria como capa antes de remover a atual.",
-                              );
-                              return;
-                            }
+                            const next = editing.gallery.find((g) => g !== editing.cover) ?? "";
                             setError(null);
-                            setEditing({ ...editing, cover: "" });
+                            setEditing({ ...editing, cover: next });
                           }}
                           className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                          title={
+                            editing.gallery.some((g) => g !== editing.cover)
+                              ? "A próxima imagem da galeria será usada como capa."
+                              : "Remove a capa."
+                          }
                         >
                           <Trash2 className="h-3.5 w-3.5" /> Remover
                         </button>
