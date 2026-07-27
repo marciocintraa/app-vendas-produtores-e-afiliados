@@ -39,6 +39,7 @@ function CatalogPage() {
   const products = useMemo(() => {
     const q = query.trim().toLowerCase();
     return allProducts.filter((p) => {
+      if (p.published === false) return false;
       if (category && p.category !== category) return false;
       if (!q) return true;
       return (
@@ -48,6 +49,7 @@ function CatalogPage() {
       );
     });
   }, [allProducts, query, category]);
+
 
 
   return (
