@@ -121,6 +121,10 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
       <label class="failed-check" title="Show only failures with an error message/stack">
         <input type="checkbox" id="failedHasError"> with error only
       </label>
+      <label class="failed-check" title="Automatically expand error details for rows matching the error term">
+        <input type="checkbox" id="failedAutoExpand" checked> auto-expand matches
+      </label>
+
       <span class="failed-count muted" id="failedCount"></span>
       <button type="button" id="failedExport" class="failed-clear failed-export" title="Export filtered failures to CSV">Export CSV ↓</button>
       <button type="button" id="failedClear" class="failed-clear" title="Clear filters">Clear</button>
