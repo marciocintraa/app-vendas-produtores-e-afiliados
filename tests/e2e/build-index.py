@@ -149,7 +149,7 @@ def _render_failed_table(summaries: dict[str, dict | None]) -> str:
         <option value="full">Full stack</option>
       </select>
       <span id="failedCopyModeResetGroup" class="failed-reset-group">
-        <button type="button" id="failedCopyModeReset" class="failed-clear" title="Reset copy mode to default and clear saved preference">Reset mode</button>
+        <button type="button" id="failedCopyModeReset" class="failed-clear" title="Reset copy mode to default and clear saved preference (Shift+R)">Reset mode</button>
         <button type="button" id="failedCopyModeCancel" class="failed-clear failed-reset-cancel" title="Cancel reset and keep current copy mode" style="display:none">Cancel</button>
       </span>
       <button type="button" id="failedCopyMatchesAll" class="failed-clear failed-copy-matches-global" title="Copy matching error lines from all visible rows">Copy from visible rows</button>
@@ -574,6 +574,23 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
       if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) return;
       const s = document.getElementById('failedSearch');
       if (s) {{ e.preventDefault(); s.focus(); s.select(); }}
+    }}
+    if (e.key === 'R' && e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && !modal.classList.contains('open')) {{
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) return;
+      const resetBtn = document.getElementById('failedCopyModeReset');
+      if (resetBtn && resetBtn.textContent !== 'Confirm reset?') {{
+        e.preventDefault();
+        resetBtn.click();
+        resetBtn.focus();
+      }}
+    }}
+    if (e.key === 'Escape' && !modal.classList.contains('open')) {{
+      const resetBtn = document.getElementById('failedCopyModeReset');
+      if (resetBtn && resetBtn.textContent === 'Confirm reset?') {{
+        const cancelBtn = document.getElementById('failedCopyModeCancel');
+        if (cancelBtn) cancelBtn.click();
+      }}
     }}
   }});
 
