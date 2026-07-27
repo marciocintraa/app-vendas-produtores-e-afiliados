@@ -86,9 +86,9 @@ function Nav() {
           <a href="#planos" className="hover:text-foreground transition-colors">Planos</a>
           <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
         </nav>
-        <a href="#baixar-app" className="hidden lg:inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-          <Download className="w-4 h-4" />
-          Baixar app
+        <a href="#planos" className="hidden lg:inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Lock className="w-4 h-4" />
+          Assinar para baixar
         </a>
         <a href="#planos" className="btn-primary text-sm !py-2.5 !px-4">
           Começar agora
