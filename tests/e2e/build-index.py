@@ -540,6 +540,37 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
     }});
     applyFilters();
 
+    // Export filtered failures to CSV
+    const fExport = document.getElementById('failedExport');
+    function csvEscape(v) {{
+      const s = v == null ? '' : String(v);
+      return /[",\\n\\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    }}
+    fExport.addEventListener('click', () => {{
+      const base = window.location.href.replace(/[?#].*$/, '');
+      const visibleRows = rows.filter(r => !r.classList.contains('hidden'));
+      const header = ['engine', 'scenario', 'duration_ms', 'trace_url', 'video_url'];
+      const lines = [header.join(',')];
+      visibleRows.forEach(r => {{
+        const engine = r.dataset.engine || '';
+        const scn = r.querySelector('.scn');
+        const name = originalHtml.get(r) || (scn ? scn.textContent : '');
+        const dur = r.dataset.duration || '0';
+        const th = r.dataset.traceHref || '';
+        const vh = r.dataset.videoHref || '';
+        const tUrl = th ? new URL(th, base).href : '';
+        const vUrl = vh ? new URL(vh, base).href : '';
+        lines.push([engine, name, dur, tUrl, vUrl].map(csvEscape).join(','));
+      }});
+      const blob = new Blob(['\\ufeff' + lines.join('\\r\\n')], {{ type: 'text/csv;charset=utf-8;' }});
+      const url = URL.createObjectURL(blob);
+      const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'failed-scenarios-' + ts + '.csv';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }});
+
     // Sort by duration
     const sortDur = document.getElementById('failedSortDur');
     let sortDir = null; // null | 'asc' | 'desc'
