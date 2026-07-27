@@ -255,14 +255,16 @@ function DownloadApp() {
                 ))}
               </ol>
               <a
-                href={APK_DOWNLOAD_URL}
+                href="#planos"
+                onClick={() => setShowInstallHelp(false)}
                 className="mt-7 w-full btn-primary inline-flex justify-center"
-                target="_blank"
-                rel="noopener noreferrer"
               >
-                <Download className="w-4 h-4" />
-                Baixar .apk
+                <Lock className="w-4 h-4" />
+                Assinar para receber o .apk
               </a>
+              <p className="mt-3 text-xs text-muted-foreground text-center">
+                O link do arquivo .apk é enviado após a compra ser aprovada.
+              </p>
             </div>
           </div>
         )}
