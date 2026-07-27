@@ -361,6 +361,14 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .err-toggle[aria-expanded="true"] {{ color: #fca5a5; border-color: #7f1d1d; }}
   .err-toggle[aria-expanded="true"] .chev {{ transform: rotate(90deg); }}
   .err-toggle.auto {{ border-style: dashed; }}
+  .err-copy {{ margin: 8px 0 0 8px; display: inline-flex; align-items: center; gap: 4px;
+               background: transparent; border: 1px solid #1f2937; color: #94a3b8;
+               border-radius: 6px; padding: 2px 8px; font-size: 10.5px;
+               text-transform: uppercase; letter-spacing: .05em; cursor: pointer;
+               transition: color .15s ease, border-color .15s ease, background .15s ease; }}
+  .err-copy:hover {{ color: #e2e8f0; border-color: #334155; background: #1e293b; }}
+  .err-copy.copied {{ color: #34d399; border-color: #14532d; background: #052e1a; }}
+  .err-copy svg {{ vertical-align: middle; }}
 
   .err-text {{ margin: 8px 0 0; padding: 8px 10px; background: #0b1120;
                border: 1px solid #1f2937; border-left: 3px solid #7f1d1d;
