@@ -15,7 +15,10 @@ import {
   Rocket,
   ShieldCheck,
   Users,
+  HelpCircle,
+  ChevronDown,
 } from "lucide-react";
+import { useState } from "react";
 import heroImg from "@/assets/hero-app.jpg";
 
 export const Route = createFileRoute("/")({
