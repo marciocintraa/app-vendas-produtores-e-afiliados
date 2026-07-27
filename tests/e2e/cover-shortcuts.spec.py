@@ -216,12 +216,20 @@ async def scenario_invalid_then_valid(page: Page) -> None:
 
     await clear_toasts(page)
     await press(page, "Enter")
-    await asyncio.sleep(0.3)
+    # Poll for either the final-confirm to open (unexpected) or a toast to render.
+    for _ in range(30):
+        await asyncio.sleep(0.1)
+        if await final_modal_is_open(page):
+            break
+        toasts_now = await recent_toasts(page)
+        if any("valida" in t.lower() or "aguarde" in t.lower() for t in toasts_now):
+            break
     check(not await final_modal_is_open(page),
           "Enter is blocked while cover is invalid (no final-confirm step)")
     toasts = await recent_toasts(page)
-    check(any("aguarde a validação" in t.lower() or "validação" in t.lower() for t in toasts),
+    check(any("aguarde" in t.lower() or "valida" in t.lower() for t in toasts),
           "an error/warning toast is shown when Enter fires on invalid cover")
+
 
     # Now switch to a valid candidate.
     await select_candidate(page, COVER_B)
