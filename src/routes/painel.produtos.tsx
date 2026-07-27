@@ -134,6 +134,7 @@ import {
   Loader2,
   Upload,
   Image as ImageIcon,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -312,6 +313,23 @@ function AdminProductsPage() {
       open: true,
       currentCover: editing?.cover ?? "",
       nextCover: confirm.selectedNext,
+    });
+  }
+
+  function resetToCurrentCover() {
+    const current = editing?.cover;
+    if (!current) {
+      toast.error("Nenhuma capa atual para restaurar.");
+      return;
+    }
+    setCoverDropError(null);
+    setConfirm((prev) => ({
+      ...prev,
+      selectedNext: current,
+      candidates: prev.candidates.includes(current) ? prev.candidates : [current, ...prev.candidates],
+    }));
+    toast.message("Capa atual restaurada", {
+      description: "A validação será executada automaticamente.",
     });
   }
 
@@ -1295,6 +1313,15 @@ function AdminProductsPage() {
               >
                 Cancelar
               </button>
+              {editing?.cover && confirm.selectedNext !== editing.cover && (
+                <button
+                  type="button"
+                  onClick={resetToCurrentCover}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+                >
+                  <RotateCcw className="h-4 w-4" /> Voltar para capa atual
+                </button>
+              )}
               {confirm.candidates.length > 0 && (
                 <button
                   type="button"
