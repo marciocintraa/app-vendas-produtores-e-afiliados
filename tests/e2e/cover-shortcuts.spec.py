@@ -293,7 +293,7 @@ async def main() -> int:
         # Seed localStorage then navigate.
         await page.goto(BASE_URL, wait_until="domcontentloaded")
         await page.evaluate(
-            "(payload) => window.localStorage.setItem(arguments[0].key, arguments[0].value)",
+            "(payload) => window.localStorage.setItem(payload.key, payload.value)",
             {"key": STORAGE_KEY, "value": json.dumps([PRODUCT])},
         )
         await page.goto(f"{BASE_URL}/painel/produtos", wait_until="domcontentloaded")
