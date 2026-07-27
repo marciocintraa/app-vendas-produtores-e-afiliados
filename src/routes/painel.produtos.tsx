@@ -458,6 +458,58 @@ function AdminProductsPage() {
     return () => ctrl.abort();
   }, [confirm.selectedNext, confirm.open]);
 
+  function isTypingTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) return false;
+    const tag = target.tagName.toLowerCase();
+    return (
+      tag === "input" ||
+      tag === "textarea" ||
+      tag === "select" ||
+      target.isContentEditable
+    );
+  }
+
+  function isActionTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof HTMLElement)) return false;
+    const tag = target.tagName.toLowerCase();
+    return (
+      tag === "button" ||
+      tag === "a" ||
+      target.getAttribute("role") === "button" ||
+      target.getAttribute("role") === "link"
+    );
+  }
+
+  useEffect(() => {
+    if (!confirm.open || finalConfirm.open) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (isTypingTarget(e.target)) return;
+      const mod = e.ctrlKey || e.metaKey;
+      if (mod && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        if (canUndoCover || (editing?.cover && confirm.selectedNext !== editing.cover)) {
+          undoCoverSelection();
+        } else {
+          toast.message("Nada para desfazer.");
+        }
+        return;
+      }
+      if (e.key === "Enter" && !e.shiftKey && !e.altKey && !isActionTarget(e.target)) {
+        e.preventDefault();
+        requestFinalConfirm();
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [
+    confirm.open,
+    confirm.selectedNext,
+    editing?.cover,
+    canUndoCover,
+    finalConfirm.open,
+    coverValidation,
+  ]);
+
 
   function openConfirm(opts: Omit<ConfirmState, "open">) {
     coverHistoryRef.current = [editing?.cover ?? ""];
