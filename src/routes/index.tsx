@@ -20,12 +20,13 @@ import {
   ChevronDown,
   Quote,
   Download,
+  Lock,
   X,
 } from "lucide-react";
 import { useState } from "react";
 import heroImg from "@/assets/hero-app.jpg";
 
-const APK_DOWNLOAD_URL = "https://drive.usercontent.google.com/download?id=1LAo1ZB4tD0VUNUMuvmI6iUrmFMrK7JPB&export=download&confirm=t";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -86,9 +87,9 @@ function Nav() {
           <a href="#planos" className="hover:text-foreground transition-colors">Planos</a>
           <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
         </nav>
-        <a href="#baixar-app" className="hidden lg:inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-          <Download className="w-4 h-4" />
-          Baixar app
+        <a href="#planos" className="hidden lg:inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <Lock className="w-4 h-4" />
+          Assinar para baixar
         </a>
         <a href="#planos" className="btn-primary text-sm !py-2.5 !px-4">
           Começar agora
@@ -192,14 +193,9 @@ function DownloadApp() {
                 Não precisa de loja, login complicado ou configuração técnica.
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <a
-                  href={APK_DOWNLOAD_URL}
-                  className="btn-primary"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Download className="w-4 h-4" />
-                  Baixar .apk para Android
+                <a href="#planos" className="btn-primary">
+                  <Lock className="w-4 h-4" />
+                  Assinar para receber o .apk
                 </a>
                 <button
                   type="button"
@@ -209,6 +205,9 @@ function DownloadApp() {
                   Como instalar
                 </button>
               </div>
+              <p className="mt-3 text-xs text-muted-foreground">
+                O download do arquivo .apk é liberado somente após a confirmação da compra na Hotmart.
+              </p>
             </div>
 
             <div className="hidden lg:flex items-center gap-4">
@@ -256,14 +255,16 @@ function DownloadApp() {
                 ))}
               </ol>
               <a
-                href={APK_DOWNLOAD_URL}
+                href="#planos"
+                onClick={() => setShowInstallHelp(false)}
                 className="mt-7 w-full btn-primary inline-flex justify-center"
-                target="_blank"
-                rel="noopener noreferrer"
               >
-                <Download className="w-4 h-4" />
-                Baixar .apk
+                <Lock className="w-4 h-4" />
+                Assinar para receber o .apk
               </a>
+              <p className="mt-3 text-xs text-muted-foreground text-center">
+                O link do arquivo .apk é enviado após a compra ser aprovada.
+              </p>
             </div>
           </div>
         )}
