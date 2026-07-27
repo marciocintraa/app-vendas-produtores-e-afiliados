@@ -575,6 +575,16 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
       const s = document.getElementById('failedSearch');
       if (s) {{ e.preventDefault(); s.focus(); s.select(); }}
     }}
+    if (e.key === 'R' && e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && !modal.classList.contains('open')) {{
+      const t = e.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) return;
+      const resetBtn = document.getElementById('failedCopyModeReset');
+      if (resetBtn && resetBtn.textContent !== 'Confirm reset?') {{
+        e.preventDefault();
+        resetBtn.click();
+        resetBtn.focus();
+      }}
+    }}
   }});
 
   // Failed scenarios filters
