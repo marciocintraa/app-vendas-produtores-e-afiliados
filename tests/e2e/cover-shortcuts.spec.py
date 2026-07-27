@@ -282,9 +282,16 @@ async def scenario_shortcuts_disabled_during_final_confirm(page: Page) -> None:
     await open_modal(page)
     await select_candidate(page, COVER_B)
     await wait_for_validation(page, "enabled")
+    await asyncio.sleep(0.2)
     await press(page, "Enter")
-    await page.wait_for_selector("text=Confirmação final da troca de capa", timeout=4000)
+    try:
+        await page.wait_for_selector("text=Confirmação final da troca de capa", timeout=4000)
+    except Exception:
+        dump = await page.evaluate("() => ({ toasts: window.__toasts || [], hasFinal: !!document.querySelector('text') })")
+        print("DEBUG scenario4:", dump)
+        raise
     check(await final_modal_is_open(page), "final-confirm step is open")
+
 
     await clear_toasts(page)
     # Ctrl+Z should NOT emit any undo toast while final-confirm is up.
