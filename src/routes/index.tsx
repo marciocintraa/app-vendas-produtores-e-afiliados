@@ -136,7 +136,7 @@ function Hero() {
               <ShieldCheck className="w-4 h-4 text-accent" /> Sem cartão
             </div>
             <div className="flex items-center gap-2">
-              <Smartphone className="w-4 h-4 text-accent" /> Android, iOS e Web
+              <Smartphone className="w-4 h-4 text-accent" /> App Android nativo
             </div>
           </div>
         </div>
@@ -165,71 +165,16 @@ function Hero() {
 }
 
 function DownloadApp() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [isInstalled, setIsInstalled] = useState(false);
-  const [showIOSHelp, setShowIOSHelp] = useState(false);
-  const [platform, setPlatform] = useState<"android" | "ios" | "desktop" | "other">("other");
+  const [isAndroid, setIsAndroid] = useState(true);
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-
     const ua = window.navigator.userAgent.toLowerCase();
-    const isIOS = /iphone|ipad|ipod/.test(ua);
-    const isAndroid = /android/.test(ua);
-    const isDesktop = !isIOS && !isAndroid && (window.innerWidth >= 1024 || /windows|macintosh|linux/.test(ua));
-
-    if (isIOS) setPlatform("ios");
-    else if (isAndroid) setPlatform("android");
-    else if (isDesktop) setPlatform("desktop");
-
-    if (window.matchMedia("(display-mode: standalone)").matches) {
-      setIsInstalled(true);
-    }
-
-    const handler = (e: Event) => {
-      e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-    };
-
-    window.addEventListener("beforeinstallprompt", handler);
-    window.addEventListener("appinstalled", () => {
-      setDeferredPrompt(null);
-      setIsInstalled(true);
-    });
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handler);
-    };
+    setIsAndroid(/android/.test(ua));
   }, []);
 
-  const handleInstall = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") {
-      setDeferredPrompt(null);
-    }
-  };
-
-  const platformSteps: Record<string, string[]> = {
-    android: [
-      "Toque no menu do Chrome (⋮) e escolha \"Adicionar à tela inicial\".",
-      "Confirme em \"Adicionar\". O ícone do Vende Fácil Pro aparecerá como um app.",
-    ],
-    ios: [
-      "Toque no botão Compartilhar (□⬆) na barra do Safari.",
-      "Role e selecione \"Adicionar à Tela de Início\".",
-      "Toque em \"Adicionar\". Pronto, seu app está instalado.",
-    ],
-    desktop: [
-      "No Chrome/Edge, clique no ícone de instalação na barra de endereço (ou menu ⋮ → Instalar Vende Fácil Pro).",
-      "Confirme a instalação. O app abrirá em uma janela própria, como um programa nativo.",
-    ],
-    other: [
-      "No menu do navegador, procure por \"Adicionar à tela inicial\" ou \"Instalar aplicativo\".",
-      "Confirme a instalação. O Vende Fácil Pro ficará disponível como um app.",
-    ],
-  };
+  const hasApk = APK_DOWNLOAD_URL.length > 0;
 
   return (
     <section id="baixar-app" className="py-16 bg-surface/30 border-y border-border">
@@ -246,61 +191,62 @@ function DownloadApp() {
             <div>
               <span className="inline-flex items-center gap-2 rounded-full border border-border bg-white/5 px-3 py-1 text-xs font-medium text-accent">
                 <Smartphone className="w-3.5 h-3.5" />
-                App instalável
+                App Android — arquivo APK
               </span>
               <h2 className="mt-4 text-2xl md:text-4xl font-bold">
-                Baixe o <span className="text-gradient">Vende Fácil Pro</span> no seu dispositivo
+                Baixe o <span className="text-gradient">Vende Fácil Pro</span> para Android
               </h2>
               <p className="mt-3 text-muted-foreground max-w-xl">
-                Instale direto pelo navegador — sem lojas, sem burocracia. Acesse seu catálogo como
-                um app nativo no Android, iPhone ou computador.
+                Aplicativo Android nativo em formato APK. Instale direto no seu celular,
+                sem depender de loja, e tenha seu catálogo sempre à mão com ícone próprio
+                na tela inicial.
+                {APK_VERSION && (
+                  <span className="block mt-1 text-xs text-muted-foreground/70">
+                    Versão {APK_VERSION} • Compatível com Android 7.0 ou superior
+                  </span>
+                )}
               </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                {isInstalled ? (
-                  <div className="inline-flex items-center gap-2 text-sm font-medium text-emerald-400">
-                    <Check className="w-4 h-4" />
-                    App já instalado
-                  </div>
-                ) : deferredPrompt ? (
-                  <button onClick={handleInstall} className="btn-primary">
+                {hasApk ? (
+                  <a
+                    href={APK_DOWNLOAD_URL}
+                    className="btn-primary"
+                    download
+                  >
                     <Download className="w-4 h-4" />
-                    Instalar agora
-                  </button>
-                ) : platform === "ios" ? (
-                  <button onClick={() => setShowIOSHelp(true)} className="btn-primary">
-                    <Apple className="w-4 h-4" />
-                    Ver como instalar no iPhone
-                  </button>
+                    Baixar APK para Android
+                  </a>
                 ) : (
                   <button
-                    onClick={() => setShowIOSHelp(true)}
+                    onClick={() => setShowHelp(true)}
                     className="btn-primary"
                   >
                     <Download className="w-4 h-4" />
-                    Como instalar
+                    Como instalar no Android
                   </button>
                 )}
                 <a href="#planos" className="btn-ghost">
                   Ver planos <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
+              {!isAndroid && (
+                <p className="mt-4 text-xs text-amber-400/90 flex items-center gap-2">
+                  <Smartphone className="w-3.5 h-3.5" />
+                  Você não está em um dispositivo Android. Abra esta página pelo celular
+                  Android para baixar e instalar o APK.
+                </p>
+              )}
             </div>
 
             <div className="hidden lg:flex items-center gap-4">
-              <div className="grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
-                <Smartphone className="w-7 h-7 text-accent" />
-              </div>
-              <div className="grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
-                <Apple className="w-7 h-7 text-accent" />
-              </div>
-              <div className="grid place-items-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
-                <Monitor className="w-7 h-7 text-accent" />
+              <div className="grid place-items-center w-24 h-24 rounded-2xl bg-gradient-to-br from-brand/25 to-brand-2/20 border border-border">
+                <Smartphone className="w-12 h-12 text-accent" />
               </div>
             </div>
           </div>
         </div>
 
-        {showIOSHelp && (
+        {showHelp && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
             role="dialog"
@@ -309,7 +255,7 @@ function DownloadApp() {
           >
             <div className="card-glass w-full max-w-md p-6 md:p-8 relative">
               <button
-                onClick={() => setShowIOSHelp(false)}
+                onClick={() => setShowHelp(false)}
                 className="absolute top-4 right-4 p-1 rounded-md hover:bg-white/5 text-muted-foreground"
                 aria-label="Fechar instruções"
               >
@@ -320,14 +266,16 @@ function DownloadApp() {
                   <Plus className="w-5 h-5 text-accent" />
                 </div>
                 <h3 id="install-title" className="text-xl font-bold">
-                  Instale o Vende Fácil Pro
+                  Instalar o APK no Android
                 </h3>
               </div>
-              <p className="mt-3 text-sm text-muted-foreground">
-                Siga os passos abaixo para adicionar o app à sua tela inicial:
-              </p>
               <ol className="mt-5 space-y-3">
-                {platformSteps[platform].map((step, idx) => (
+                {[
+                  "Toque no botão \"Baixar APK\" e aguarde o arquivo terminar de baixar.",
+                  "Abra o arquivo baixado (pelo aviso de download ou pela pasta Downloads).",
+                  "Se o Android pedir, autorize \"Instalar de fontes desconhecidas\" para o seu navegador.",
+                  "Confirme a instalação. O ícone do Vende Fácil Pro aparecerá na sua tela inicial.",
+                ].map((step, idx) => (
                   <li key={idx} className="flex gap-3 text-sm">
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-accent/10 text-accent text-xs font-semibold grid place-items-center">
                       {idx + 1}
@@ -337,7 +285,7 @@ function DownloadApp() {
                 ))}
               </ol>
               <button
-                onClick={() => setShowIOSHelp(false)}
+                onClick={() => setShowHelp(false)}
                 className="mt-7 w-full btn-primary"
               >
                 Entendi
@@ -349,6 +297,7 @@ function DownloadApp() {
     </section>
   );
 }
+
 
 function SocialProof() {
   const items = [
