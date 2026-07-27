@@ -336,6 +336,12 @@ async def main() -> int:
         browser_type = getattr(pw, browser_name)
         browser = await browser_type.launch(headless=True)
         context = await browser.new_context(viewport={"width": 1280, "height": 1800})
+
+        trace_enabled = os.environ.get("PLAYWRIGHT_TRACE", "1") != "0"
+        trace_path = SCREENSHOTS / f"trace-{browser_name}.zip"
+        if trace_enabled:
+            await context.tracing.start(screenshots=True, snapshots=True, sources=True)
+
         page = await context.new_page()
 
         # Seed localStorage then navigate.
@@ -371,6 +377,13 @@ async def main() -> int:
                 await page.wait_for_selector("text=E2E Shortcut Test", timeout=8000)
                 await install_toast_capture(page)
 
+        if trace_enabled:
+            # Only persist the trace when something failed — keeps CI artifacts small.
+            if failures:
+                await context.tracing.stop(path=str(trace_path))
+                print(f"trace saved: {trace_path}")
+            else:
+                await context.tracing.stop()
 
         await context.close()
         await browser.close()
