@@ -1562,17 +1562,21 @@ function AdminProductsPage() {
                 <button
                   type="button"
                   onClick={undoCoverSelection}
+                  title="Desfazer seleção (Ctrl+Z)"
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
                 >
-                  <Undo className="h-4 w-4" /> Desfazer
+                  <Undo className="h-4 w-4" /> Desfazer{" "}
+                  <span className="hidden text-[10px] opacity-60 sm:inline">Ctrl+Z</span>
                 </button>
               )}
               <button
                 type="button"
                 onClick={requestFinalConfirm}
-                className="rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
+                title="Confirmar troca de capa (Enter)"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
               >
-                {confirm.actionLabel}
+                {confirm.actionLabel}{" "}
+                <span className="hidden text-[10px] opacity-70 sm:inline">Enter</span>
               </button>
             </div>
           </div>
