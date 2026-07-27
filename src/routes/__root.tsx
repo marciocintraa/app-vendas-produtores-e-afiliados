@@ -81,11 +81,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "SaaS para produtores e afiliados criarem seu próprio app de catálogo de produtos digitais, com IA, analytics e notificações push.",
+          "Transforme seu catálogo de infoprodutos em um app profissional. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
       },
       { name: "author", content: "Digital Store Pro" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "Digital Store Pro — App Builder para Produtos Digitais" },
+      { name: "twitter:title", content: "Digital Store Pro — App Builder para Produtos Digitais" },
+      { property: "og:description", content: "Transforme seu catálogo de infoprodutos em um app profissional. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais." },
+      { name: "twitter:description", content: "Transforme seu catálogo de infoprodutos em um app profissional. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/OCHVuUZ4KwYgyIwNrW7Fe5QlrKA3/social-images/social-1785133673630-Capturar.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/OCHVuUZ4KwYgyIwNrW7Fe5QlrKA3/social-images/social-1785133673630-Capturar.webp" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
@@ -95,7 +101,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap",
       },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,
