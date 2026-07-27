@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Check, ExternalLink, Sparkles, Star, BookOpen, Share2 } from "lucide-react";
-import { getProduct, PRODUCTS } from "@/lib/catalog-data";
+import { getProduct, PRODUCTS, type Product } from "@/lib/catalog-data";
 
 export const Route = createFileRoute("/catalogo/$productId")({
   loader: ({ params }) => {
