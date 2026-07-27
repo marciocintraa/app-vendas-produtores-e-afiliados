@@ -649,20 +649,22 @@ function AdminProductsPage() {
                                     );
                                     return;
                                   }
+                                  const nextGallery = editing.gallery.filter((_, j) => j !== i);
                                   openConfirm({
                                     title: "Trocar capa principal?",
                                     description:
                                       "Esta imagem é a capa atual do produto. Removê-la promoverá automaticamente a próxima imagem da galeria como nova capa.",
                                     actionLabel: "Sim, trocar capa",
+                                    nextCover: nextGallery[0] ?? "",
                                     onConfirm: () => {
                                       setError(null);
                                       setEditing((prev) => {
                                         if (!prev) return prev;
-                                        const nextGallery = prev.gallery.filter((_, j) => j !== i);
+                                        const next = prev.gallery.filter((_, j) => j !== i);
                                         return {
                                           ...prev,
-                                          gallery: nextGallery,
-                                          cover: nextGallery[0] ?? "",
+                                          gallery: next,
+                                          cover: next[0] ?? "",
                                         };
                                       });
                                       closeConfirm();
