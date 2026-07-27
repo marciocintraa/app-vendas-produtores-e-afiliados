@@ -148,6 +148,7 @@ function AdminProductsPage() {
   }
 
   function closeConfirm() {
+    setFullPreview(false);
     setConfirm((prev) => ({ ...prev, open: false }));
   }
 
