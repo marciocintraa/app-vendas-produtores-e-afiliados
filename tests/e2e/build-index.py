@@ -49,7 +49,45 @@ def load_summary(json_path: Path, engine: str) -> dict:
     }
 
 
+def _render_failed_table(summaries: dict[str, dict | None]) -> str:
+    rows = []
+    for engine in ENGINES:
+        s = summaries.get(engine)
+        if not s:
+            continue
+        trace_href = s.get("trace_href")
+        video_href = s.get("video_href")
+        for sc in s.get("scenarios", []):
+            if sc.get("status") != "failed":
+                continue
+            name = _html.escape(sc.get("name", "(unnamed)"))
+            dur = sc.get("duration_ms", 0)
+            links = []
+            if trace_href:
+                links.append(f'<a class="inline-link trace" href="{trace_href}" download title="Download trace.zip">trace</a>')
+            if video_href:
+                links.append(f'<a class="inline-link video" href="{video_href}" download title="Download video.webm">video</a>')
+            links_html = f' <span class="inline-links">{" ".join(links)}</span>' if links else ""
+            rows.append(
+                f'<tr><td class="eng">{engine}</td>'
+                f'<td class="sc"><span class="scn">{name}</span>{links_html}</td>'
+                f'<td class="dur">{dur} ms</td></tr>'
+            )
+    if not rows:
+        return ""
+    return f"""
+  <h2>Failed scenarios</h2>
+  <div class="failed-table-wrap">
+    <table class="failed-table">
+      <thead><tr><th>Engine</th><th>Scenario</th><th>Duration</th></tr></thead>
+      <tbody>{''.join(rows)}</tbody>
+    </table>
+    <p class="muted">Trace/video assets are recorded per engine run and shared across its failed scenarios.</p>
+  </div>"""
+
+
 def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
+
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
 
     totals_passed = sum((s or {}).get("passed", 0) for s in summaries.values())
@@ -210,6 +248,26 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   .pane.active {{ display: block; }}
   .muted {{ color: #64748b; font-size: 12px; }}
   h2 {{ font-size: 16px; margin: 24px 0 12px; color: #cbd5e1; }}
+  .failed-table-wrap {{ background: #111827; border: 1px solid #1f2937; border-radius: 10px;
+                        padding: 4px 4px 12px; }}
+  .failed-table {{ width: 100%; border-collapse: collapse; font-size: 13px; }}
+  .failed-table th, .failed-table td {{ padding: 10px 14px; text-align: left;
+                                        border-bottom: 1px solid #1f2937; }}
+  .failed-table th {{ color: #94a3b8; font-weight: 500; font-size: 11px;
+                      text-transform: uppercase; letter-spacing: .05em; }}
+  .failed-table tbody tr:last-child td {{ border-bottom: none; }}
+  .failed-table td.eng {{ text-transform: capitalize; color: #cbd5e1; width: 120px; }}
+  .failed-table td.dur {{ color: #94a3b8; width: 100px; }}
+  .failed-table .scn {{ color: #f87171; font-weight: 500; }}
+  .inline-links {{ margin-left: 10px; display: inline-flex; gap: 6px; }}
+  .inline-link {{ display: inline-block; padding: 2px 8px; border-radius: 999px;
+                  font-size: 11px; text-decoration: none; font-weight: 500; }}
+  .inline-link.trace {{ background: #1e1b4b; color: #c4b5fd; }}
+  .inline-link.trace:hover {{ background: #312e81; }}
+  .inline-link.video {{ background: #134e4a; color: #5eead4; }}
+  .inline-link.video:hover {{ background: #115e59; }}
+  .failed-table-wrap + p.muted {{ padding: 0 14px; }}
+
 </style></head><body>
 <header>
   <h1>E2E consolidated report — cover-shortcuts</h1>
@@ -227,10 +285,13 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
   <h2>Per-engine summary</h2>
   <div class="engines">{''.join(engine_cards)}</div>
 
+  {_render_failed_table(summaries)}
+
   <h2>Full reports</h2>
   <div class="tabs">{''.join(tabs)}</div>
   <div class="frame-wrap">{''.join(panes) or '<p class="muted" style="padding:16px">No per-engine reports were found.</p>'}</div>
 </main>
+
 <script>
   const tabs = document.querySelectorAll('.tab:not(:disabled)');
   const panes = document.querySelectorAll('.pane');
