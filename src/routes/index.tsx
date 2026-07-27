@@ -55,6 +55,7 @@ function Landing() {
       <Nav />
       <main>
         <Hero />
+        <DownloadApp />
         <SocialProof />
         <Features />
         <Audience />
