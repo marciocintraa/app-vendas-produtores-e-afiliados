@@ -654,12 +654,13 @@ function Pricing() {
                   </li>
                 ))}
               </ul>
-              <a
-                href="#"
+              <Link
+                to="/checkout/$plan"
+                params={{ plan: p.priceId }}
                 className={`mt-8 w-full ${p.highlight ? "btn-primary" : "btn-ghost"}`}
               >
                 {p.cta}
-              </a>
+              </Link>
             </div>
           ))}
         </div>
