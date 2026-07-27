@@ -53,6 +53,7 @@ function Landing() {
         <Features />
         <Audience />
         <Pricing />
+        <FAQ />
         <FinalCTA />
       </main>
       <Footer />
