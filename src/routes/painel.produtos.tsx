@@ -813,6 +813,38 @@ function AdminProductsPage() {
           </form>
         </div>
       )}
+
+      {confirm.open && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border border-border/70 bg-card p-6 shadow-card">
+            <div className="flex flex-col items-center text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-500">
+                <AlertTriangle className="h-7 w-7" />
+              </div>
+              <h3 className="mt-4 font-display text-xl font-semibold">{confirm.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                {confirm.description}
+              </p>
+            </div>
+            <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={closeConfirm}
+                className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-surface-2"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={confirm.onConfirm}
+                className="rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground transition-transform hover:scale-[1.01]"
+              >
+                {confirm.actionLabel}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
