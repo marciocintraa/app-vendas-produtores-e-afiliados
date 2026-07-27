@@ -13,6 +13,7 @@ import {
   EyeOff,
   GripVertical,
   Star,
+  AlertTriangle,
 } from "lucide-react";
 import { type Product } from "@/lib/catalog-data";
 import {
