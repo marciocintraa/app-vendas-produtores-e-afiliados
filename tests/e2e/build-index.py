@@ -778,7 +778,7 @@ def render_index(summaries: dict[str, dict | None], out_path: Path) -> None:
         fCopyMatchesAll.title = 'No matching lines in visible rows';
         return;
       }}
-      navigator.clipboard.writeText(chunks.join('\n\n')).then(() => {{
+      navigator.clipboard.writeText(chunks.join('\\n\\n')).then(() => {{
         fCopyMatchesAll.classList.add('copied');
         const original = fCopyMatchesAll.textContent;
         fCopyMatchesAll.textContent = 'copied ' + totalMatches + (totalMatches === 1 ? ' line' : ' lines');
