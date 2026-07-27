@@ -100,6 +100,17 @@ type ConfirmState = {
   actionLabel: string;
   candidates: string[];
   selectedNext: string;
+  preview: {
+    title: string;
+    tagline: string;
+    category: string;
+    platform: Product["platform"];
+    price: number;
+    originalPrice?: number;
+    rating: number;
+    reviews: number;
+    gallery: string[];
+  };
   onConfirm: (nextCover: string) => void;
 };
 
