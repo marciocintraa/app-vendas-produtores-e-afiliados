@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { HOTMART_CHECKOUT_URLS, type PlanId } from "@/lib/hotmart";
 import {
   Sparkles,
