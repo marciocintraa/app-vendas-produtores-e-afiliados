@@ -13,6 +13,7 @@ import {
   Check,
   ArrowRight,
   Smartphone,
+  Monitor,
   Rocket,
   ShieldCheck,
   Users,
@@ -111,10 +112,41 @@ function Hero() {
             <span className="text-gradient">Vende Fácil Pro</span>.
           </h1>
           <p className="mt-6 text-lg text-muted-foreground max-w-xl">
-            Produtores e afiliados agora têm seu próprio app de vendas para Android. Concentre todos
+            Produtores e afiliados agora têm seu próprio app de vendas. Concentre todos
             os seus produtos da Hotmart, Kiwify, Eduzz e outras plataformas em um único aplicativo
-            instalável — com IA, analytics e notificações push para converter mais.
+            — com IA, analytics e notificações push para converter mais.
           </p>
+
+          <div className="mt-6 rounded-2xl border border-border bg-surface/60 p-4 max-w-xl">
+            <p className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-accent" />
+              Você escolhe como usar após a compra
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-xl bg-background/60 border border-border p-3">
+                <div className="flex items-center gap-2 text-accent mb-1">
+                  <Smartphone className="w-4 h-4" />
+                  <span className="text-xs font-bold uppercase tracking-wide">Android</span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-snug">
+                  Baixe o APK e instale no celular ou tablet.
+                </p>
+              </div>
+              <div className="rounded-xl bg-background/60 border border-border p-3">
+                <div className="flex items-center gap-2 text-accent mb-1">
+                  <Monitor className="w-4 h-4" />
+                  <span className="text-xs font-bold uppercase tracking-wide">Web</span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-snug">
+                  Use pelo navegador em qualquer dispositivo.
+                </p>
+              </div>
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              A escolha é feita depois do pagamento confirmado, sem custo extra. Use a opção que for melhor para você.
+            </p>
+          </div>
+
           <div className="mt-8 flex flex-wrap gap-3">
             <a href="#planos" className="btn-primary">
               Começar agora <ArrowRight className="w-4 h-4" />
@@ -123,12 +155,15 @@ function Hero() {
               Ver recursos
             </a>
           </div>
-          <div className="mt-10 flex items-center gap-6 text-sm text-muted-foreground">
+          <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-accent" /> Pagamento na Hotmart
             </div>
             <div className="flex items-center gap-2">
-              <Smartphone className="w-4 h-4 text-accent" /> App para Android
+              <Smartphone className="w-4 h-4 text-accent" /> Android
+            </div>
+            <div className="flex items-center gap-2">
+              <Monitor className="w-4 h-4 text-accent" /> Web
             </div>
           </div>
         </div>
