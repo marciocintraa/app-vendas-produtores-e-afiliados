@@ -412,7 +412,7 @@ function Pricing() {
       desc: "Para começar a vender com um catálogo enxuto.",
       features: [
         "Até 2 produtos",
-
+        "Cole seus links de afiliado ou de produtor no catálogo e divulgue produtos sem criar páginas de vendas, vídeos ou materiais extras",
         "Categorias básicas",
         "Tema padrão",
         "Estatísticas básicas",
