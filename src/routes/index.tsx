@@ -13,6 +13,7 @@ import {
   Check,
   ArrowRight,
   Smartphone,
+  Monitor,
   Rocket,
   ShieldCheck,
   Users,
