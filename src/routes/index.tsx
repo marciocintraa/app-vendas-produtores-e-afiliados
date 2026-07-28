@@ -256,7 +256,7 @@ function Features() {
             Uma ferramenta de vendas, não só um catálogo.
           </h2>
           <p className="mt-4 text-muted-foreground text-lg">
-            Cada recurso foi desenhado para aumentar conversões, fidelizar clientes e escalar a
+            Cada recurso foi desenhado para baixar despesas, fidelizar clientes e escalar a
             receita recorrente do seu negócio digital.
           </p>
         </div>
