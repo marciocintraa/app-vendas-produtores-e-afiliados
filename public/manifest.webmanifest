@@ -2,7 +2,7 @@
   "name": "Vende Fácil Pro",
   "short_name": "Vende Fácil",
   "description": "Transforme seu catálogo de infoprodutos em um app profissional. Ideal para produtores, afiliados e criadores digitais.",
-  "start_url": "/",
+  "start_url": "/app",
   "display": "standalone",
   "background_color": "#0B0814",
   "theme_color": "#8B5CF6",
