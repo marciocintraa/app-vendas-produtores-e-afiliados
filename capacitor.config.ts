@@ -5,8 +5,18 @@ const config: CapacitorConfig = {
   appName: "Vende Fácil Pro",
   webDir: "public",
   server: {
-    url: "https://app-vendas-produtores-e-afiliados.lovable.app",
+    url: "https://vendefacillapp.com.br",
     cleartext: false,
+    androidScheme: "https",
+    allowNavigation: [
+      "vendefacillapp.com.br",
+      "*.vendefacillapp.com.br",
+      "app-vendas-produtores-e-afiliados.lovable.app",
+      "*.lovable.app",
+      "*.supabase.co",
+      "pay.hotmart.com",
+      "*.hotmart.com",
+    ],
   },
   android: {
     buildPath: "android",
