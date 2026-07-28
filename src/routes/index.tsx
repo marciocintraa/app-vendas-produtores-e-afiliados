@@ -428,6 +428,7 @@ function Pricing() {
       desc: "Para produtores em crescimento que querem escalar.",
       features: [
         "Até 5 produtos",
+        "Cole seus links de afiliado ou de produtor no catálogo e divulgue produtos sem criar páginas de vendas, vídeos ou materiais extras",
         "Categorias ilimitadas",
         "Personalização visual",
         "Notificações push",
