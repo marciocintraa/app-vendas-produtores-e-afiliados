@@ -411,7 +411,8 @@ function Pricing() {
       per: "/mês",
       desc: "Para começar a vender com um catálogo enxuto.",
       features: [
-        "Até 1 produto",
+        "Até 2 produtos",
+
         "Categorias básicas",
         "Tema padrão",
         "Estatísticas básicas",
@@ -535,7 +536,7 @@ function FAQ() {
       id: "planos",
       question: "Quantos produtos posso cadastrar em cada plano?",
       answer:
-        "O plano Individual permite até 1 produto, o Familiar até 5 produtos, e o Premium é ilimitado. Você pode trocar de plano a qualquer momento conforme seu catálogo cresce.",
+        "O plano Individual permite até 2 produtos, o Familiar até 5 produtos, e o Premium é ilimitado. Você pode trocar de plano a qualquer momento conforme seu catálogo cresce.",
     },
     {
       id: "produtos",
