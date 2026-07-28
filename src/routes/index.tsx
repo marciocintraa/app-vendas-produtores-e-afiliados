@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { HOTMART_CHECKOUT_URLS, type PlanId } from "@/lib/hotmart";
+import { LANDING_CHECKOUT_URLS, type LandingPlanId } from "@/lib/landing-checkout";
 import {
   Sparkles,
   Store,
@@ -418,7 +418,7 @@ function Pricing() {
         "Estatísticas básicas",
       ],
       cta: "Assinar Individual",
-      priceId: "starter_monthly" as PlanId,
+      priceId: "starter_monthly" as LandingPlanId,
       highlight: false,
     },
     {
@@ -435,7 +435,7 @@ function Pricing() {
         "Estatísticas completas",
       ],
       cta: "Assinar Familiar",
-      priceId: "pro_monthly" as PlanId,
+      priceId: "pro_monthly" as LandingPlanId,
       highlight: true,
     },
     {
@@ -453,7 +453,7 @@ function Pricing() {
         "Suporte prioritário",
       ],
       cta: "Assinar Premium",
-      priceId: "premium_monthly" as PlanId,
+      priceId: "premium_monthly" as LandingPlanId,
       highlight: false,
     },
   ];
@@ -504,7 +504,7 @@ function Pricing() {
                 ))}
               </ul>
               <a
-                href={HOTMART_CHECKOUT_URLS[p.priceId]}
+                href={LANDING_CHECKOUT_URLS[p.priceId]}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`mt-8 w-full inline-flex items-center justify-center gap-2 ${p.highlight ? "btn-primary" : "btn-ghost"}`}
