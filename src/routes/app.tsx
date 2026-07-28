@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Mail, Smartphone, Monitor, Download, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Mail, Smartphone, Monitor, Download, ArrowRight, CheckCircle2, Check, ShoppingCart } from "lucide-react";
+import { CHECKOUT_PLANS } from "@/lib/checkout-links";
+
 
 export const Route = createFileRoute("/app")({
   head: () => ({
@@ -105,7 +107,70 @@ function WebAppEntry() {
           </p>
         </form>
 
+        {/* Planos / checkout */}
+        <div className="mb-10">
+          <div className="mb-5 text-center">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-pink-500/30 bg-pink-500/10 px-4 py-1.5 text-sm text-pink-200">
+              <ShoppingCart className="h-4 w-4" />
+              Ainda não tem acesso?
+            </div>
+            <h2 className="text-2xl font-bold">Escolha seu plano</h2>
+            <p className="mt-1 text-sm text-slate-400">
+              Pagamento seguro pela Hotmart — cartão, PIX ou boleto.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            {CHECKOUT_PLANS.map((plan) => (
+              <div
+                key={plan.id}
+                className={`flex flex-col rounded-2xl border p-5 backdrop-blur ${
+                  plan.highlight
+                    ? "border-purple-400/50 bg-purple-500/10"
+                    : "border-white/10 bg-white/5"
+                }`}
+              >
+                {plan.highlight && (
+                  <span className="mb-2 self-start rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide">
+                    Mais escolhido
+                  </span>
+                )}
+                <h3 className="text-lg font-semibold">{plan.name}</h3>
+                <p className="mb-4 mt-1 text-2xl font-bold">
+                  {plan.price}
+                  <span className="text-sm font-normal text-slate-400">/mês</span>
+                </p>
+                <ul className="mb-5 flex-1 space-y-2 text-sm text-slate-300">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex gap-2">
+                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href={plan.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition hover:opacity-90 ${
+                    plan.highlight
+                      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                      : "border border-white/15 bg-white/10 text-white"
+                  }`}
+                >
+                  Assinar agora <ArrowRight className="h-4 w-4" />
+                </a>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-4 text-center text-xs text-slate-500">
+            Após a confirmação do pagamento você recebe o acesso no e-mail informado na compra.
+          </p>
+        </div>
+
         {/* Install as app section */}
+
         {!isStandalone && (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
             <div className="mb-4 flex items-center gap-2">
