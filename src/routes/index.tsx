@@ -470,9 +470,9 @@ function Pricing() {
           </h2>
           <p className="mt-4 text-muted-foreground text-lg">
             Escolha o plano que acompanha o crescimento do seu catálogo. Pagamento e entrega são
-            feitos pela Hotmart — após a aprovação, você recebe por e-mail o link do arquivo
+            feitos pela Hotmart — após a aprovação, você recebe por e-mail o link direto do arquivo
             <span className="font-semibold text-foreground"> vende-facil-pro-release.apk</span> para
-            instalar no Android.
+            instalar no Android sem passar pela tela de aviso do Drive.
           </p>
         </div>
 
@@ -563,7 +563,7 @@ function FAQ() {
       id: "android",
       question: "O app funciona apenas no Android?",
       answer:
-        "Sim. O Vende Fácil Pro é entregue como o arquivo vende-facil-pro-release.apk para Android. Após a compra aprovada, você recebe o link de download e instala no celular em poucos toques.",
+        "Sim. O Vende Fácil Pro é entregue como o arquivo vende-facil-pro-release.apk para Android. Após a compra aprovada, você recebe o link direto de download (sem aviso de vírus do Drive) e instala no celular em poucos toques.",
     },
     {
       id: "personalizacao",
