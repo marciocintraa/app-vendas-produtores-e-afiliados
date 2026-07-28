@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: "Vende Fácil Pro",
   webDir: "public",
   server: {
-    url: "https://vendefacillapp.com.br",
+    url: "https://vendefacillapp.com.br/app",
     cleartext: false,
     androidScheme: "https",
     allowNavigation: [
