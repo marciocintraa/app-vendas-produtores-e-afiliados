@@ -445,6 +445,7 @@ function Pricing() {
       desc: "Para operações profissionais com marca própria.",
       features: [
         "Produtos ilimitados",
+        "Cole seus links de afiliado ou de produtor no catálogo e divulgue produtos sem criar páginas de vendas, vídeos ou materiais extras",
         "IA completa",
         "Tema e domínio personalizados",
         "Analytics avançado",
