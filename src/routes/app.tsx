@@ -136,6 +136,9 @@ function WebAppEntry() {
                   </span>
                 )}
                 <h3 className="text-lg font-semibold">{plan.name}</h3>
+                <span className="mt-1 self-start rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-300">
+                  {plan.limitLabel}
+                </span>
                 <p className="mb-4 mt-1 text-2xl font-bold">
                   {plan.price}
                   <span className="text-sm font-normal text-slate-400">/mês</span>
