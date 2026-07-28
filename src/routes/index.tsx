@@ -412,7 +412,7 @@ function Pricing() {
       desc: "Para começar a vender com um catálogo enxuto.",
       features: [
         "Até 2 produtos",
-
+        "Cole seus links de afiliado ou de produtor no catálogo e divulgue produtos sem criar páginas de vendas, vídeos ou materiais extras",
         "Categorias básicas",
         "Tema padrão",
         "Estatísticas básicas",
@@ -428,6 +428,7 @@ function Pricing() {
       desc: "Para produtores em crescimento que querem escalar.",
       features: [
         "Até 5 produtos",
+        "Cole seus links de afiliado ou de produtor no catálogo e divulgue produtos sem criar páginas de vendas, vídeos ou materiais extras",
         "Categorias ilimitadas",
         "Personalização visual",
         "Notificações push",
@@ -444,6 +445,7 @@ function Pricing() {
       desc: "Para operações profissionais com marca própria.",
       features: [
         "Produtos ilimitados",
+        "Cole seus links de afiliado ou de produtor no catálogo e divulgue produtos sem criar páginas de vendas, vídeos ou materiais extras",
         "IA completa",
         "Tema e domínio personalizados",
         "Analytics avançado",
