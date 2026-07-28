@@ -369,8 +369,6 @@ function Testimonials() {
 }
 
 function Pricing() {
-  const [selected, setSelected] = useState<PlanId | null>(null);
-
   const plans = [
     {
       name: "Individual",
@@ -433,8 +431,9 @@ function Pricing() {
             Assinatura simples, app Android liberado.
           </h2>
           <p className="mt-4 text-muted-foreground text-lg">
-            Escolha o plano que acompanha o crescimento do seu catálogo. Após o pagamento você recebe
-            o link do .apk para instalar no Android.
+            Escolha o plano que acompanha o crescimento do seu catálogo. Pagamento e entrega são
+            feitos pela Hotmart — após a aprovação, você recebe por e-mail o link do .apk para
+            instalar no Android.
           </p>
         </div>
 
@@ -465,151 +464,28 @@ function Pricing() {
                   </li>
                 ))}
               </ul>
-              <button
-                type="button"
-                onClick={() => setSelected(p.priceId)}
-                className={`mt-8 w-full inline-block text-center ${p.highlight ? "btn-primary" : "btn-ghost"}`}
+              <a
+                href={HOTMART_CHECKOUT_URLS[p.priceId]}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`mt-8 w-full inline-flex items-center justify-center gap-2 ${p.highlight ? "btn-primary" : "btn-ghost"}`}
               >
                 {p.cta}
-              </button>
+                <ArrowRight className="w-4 h-4" />
+              </a>
             </div>
           ))}
         </div>
-      </div>
 
-      {selected && (
-        <CheckoutModal plan={selected} onClose={() => setSelected(null)} />
-      )}
+        <p className="mt-8 text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
+          <ShieldCheck className="w-3.5 h-3.5" />
+          Pagamento seguro pela Hotmart · Cartão · PIX · Boleto
+        </p>
+      </div>
     </section>
   );
 }
 
-function CheckoutModal({ plan, onClose }: { plan: PlanId; onClose: () => void }) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const planLabel: Record<PlanId, string> = {
-    starter_monthly: "Individual — R$ 37/mês",
-    pro_monthly: "Familiar — R$ 57/mês",
-    premium_monthly: "Premium — R$ 97/mês",
-  };
-
-  const formatCpf = (v: string) => {
-    const digits = v.replace(/\D/g, "").slice(0, 11);
-    return digits
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d)/, "$1.$2")
-      .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-  };
-
-  const isValidCpf = (v: string) => v.replace(/\D/g, "").length === 11;
-  const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    if (name.trim().length < 2) return setError("Informe seu nome completo.");
-    if (!isValidEmail(email)) return setError("Informe um e-mail válido.");
-    if (!isValidCpf(cpf)) return setError("Informe um CPF válido (11 dígitos).");
-
-    setSubmitting(true);
-    const base = HOTMART_CHECKOUT_URLS[plan];
-    const params = new URLSearchParams({
-      email: email.trim().toLowerCase(),
-      name: name.trim(),
-      document: cpf.replace(/\D/g, ""),
-    });
-    const sep = base.includes("?") ? "&" : "?";
-    window.location.href = `${base}${sep}${params.toString()}`;
-  };
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
-      role="dialog"
-      aria-modal="true"
-      onClick={onClose}
-    >
-      <div
-        className="card-glass w-full max-w-md p-6 md:p-8 relative"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded-md hover:bg-white/5 text-muted-foreground"
-          aria-label="Fechar"
-        >
-          <X className="w-5 h-5" />
-        </button>
-        <h3 className="text-xl font-bold">Finalizar assinatura</h3>
-        <p className="text-sm text-muted-foreground mt-1">Plano {planLabel[plan]}</p>
-        <p className="text-xs text-accent mt-2">
-          Após o pagamento aprovado você receberá o link do app Android por e-mail.
-        </p>
-
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <div>
-            <label className="text-sm font-medium mb-1.5 block">Nome completo</label>
-            <input
-              type="text"
-              required
-              autoFocus
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Como está no documento"
-              className="w-full px-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none"
-            />
-          </div>
-          <div>
-            <label className="text-sm font-medium mb-1.5 block">E-mail</label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="voce@exemplo.com"
-              className="w-full px-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              É por este e-mail que você receberá o link para baixar o app Android após o pagamento.
-            </p>
-          </div>
-          <div>
-            <label className="text-sm font-medium mb-1.5 block">CPF</label>
-            <input
-              type="text"
-              required
-              inputMode="numeric"
-              value={cpf}
-              onChange={(e) => setCpf(formatCpf(e.target.value))}
-              placeholder="000.000.000-00"
-              className="w-full px-4 py-3 rounded-lg bg-background border border-border focus:border-primary focus:outline-none"
-            />
-          </div>
-
-          {error && <p className="text-sm text-red-500">{error}</p>}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full btn-primary !py-3 justify-center disabled:opacity-60"
-          >
-            {submitting ? "Redirecionando…" : "Ir para pagamento"}
-            <ArrowRight className="w-4 h-4" />
-          </button>
-
-          <div className="flex items-center justify-center gap-4 pt-2 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> Pagamento seguro</span>
-            <span>Cartão · PIX · Boleto</span>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
 
 
 function FAQ() {
