@@ -164,12 +164,13 @@ function WebAppEntry() {
               </ul>
 
               {plan.isFree ? (
-                <a
-                  href={plan.url}
+                <button
+                  type="button"
+                  onClick={startFree}
                   className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/10 px-8 py-3 font-bold text-white transition hover:bg-white/20"
                 >
                   Começar grátis <ArrowRight className="h-4 w-4" />
-                </a>
+                </button>
               ) : (
                 <a
                   href={plan.url}
