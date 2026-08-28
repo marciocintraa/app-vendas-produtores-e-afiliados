@@ -134,6 +134,40 @@ export async function ensureUser(email: string): Promise<string | null> {
   return data.user?.id ?? null;
 }
 
+export async function ensureFreeSubscription(email: string): Promise<string | null> {
+  const normalized = email.trim().toLowerCase();
+  const userId = await ensureUser(normalized);
+  if (!userId) {
+    logDelivery({ step: "ensureFreeSubscription", email: normalized, success: false, detail: "failed to create/find user" });
+    return null;
+  }
+
+  const subscriptionCode = `free_${userId}`;
+  const { error } = await supabaseAdmin.from("subscriptions").upsert(
+    {
+      user_id: userId,
+      stripe_subscription_id: subscriptionCode,
+      stripe_customer_id: normalized,
+      product_id: "free",
+      price_id: "gratis",
+      status: "active",
+      current_period_end: null,
+      cancel_at_period_end: false,
+      environment: "hotmart",
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "stripe_subscription_id" },
+  );
+
+  if (error) {
+    logDelivery({ step: "ensureFreeSubscription", email: normalized, success: false, detail: error.message });
+    return null;
+  }
+
+  logDelivery({ step: "ensureFreeSubscription", email: normalized, success: true, detail: "active free subscription" });
+  return userId;
+}
+
 export async function upsertActiveSubscription(
   payload: HotmartWebhookPayload,
 ): Promise<DeliveryLog[]> {
