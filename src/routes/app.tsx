@@ -113,104 +113,63 @@ function WebAppEntry() {
           </p>
         </form>
 
-        {/* Oferta imperdível */}
-        <div className="relative mb-10 overflow-hidden rounded-2xl border border-amber-400/40 bg-gradient-to-r from-amber-500/20 via-pink-500/20 to-purple-500/20 p-6 text-center shadow-2xl backdrop-blur">
-          <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 px-4 py-1 text-xs font-bold uppercase tracking-widest text-black">
-            <Sparkles className="h-4 w-4" />
-            Oferta Imperdível
-          </span>
-          <h2 className="text-2xl font-bold sm:text-3xl">
-            Comece <span className="bg-gradient-to-r from-amber-300 to-pink-300 bg-clip-text text-transparent">grátis hoje</span>{" "}
-            com 2 produtos no catálogo
-          </h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-slate-200">
-            Sem cartão de crédito. Cadastre seu e-mail e teste o Vende Fácil Pro agora —
-            quando quiser escalar, o plano Familiar libera 10 produtos e o Premium é ilimitado.
-          </p>
-          <button
-            type="button"
-            onClick={scrollToAccessForm}
-            className="mt-5 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-400 to-pink-500 px-8 py-3 font-bold text-black transition hover:opacity-90"
+        {/* Oferta imperdível — pagamento único */}
+        {CHECKOUT_PLANS.map((plan) => (
+          <div
+            key={plan.id}
+            className="relative mb-10 overflow-hidden rounded-2xl border border-amber-400/40 bg-gradient-to-r from-amber-500/20 via-pink-500/20 to-purple-500/20 p-6 text-center shadow-2xl backdrop-blur"
           >
-            Quero minha conta grátis <ArrowRight className="h-4 w-4" />
-          </button>
-          <p className="mt-3 text-xs text-slate-400">
-            Aproveite: upgrade para o Familiar ou Premium a qualquer momento, sem perder seus produtos.
-          </p>
-        </div>
+            <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 px-4 py-1 text-xs font-bold uppercase tracking-widest text-black">
+              <Sparkles className="h-4 w-4" />
+              Oferta Imperdível
+            </span>
+            <h2 className="text-2xl font-bold sm:text-3xl">
+              Acesso <span className="bg-gradient-to-r from-amber-300 to-pink-300 bg-clip-text text-transparent">vitalício</span>{" "}
+              com produtos ilimitados
+            </h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-slate-200">
+              Pague uma única vez e use para sempre — sem mensalidades, sem taxas escondidas.
+            </p>
 
-        {/* Planos / checkout */}
-        <div className="mb-10">
-          <div className="mb-5 text-center">
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-pink-500/30 bg-pink-500/10 px-4 py-1.5 text-sm text-pink-200">
-              <ShoppingCart className="h-4 w-4" />
-              Ainda não tem acesso?
+            <div className="mt-5">
+              <p className="text-sm text-slate-300 line-through">De R$ 497,00 por apenas</p>
+              <p className="text-5xl font-extrabold tracking-tight">
+                {plan.price}
+              </p>
+              {plan.installmentPrice && (
+                <p className="mt-1 text-sm font-medium text-amber-300">{plan.installmentPrice}</p>
+              )}
             </div>
-            <h2 className="text-2xl font-bold">Escolha seu plano</h2>
-            <p className="mt-1 text-sm text-slate-400">
-              Pagamento seguro pela Hotmart — cartão, PIX ou boleto.
+
+            <ul className="mx-auto mb-6 mt-5 max-w-xs space-y-2 text-left text-sm text-slate-200">
+              {plan.features.map((f) => (
+                <li key={f} className="flex gap-2">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+
+            <a
+              href={plan.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-400 to-pink-500 px-8 py-3 font-bold text-black transition hover:opacity-90"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              Quero meu acesso agora <ArrowRight className="h-4 w-4" />
+            </a>
+            <p className="mt-3 text-xs text-slate-400">
+              Pagamento seguro pela Hotmart — cartão (à vista ou parcelado), PIX ou boleto.
+              Após a confirmação você recebe o acesso no e-mail informado na compra.
             </p>
           </div>
+        ))}
 
-          <div className="grid gap-4 sm:grid-cols-3">
-            {CHECKOUT_PLANS.map((plan) => (
-              <div
-                key={plan.id}
-                className={`flex flex-col rounded-2xl border p-5 backdrop-blur ${
-                  plan.highlight
-                    ? "border-purple-400/50 bg-purple-500/10"
-                    : "border-white/10 bg-white/5"
-                }`}
-              >
-                {plan.highlight && (
-                  <span className="mb-2 self-start rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide">
-                    Mais escolhido
-                  </span>
-                )}
-                <h3 className="text-lg font-semibold">{plan.name}</h3>
-                <span className="mt-1 self-start rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-300">
-                  {plan.limitLabel}
-                </span>
-                <p className="mb-4 mt-1 text-2xl font-bold">
-                  {plan.price}
-                  {plan.url && <span className="text-sm font-normal text-slate-400">/mês</span>}
-                </p>
-                <ul className="mb-5 flex-1 space-y-2 text-sm text-slate-300">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex gap-2">
-                      <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                {plan.url ? (
-                  <a
-                    href={plan.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition hover:opacity-90 ${
-                      plan.highlight
-                        ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
-                        : "border border-white/15 bg-white/10 text-white"
-                    }`}
-                  >
-                    Assinar agora <ArrowRight className="h-4 w-4" />
-                  </a>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={scrollToAccessForm}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-400/40 bg-emerald-400/10 px-4 py-2.5 text-sm font-semibold text-emerald-200 transition hover:opacity-90"
-                  >
-                    Criar conta grátis <ArrowRight className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-
-          <p className="mt-4 text-center text-xs text-slate-500">
-            Após a confirmação do pagamento você recebe o acesso no e-mail informado na compra.
+        {/* Acesso de quem já comprou */}
+        <div className="mb-10 text-center">
+          <p className="text-sm text-slate-400">
+            Já comprou? Informe seu e-mail no formulário acima para entrar no painel.
           </p>
         </div>
 
