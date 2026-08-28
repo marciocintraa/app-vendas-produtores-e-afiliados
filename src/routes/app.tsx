@@ -124,7 +124,7 @@ function WebAppEntry() {
               com produtos ilimitados
             </h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-slate-200">
-              Pague uma única vez e use para sempre — sem mensalidades, sem taxas escondidas.
+              Invista no seu app profissional. Pague uma única vez e use para sempre — sem mensalidades, sem taxas escondidas.
             </p>
 
             <div className="mt-5">
@@ -133,7 +133,7 @@ function WebAppEntry() {
                 {plan.price}
               </p>
               {plan.installmentPrice && (
-                <p className="mt-1 text-sm font-medium text-amber-300">{plan.installmentPrice}</p>
+                <p className="mt-1 text-base font-semibold text-amber-300">ou {plan.installmentPrice}</p>
               )}
             </div>
 
