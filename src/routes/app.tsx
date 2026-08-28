@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Mail, Smartphone, Monitor, Download, ArrowRight, CheckCircle2, Check, ShoppingCart } from "lucide-react";
+import { Mail, Smartphone, Monitor, Download, ArrowRight, CheckCircle2, Check, ShoppingCart, Sparkles } from "lucide-react";
 import { CHECKOUT_PLANS } from "@/lib/checkout-links";
 
 
