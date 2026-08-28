@@ -50,18 +50,28 @@ function isActive(sub: { status: string; current_period_end: string | null } | n
 }
 
 const buildAccessLink = createServerFn({ method: "GET" })
-  .validator((d: { email: string }) => d)
+  .validator((d: { email: string; free?: boolean }) => d)
   .handler(async ({ data }): Promise<AccessResult> => {
     const email = data.email.trim().toLowerCase();
+    const free = data.free === true;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       logDelivery({ step: "access", success: false, detail: "invalid email format" });
       return { state: "invalid_email", checkedAt: new Date().toISOString() };
     }
 
-    const userId = await findUserByEmail(email);
-    if (!userId) {
-      logDelivery({ step: "access", email, success: false, detail: "user not found" });
-      return { state: "no_purchase", checkedAt: new Date().toISOString() };
+    let userId = await findUserByEmail(email);
+
+    if (free) {
+      userId = await ensureFreeSubscription(email);
+      if (!userId) {
+        logDelivery({ step: "access", email, success: false, detail: "failed to create free subscription" });
+        return { state: "link_failed", checkedAt: new Date().toISOString() };
+      }
+    } else {
+      if (!userId) {
+        logDelivery({ step: "access", email, success: false, detail: "user not found" });
+        return { state: "no_purchase", checkedAt: new Date().toISOString() };
+      }
     }
 
     const sub = await getLatestSubscription(userId);
