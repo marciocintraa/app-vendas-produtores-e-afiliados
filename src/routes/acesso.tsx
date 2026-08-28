@@ -135,7 +135,7 @@ export const Route = createFileRoute("/acesso")({
 });
 
 function AccessPage() {
-  const { state: initialState, email } = Route.useLoaderData();
+  const { state: initialState, email, free } = Route.useLoaderData();
   const [state, setState] = useState(initialState);
   const [polling, setPolling] = useState(false);
   const [pollCount, setPollCount] = useState(0);
@@ -144,7 +144,7 @@ function AccessPage() {
 
   useEffect(() => {
     // simplificado: sem logs de journey
-  }, [initialState, email]);
+  }, [initialState, email, free]);
 
   // Se o estado inicial for "no_purchase", faz polling por até ~30s.
   // Isso cobre o caso em que o comprador clica no email da Hotmart antes
@@ -160,7 +160,7 @@ function AccessPage() {
       setPollCount(count);
       setChecking(true);
       try {
-        const res = await buildAccessLink({ data: { email } });
+        const res = await buildAccessLink({ data: { email, free } });
         if (res.state === "ok" && res.url) {
           window.location.href = res.url;
           return;
@@ -182,12 +182,12 @@ function AccessPage() {
     return () => {
       if (pollRef.current) window.clearTimeout(pollRef.current);
     };
-  }, [initialState, email]);
+  }, [initialState, email, free]);
 
   const handleRetry = async () => {
     setChecking(true);
     try {
-      const res = await buildAccessLink({ data: { email } });
+      const res = await buildAccessLink({ data: { email, free } });
       if (res.state === "ok" && res.url) {
         window.location.href = res.url;
         return;
