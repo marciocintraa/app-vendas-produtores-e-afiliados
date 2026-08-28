@@ -115,6 +115,7 @@ const buildAccessLink = createServerFn({ method: "GET" })
 export const Route = createFileRoute("/acesso")({
   validateSearch: (s: Record<string, unknown>) => ({
     email: typeof s.email === "string" ? s.email : undefined,
+    free: s.free === true || s.free === "true",
   }),
   head: () => ({
     meta: [
@@ -124,11 +125,11 @@ export const Route = createFileRoute("/acesso")({
     ],
   }),
   loader: async ({ location }) => {
-    const email = (location.search as { email?: string }).email;
-    if (!email) return { state: "missing" as const, email: "" };
-    const res = await buildAccessLink({ data: { email } });
+    const { email, free } = location.search as { email?: string; free?: boolean };
+    if (!email) return { state: "missing" as const, email: "", free: !!free };
+    const res = await buildAccessLink({ data: { email, free: !!free } });
     if (res.state === "ok" && res.url) throw redirect({ href: res.url });
-    return { state: res.state, email };
+    return { state: res.state, email, free: !!free };
   },
   component: AccessPage,
 });
