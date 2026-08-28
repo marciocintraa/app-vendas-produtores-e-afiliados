@@ -54,6 +54,11 @@ function WebAppEntry() {
     navigate({ to: "/acesso", search: { email: clean } as never });
   }
 
+  function scrollToAccessForm() {
+    document.getElementById("form-acesso")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    document.getElementById("email")?.focus({ preventScroll: true });
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0B0814] via-[#150922] to-[#0B0814] text-white">
       <div className="mx-auto max-w-2xl px-6 py-16">
