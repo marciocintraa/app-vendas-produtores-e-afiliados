@@ -1,6 +1,6 @@
 // Links de checkout da Hotmart usados dentro do app.
 // Alterar aqui não afeta o webhook nem a entrega do produto.
-export type CheckoutPlanId = "vitalicio";
+export type CheckoutPlanId = "gratis" | "vitalicio";
 
 export interface CheckoutPlan {
   id: CheckoutPlanId;
@@ -15,9 +15,26 @@ export interface CheckoutPlan {
   features: string[];
   /** URL do checkout Hotmart (pagamento único ou parcelado). */
   url: string;
+  /** Se true, o botão leva ao formulário de acesso em vez do checkout. */
+  isFree?: boolean;
 }
 
 export const CHECKOUT_PLANS: CheckoutPlan[] = [
+  {
+    id: "gratis",
+    name: "Conta Grátis",
+    price: "R$ 0,00",
+    productLimit: 2,
+    limitLabel: "2 produtos",
+    features: [
+      "Até 2 produtos no catálogo",
+      "Links de afiliado nos produtos",
+      "Vitrine personalizável",
+      "Acesso Web + Android",
+    ],
+    url: "#form-acesso",
+    isFree: true,
+  },
   {
     id: "vitalicio",
     name: "Vende Fácil Pro",
@@ -40,5 +57,6 @@ export const CHECKOUT_PLANS: CheckoutPlan[] = [
 
 /** Limite de produtos por plano (null = ilimitado). */
 export const PLAN_PRODUCT_LIMITS: Record<CheckoutPlanId, number | null> = {
+  gratis: 2,
   vitalicio: null,
 };
