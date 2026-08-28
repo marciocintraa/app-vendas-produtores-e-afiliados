@@ -222,7 +222,8 @@ function AccessPage() {
                   .trim()
                   .toLowerCase();
                 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return;
-                window.location.href = `/acesso?email=${encodeURIComponent(value)}`;
+                const freeParam = free ? "&free=true" : "";
+                window.location.href = `/acesso?email=${encodeURIComponent(value)}${freeParam}`;
               }}
               className="mt-6 space-y-3 text-left"
             >
