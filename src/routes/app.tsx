@@ -173,7 +173,7 @@ function WebAppEntry() {
                 </span>
                 <p className="mb-4 mt-1 text-2xl font-bold">
                   {plan.price}
-                  <span className="text-sm font-normal text-slate-400">/mês</span>
+                  {plan.url && <span className="text-sm font-normal text-slate-400">/mês</span>}
                 </p>
                 <ul className="mb-5 flex-1 space-y-2 text-sm text-slate-300">
                   {plan.features.map((f) => (
