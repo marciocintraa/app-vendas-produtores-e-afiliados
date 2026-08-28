@@ -109,58 +109,77 @@ function WebAppEntry() {
           </p>
         </form>
 
-        {/* Oferta imperdível — pagamento único */}
-        {CHECKOUT_PLANS.map((plan) => (
-          <div
-            key={plan.id}
-            className="relative mb-10 overflow-hidden rounded-2xl border border-amber-400/40 bg-gradient-to-r from-amber-500/20 via-pink-500/20 to-purple-500/20 p-6 text-center shadow-2xl backdrop-blur"
-          >
-            <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 px-4 py-1 text-xs font-bold uppercase tracking-widest text-black">
-              <Sparkles className="h-4 w-4" />
-              Oferta Imperdível
-            </span>
-            <h2 className="text-2xl font-bold sm:text-3xl">
-              Acesso <span className="bg-gradient-to-r from-amber-300 to-pink-300 bg-clip-text text-transparent">vitalício</span>{" "}
-              com produtos ilimitados
-            </h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-slate-200">
-              Invista no seu app profissional. Pague uma única vez e use para sempre — sem mensalidades, sem taxas escondidas.
-            </p>
-
-            <div className="mt-5">
-              <p className="text-sm text-slate-300 line-through">De R$ 497,00 por apenas</p>
-              <p className="text-5xl font-extrabold tracking-tight">
-                {plan.price}
+        {/* Planos — grátis e oferta vitalícia */}
+        <div className="mb-10 grid gap-6 md:grid-cols-2">
+          {CHECKOUT_PLANS.map((plan) => (
+            <div
+              key={plan.id}
+              className={`relative overflow-hidden rounded-2xl border p-6 text-center shadow-2xl backdrop-blur ${
+                plan.highlight
+                  ? "border-amber-400/40 bg-gradient-to-r from-amber-500/20 via-pink-500/20 to-purple-500/20"
+                  : "border-white/10 bg-white/5"
+              }`}
+            >
+              {plan.highlight && (
+                <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 px-4 py-1 text-xs font-bold uppercase tracking-widest text-black">
+                  <Sparkles className="h-4 w-4" />
+                  Oferta Imperdível
+                </span>
+              )}
+              <h2 className="text-2xl font-bold sm:text-3xl">{plan.name}</h2>
+              <p className="mx-auto mt-2 max-w-md text-sm text-slate-200">
+                {plan.id === "vitalicio"
+                  ? "Invista no seu app profissional. Pague uma única vez e use para sempre — sem mensalidades, sem taxas escondidas."
+                  : "Comece sem pagar nada. Ideal para testar e começar a divulgar seus primeiros produtos."}
               </p>
-              {plan.installmentPrice && (
-                <p className="mt-1 text-base font-semibold text-amber-300">ou {plan.installmentPrice}</p>
+
+              <div className="mt-5">
+                {plan.id === "vitalicio" && (
+                  <p className="text-sm text-slate-300 line-through">De R$ 497,00 por apenas</p>
+                )}
+                <p className="text-5xl font-extrabold tracking-tight">{plan.price}</p>
+                {plan.installmentPrice && (
+                  <p className="mt-1 text-base font-semibold text-amber-300">ou {plan.installmentPrice}</p>
+                )}
+              </div>
+
+              <ul className="mx-auto mb-6 mt-5 max-w-xs space-y-2 text-left text-sm text-slate-200">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex gap-2">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {plan.isFree ? (
+                <a
+                  href={plan.url}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/10 px-8 py-3 font-bold text-white transition hover:bg-white/20"
+                >
+                  Começar grátis <ArrowRight className="h-4 w-4" />
+                </a>
+              ) : (
+                <a
+                  href={plan.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-400 to-pink-500 px-8 py-3 font-bold text-black transition hover:opacity-90"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                  Quero meu acesso agora <ArrowRight className="h-4 w-4" />
+                </a>
+              )}
+
+              {plan.id === "vitalicio" && (
+                <p className="mt-3 text-xs text-slate-400">
+                  Pagamento seguro pela Hotmart — cartão (à vista ou parcelado), PIX ou boleto.
+                  Após a confirmação você recebe o acesso no e-mail informado na compra.
+                </p>
               )}
             </div>
-
-            <ul className="mx-auto mb-6 mt-5 max-w-xs space-y-2 text-left text-sm text-slate-200">
-              {plan.features.map((f) => (
-                <li key={f} className="flex gap-2">
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />
-                  <span>{f}</span>
-                </li>
-              ))}
-            </ul>
-
-            <a
-              href={plan.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-400 to-pink-500 px-8 py-3 font-bold text-black transition hover:opacity-90"
-            >
-              <ShoppingCart className="h-4 w-4" />
-              Quero meu acesso agora <ArrowRight className="h-4 w-4" />
-            </a>
-            <p className="mt-3 text-xs text-slate-400">
-              Pagamento seguro pela Hotmart — cartão (à vista ou parcelado), PIX ou boleto.
-              Após a confirmação você recebe o acesso no e-mail informado na compra.
-            </p>
-          </div>
-        ))}
+          ))}
+        </div>
 
         {/* Acesso de quem já comprou */}
         <div className="mb-10 text-center">
