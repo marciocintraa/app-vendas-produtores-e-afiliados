@@ -3,7 +3,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { useEffect, useState, useRef } from "react";
 import { Loader2, Mail, AlertCircle, CheckCircle, RefreshCw } from "lucide-react";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { findUserByEmail, logDelivery } from "@/lib/hotmart.server";
+import { findUserByEmail, logDelivery, ensureFreeSubscription } from "@/lib/hotmart.server";
 
 
 
@@ -50,18 +50,28 @@ function isActive(sub: { status: string; current_period_end: string | null } | n
 }
 
 const buildAccessLink = createServerFn({ method: "GET" })
-  .validator((d: { email: string }) => d)
+  .validator((d: { email: string; free?: boolean }) => d)
   .handler(async ({ data }): Promise<AccessResult> => {
     const email = data.email.trim().toLowerCase();
+    const free = data.free === true;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       logDelivery({ step: "access", success: false, detail: "invalid email format" });
       return { state: "invalid_email", checkedAt: new Date().toISOString() };
     }
 
-    const userId = await findUserByEmail(email);
-    if (!userId) {
-      logDelivery({ step: "access", email, success: false, detail: "user not found" });
-      return { state: "no_purchase", checkedAt: new Date().toISOString() };
+    let userId = await findUserByEmail(email);
+
+    if (free) {
+      userId = await ensureFreeSubscription(email);
+      if (!userId) {
+        logDelivery({ step: "access", email, success: false, detail: "failed to create free subscription" });
+        return { state: "link_failed", checkedAt: new Date().toISOString() };
+      }
+    } else {
+      if (!userId) {
+        logDelivery({ step: "access", email, success: false, detail: "user not found" });
+        return { state: "no_purchase", checkedAt: new Date().toISOString() };
+      }
     }
 
     const sub = await getLatestSubscription(userId);
@@ -105,6 +115,7 @@ const buildAccessLink = createServerFn({ method: "GET" })
 export const Route = createFileRoute("/acesso")({
   validateSearch: (s: Record<string, unknown>) => ({
     email: typeof s.email === "string" ? s.email : undefined,
+    free: s.free === true || s.free === "true",
   }),
   head: () => ({
     meta: [
@@ -114,17 +125,17 @@ export const Route = createFileRoute("/acesso")({
     ],
   }),
   loader: async ({ location }) => {
-    const email = (location.search as { email?: string }).email;
-    if (!email) return { state: "missing" as const, email: "" };
-    const res = await buildAccessLink({ data: { email } });
+    const { email, free } = location.search as { email?: string; free?: boolean };
+    if (!email) return { state: "missing" as const, email: "", free: !!free };
+    const res = await buildAccessLink({ data: { email, free: !!free } });
     if (res.state === "ok" && res.url) throw redirect({ href: res.url });
-    return { state: res.state, email };
+    return { state: res.state, email, free: !!free };
   },
   component: AccessPage,
 });
 
 function AccessPage() {
-  const { state: initialState, email } = Route.useLoaderData();
+  const { state: initialState, email, free } = Route.useLoaderData();
   const [state, setState] = useState(initialState);
   const [polling, setPolling] = useState(false);
   const [pollCount, setPollCount] = useState(0);
@@ -133,7 +144,7 @@ function AccessPage() {
 
   useEffect(() => {
     // simplificado: sem logs de journey
-  }, [initialState, email]);
+  }, [initialState, email, free]);
 
   // Se o estado inicial for "no_purchase", faz polling por até ~30s.
   // Isso cobre o caso em que o comprador clica no email da Hotmart antes
@@ -149,7 +160,7 @@ function AccessPage() {
       setPollCount(count);
       setChecking(true);
       try {
-        const res = await buildAccessLink({ data: { email } });
+        const res = await buildAccessLink({ data: { email, free } });
         if (res.state === "ok" && res.url) {
           window.location.href = res.url;
           return;
@@ -171,12 +182,12 @@ function AccessPage() {
     return () => {
       if (pollRef.current) window.clearTimeout(pollRef.current);
     };
-  }, [initialState, email]);
+  }, [initialState, email, free]);
 
   const handleRetry = async () => {
     setChecking(true);
     try {
-      const res = await buildAccessLink({ data: { email } });
+      const res = await buildAccessLink({ data: { email, free } });
       if (res.state === "ok" && res.url) {
         window.location.href = res.url;
         return;
@@ -211,7 +222,8 @@ function AccessPage() {
                   .trim()
                   .toLowerCase();
                 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return;
-                window.location.href = `/acesso?email=${encodeURIComponent(value)}`;
+                const freeParam = free ? "&free=true" : "";
+                window.location.href = `/acesso?email=${encodeURIComponent(value)}${freeParam}`;
               }}
               className="mt-6 space-y-3 text-left"
             >
