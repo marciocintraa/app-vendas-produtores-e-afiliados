@@ -9,7 +9,7 @@ export const Route = createFileRoute("/bem-vindo")({
   beforeLoad: ({ search }) => {
     throw redirect({
       to: "/acesso",
-      search: search.email ? { email: search.email } : {},
+      search: { email: search.email },
     });
   },
 });

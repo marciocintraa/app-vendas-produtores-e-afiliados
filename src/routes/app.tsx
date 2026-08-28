@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Mail, Smartphone, Monitor, Download, ArrowRight, CheckCircle2, Check, ShoppingCart } from "lucide-react";
+import { Mail, Smartphone, Monitor, Download, ArrowRight, CheckCircle2, Check, ShoppingCart, Sparkles } from "lucide-react";
 import { CHECKOUT_PLANS } from "@/lib/checkout-links";
 
 
@@ -54,6 +54,11 @@ function WebAppEntry() {
     navigate({ to: "/acesso", search: { email: clean } as never });
   }
 
+  function scrollToAccessForm() {
+    document.getElementById("form-acesso")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    document.getElementById("email")?.focus({ preventScroll: true });
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0B0814] via-[#150922] to-[#0B0814] text-white">
       <div className="mx-auto max-w-2xl px-6 py-16">
@@ -76,6 +81,7 @@ function WebAppEntry() {
 
         {/* Access form */}
         <form
+          id="form-acesso"
           onSubmit={handleSubmit}
           className="mb-10 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur"
         >
@@ -106,6 +112,32 @@ function WebAppEntry() {
             Enviamos um link mágico automaticamente. Não precisa de senha.
           </p>
         </form>
+
+        {/* Oferta imperdível */}
+        <div className="relative mb-10 overflow-hidden rounded-2xl border border-amber-400/40 bg-gradient-to-r from-amber-500/20 via-pink-500/20 to-purple-500/20 p-6 text-center shadow-2xl backdrop-blur">
+          <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 px-4 py-1 text-xs font-bold uppercase tracking-widest text-black">
+            <Sparkles className="h-4 w-4" />
+            Oferta Imperdível
+          </span>
+          <h2 className="text-2xl font-bold sm:text-3xl">
+            Comece <span className="bg-gradient-to-r from-amber-300 to-pink-300 bg-clip-text text-transparent">grátis hoje</span>{" "}
+            com 2 produtos no catálogo
+          </h2>
+          <p className="mx-auto mt-2 max-w-md text-sm text-slate-200">
+            Sem cartão de crédito. Cadastre seu e-mail e teste o Vende Fácil Pro agora —
+            quando quiser escalar, o plano Familiar libera 10 produtos e o Premium é ilimitado.
+          </p>
+          <button
+            type="button"
+            onClick={scrollToAccessForm}
+            className="mt-5 inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-amber-400 to-pink-500 px-8 py-3 font-bold text-black transition hover:opacity-90"
+          >
+            Quero minha conta grátis <ArrowRight className="h-4 w-4" />
+          </button>
+          <p className="mt-3 text-xs text-slate-400">
+            Aproveite: upgrade para o Familiar ou Premium a qualquer momento, sem perder seus produtos.
+          </p>
+        </div>
 
         {/* Planos / checkout */}
         <div className="mb-10">
@@ -141,7 +173,7 @@ function WebAppEntry() {
                 </span>
                 <p className="mb-4 mt-1 text-2xl font-bold">
                   {plan.price}
-                  <span className="text-sm font-normal text-slate-400">/mês</span>
+                  {plan.url && <span className="text-sm font-normal text-slate-400">/mês</span>}
                 </p>
                 <ul className="mb-5 flex-1 space-y-2 text-sm text-slate-300">
                   {plan.features.map((f) => (
@@ -151,18 +183,28 @@ function WebAppEntry() {
                     </li>
                   ))}
                 </ul>
-                <a
-                  href={plan.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition hover:opacity-90 ${
-                    plan.highlight
-                      ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
-                      : "border border-white/15 bg-white/10 text-white"
-                  }`}
-                >
-                  Assinar agora <ArrowRight className="h-4 w-4" />
-                </a>
+                {plan.url ? (
+                  <a
+                    href={plan.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition hover:opacity-90 ${
+                      plan.highlight
+                        ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                        : "border border-white/15 bg-white/10 text-white"
+                    }`}
+                  >
+                    Assinar agora <ArrowRight className="h-4 w-4" />
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={scrollToAccessForm}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-emerald-400/40 bg-emerald-400/10 px-4 py-2.5 text-sm font-semibold text-emerald-200 transition hover:opacity-90"
+                  >
+                    Criar conta grátis <ArrowRight className="h-4 w-4" />
+                  </button>
+                )}
               </div>
             ))}
           </div>
