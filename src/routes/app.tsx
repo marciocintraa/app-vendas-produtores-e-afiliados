@@ -93,7 +93,7 @@ function WebAppEntry() {
           className="mb-10 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur"
         >
           <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-200">
-            E-mail da compra
+            {freeMode ? "E-mail para acessar grátis" : "E-mail da compra"}
           </label>
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
