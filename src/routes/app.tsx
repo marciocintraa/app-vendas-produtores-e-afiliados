@@ -32,6 +32,7 @@ function WebAppEntry() {
   const [email, setEmail] = useState("");
   const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
   const [isStandalone, setIsStandalone] = useState(false);
+  const [freeMode, setFreeMode] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -51,7 +52,17 @@ function WebAppEntry() {
     e.preventDefault();
     const clean = email.trim().toLowerCase();
     if (!clean || !clean.includes("@")) return;
-    navigate({ to: "/acesso", search: { email: clean } as never });
+    navigate({ to: "/acesso", search: { email: clean, free: freeMode || undefined } as never });
+  }
+
+  function startFree() {
+    setFreeMode(true);
+    const form = document.getElementById("form-acesso");
+    form?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setTimeout(() => {
+      const input = document.getElementById("email");
+      input?.focus();
+    }, 400);
   }
 
 
