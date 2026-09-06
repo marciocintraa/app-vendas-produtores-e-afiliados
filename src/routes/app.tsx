@@ -117,7 +117,7 @@ function WebAppEntry() {
           </div>
           <p className="mt-3 text-xs text-slate-400">
             {freeMode
-              ? "Crie sua conta grátis com até 2 catálogos. Enviamos um link mágico — não precisa de senha."
+              ? "Crie sua conta grátis com 1 catálogo e até 2 produtos. Enviamos um link mágico — não precisa de senha."
               : "Enviamos um link mágico automaticamente. Não precisa de senha."}
           </p>
         </form>

@@ -25,9 +25,9 @@ export const CHECKOUT_PLANS: CheckoutPlan[] = [
     name: "Conta Grátis",
     price: "R$ 0,00",
     productLimit: 2,
-    limitLabel: "2 catálogos",
+    limitLabel: "1 catálogo com 2 produtos",
     features: [
-      "Até 2 catálogos de produtos",
+      "1 catálogo com até 2 produtos",
       "Links de afiliado nos produtos",
       "Vitrine personalizável",
       "Acesso Web + Android",
