@@ -151,10 +151,10 @@ import {
 export const Route = createFileRoute("/_authenticated/painel/produtos")({
   head: () => ({
     meta: [
-      { title: "Meus produtos — Vende Fácil Pro" },
+      { title: "Meus catálogos — Vende Fácil Pro" },
       {
         name: "description",
-        content: "Crie, edite e publique produtos do seu catálogo digital.",
+        content: "Crie, edite e publique catálogos na sua vitrine digital.",
       },
       { name: "robots", content: "noindex" },
     ],
@@ -776,7 +776,7 @@ function AdminProductsPage() {
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="font-display text-xl font-semibold">
-                  {editing.id ? "Editar produto" : "Novo produto"}
+                  {editing.id ? "Editar catálogo" : "Novo catálogo"}
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Preencha os campos abaixo e salve para atualizar o catálogo.
