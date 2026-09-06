@@ -117,7 +117,7 @@ function WebAppEntry() {
           </div>
           <p className="mt-3 text-xs text-slate-400">
             {freeMode
-              ? "Crie sua conta grátis com até 2 produtos. Enviamos um link mágico — não precisa de senha."
+              ? "Crie sua conta grátis com até 2 catálogos. Enviamos um link mágico — não precisa de senha."
               : "Enviamos um link mágico automaticamente. Não precisa de senha."}
           </p>
         </form>
@@ -143,7 +143,7 @@ function WebAppEntry() {
               <p className="mx-auto mt-2 max-w-md text-sm text-slate-200">
                 {plan.id === "vitalicio"
                   ? "Invista no seu app profissional. Pague uma única vez e use para sempre — sem mensalidades, sem taxas escondidas."
-                  : "Comece sem pagar nada. Ideal para testar e começar a divulgar seus primeiros produtos."}
+                  : "Comece sem pagar nada. Ideal para testar e começar a divulgar seus primeiros catálogos."}
               </p>
 
               <div className="mt-5">
