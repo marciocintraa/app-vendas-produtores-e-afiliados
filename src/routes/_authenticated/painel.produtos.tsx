@@ -151,10 +151,10 @@ import {
 export const Route = createFileRoute("/_authenticated/painel/produtos")({
   head: () => ({
     meta: [
-      { title: "Meus produtos — Vende Fácil Pro" },
+      { title: "Meus catálogos — Vende Fácil Pro" },
       {
         name: "description",
-        content: "Crie, edite e publique produtos do seu catálogo digital.",
+        content: "Crie, edite e publique catálogos na sua vitrine digital.",
       },
       { name: "robots", content: "noindex" },
     ],
@@ -657,11 +657,11 @@ function AdminProductsPage() {
               <Sparkles className="h-3.5 w-3.5 text-primary" /> Painel do assinante
             </span>
             <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight md:text-4xl">
-              Meus produtos
+              Meus catálogos
             </h1>
             <p className="mt-2 max-w-xl text-muted-foreground">
-              Cadastre novos produtos, edite os existentes e controle o que fica publicado no
-              seu catálogo.
+              Crie novos catálogos, edite os existentes e controle o que fica publicado na sua
+              vitrine.
             </p>
           </div>
           <button
@@ -669,13 +669,13 @@ function AdminProductsPage() {
             onClick={startCreate}
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.01]"
           >
-            <Plus className="h-4 w-4" /> Novo produto
+            <Plus className="h-4 w-4" /> Novo catálogo
           </button>
         </div>
 
         <div className="mt-8 overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card">
           <div className="grid grid-cols-[1.5fr_1fr_0.8fr_0.8fr_auto] gap-4 border-b border-border/60 bg-surface/60 px-5 py-3 text-xs uppercase tracking-wide text-muted-foreground">
-            <div>Produto</div>
+            <div>Catálogo</div>
             <div>Categoria</div>
             <div>Preço</div>
             <div>Status</div>
@@ -683,7 +683,7 @@ function AdminProductsPage() {
           </div>
           {sorted.length === 0 ? (
             <div className="p-10 text-center text-muted-foreground">
-              Nenhum produto cadastrado ainda. Clique em <b>Novo produto</b> para começar.
+              Nenhum catálogo criado ainda. Clique em <b>Novo catálogo</b> para começar.
             </div>
           ) : (
             <ul className="divide-y divide-border/60">
@@ -776,7 +776,7 @@ function AdminProductsPage() {
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="font-display text-xl font-semibold">
-                  {editing.id ? "Editar produto" : "Novo produto"}
+                  {editing.id ? "Editar catálogo" : "Novo catálogo"}
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Preencha os campos abaixo e salve para atualizar o catálogo.
