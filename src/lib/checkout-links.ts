@@ -40,11 +40,11 @@ export const CHECKOUT_PLANS: CheckoutPlan[] = [
     name: "Vende Fácil Pro",
     price: "R$ 197,00",
     installmentPrice: "6 x de R$ 36,96",
-    productLimit: 5,
-    limitLabel: "5 catálogos",
+    productLimit: null,
+    limitLabel: "5 catálogos com produtos ilimitados",
     highlight: true,
     features: [
-      "Até 5 catálogos de produtos",
+      "Até 5 catálogos, sem limite de produtos em cada um",
       "Links de afiliado nos produtos",
       "Personalização completa da vitrine",
       "Recursos avançados de marketing",
@@ -58,5 +58,5 @@ export const CHECKOUT_PLANS: CheckoutPlan[] = [
 /** Limite de produtos por plano (null = ilimitado). */
 export const PLAN_PRODUCT_LIMITS: Record<CheckoutPlanId, number | null> = {
   gratis: 2,
-  vitalicio: 5,
+  vitalicio: null,
 };
