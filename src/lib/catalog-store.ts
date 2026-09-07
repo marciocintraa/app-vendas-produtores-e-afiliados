@@ -2,12 +2,27 @@ import { useSyncExternalStore } from "react";
 import { PRODUCTS, type Product } from "./catalog-data";
 
 const STORAGE_KEY = "dsp:catalog:v1";
+const CATALOGS_KEY = "dsp:catalogs:v1";
+
+export const MAX_CATALOGS = 5;
+export const DEFAULT_CATALOG_ID = "catalogo-principal";
+
+export type Catalog = {
+  id: string;
+  name: string;
+  createdAt: number;
+};
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
 
 let state: Product[] = PRODUCTS;
 let hydrated = false;
+
+let catalogsState: Catalog[] = [
+  { id: DEFAULT_CATALOG_ID, name: "Catálogo principal", createdAt: 0 },
+];
+let catalogsHydrated = false;
 
 function loadFromStorage(): Product[] | null {
   if (typeof window === "undefined") return null;
@@ -39,6 +54,39 @@ function ensureHydrated() {
   else persist();
 }
 
+function loadCatalogsFromStorage(): Catalog[] | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(CATALOGS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Catalog[];
+    if (!Array.isArray(parsed)) return null;
+    return parsed.filter((c) => c && typeof c.id === "string" && typeof c.name === "string");
+  } catch {
+    return null;
+  }
+}
+
+function persistCatalogs() {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(CATALOGS_KEY, JSON.stringify(catalogsState));
+  } catch {
+    /* ignore */
+  }
+}
+
+function ensureCatalogsHydrated() {
+  if (catalogsHydrated || typeof window === "undefined") return;
+  catalogsHydrated = true;
+  const loaded = loadCatalogsFromStorage();
+  if (loaded && loaded.length > 0) {
+    catalogsState = loaded;
+  } else {
+    persistCatalogs();
+  }
+}
+
 function emit() {
   for (const l of listeners) l();
 }
@@ -57,8 +105,21 @@ function getServerSnapshot() {
   return PRODUCTS;
 }
 
+function getCatalogsSnapshot() {
+  ensureCatalogsHydrated();
+  return catalogsState;
+}
+
+function getServerCatalogsSnapshot(): Catalog[] {
+  return [{ id: DEFAULT_CATALOG_ID, name: "Catálogo principal", createdAt: 0 }];
+}
+
 export function useProducts() {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
+
+export function useCatalogs() {
+  return useSyncExternalStore(subscribe, getCatalogsSnapshot, getServerCatalogsSnapshot);
 }
 
 export function useProduct(id: string): Product | undefined {
@@ -69,6 +130,11 @@ export function useProduct(id: string): Product | undefined {
 export function getAllProducts(): Product[] {
   ensureHydrated();
   return state;
+}
+
+export function getAllCatalogs(): Catalog[] {
+  ensureCatalogsHydrated();
+  return catalogsState;
 }
 
 export function saveProduct(product: Product) {
@@ -92,11 +158,43 @@ export function deleteProduct(id: string) {
   emit();
 }
 
+export function saveCatalog(catalog: Catalog) {
+  ensureCatalogsHydrated();
+  const idx = catalogsState.findIndex((c) => c.id === catalog.id);
+  if (idx >= 0) {
+    const next = catalogsState.slice();
+    next[idx] = catalog;
+    catalogsState = next;
+  } else {
+    catalogsState = [...catalogsState, catalog];
+  }
+  persistCatalogs();
+  emit();
+}
+
+export function deleteCatalog(id: string) {
+  ensureCatalogsHydrated();
+  ensureHydrated();
+  const remaining = catalogsState.filter((c) => c.id !== id);
+  if (remaining.length === 0) {
+    remaining.push({ id: DEFAULT_CATALOG_ID, name: "Catálogo principal", createdAt: Date.now() });
+  }
+  catalogsState = remaining;
+  // Produtos do catálogo removido voltam para o primeiro catálogo restante.
+  const fallbackId = remaining[0].id;
+  state = state.map((p) =>
+    (p.catalogId ?? DEFAULT_CATALOG_ID) === id ? { ...p, catalogId: fallbackId } : p,
+  );
+  persistCatalogs();
+  persist();
+  emit();
+}
+
 export function slugify(input: string): string {
   return input
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 60);
