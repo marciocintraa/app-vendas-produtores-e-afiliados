@@ -140,6 +140,7 @@ import {
   FolderOpen,
 } from "lucide-react";
 import { toast } from "sonner";
+import { usePlan } from "@/lib/use-plan";
 
 import { type Product } from "@/lib/catalog-data";
 import {
@@ -252,6 +253,7 @@ type ConfirmState = {
 function AdminProductsPage() {
   const products = useProducts();
   const catalogs = useCatalogs();
+  const { plan, maxCatalogs, maxProductsPerCatalog } = usePlan();
   const [activeCatalogId, setActiveCatalogId] = useState(DEFAULT_CATALOG_ID);
   const [catalogModal, setCatalogModal] = useState<{ id: string | null; name: string } | null>(
     null,
@@ -583,6 +585,15 @@ function AdminProductsPage() {
   }, [editing]);
 
   function startCreate() {
+    if (
+      maxProductsPerCatalog !== null &&
+      sorted.length >= maxProductsPerCatalog
+    ) {
+      toast.error("Limite de produtos atingido", {
+        description: `A Conta Grátis permite até ${maxProductsPerCatalog} produtos no seu catálogo. Libere produtos ilimitados com o Vende Fácil Pro.`,
+      });
+      return;
+    }
     setEditing(emptyDraft(activeCatalog.id));
   }
 
@@ -657,9 +668,12 @@ function AdminProductsPage() {
   }
 
   function openCreateCatalog() {
-    if (catalogs.length >= MAX_CATALOGS) {
+    if (catalogs.length >= maxCatalogs) {
       toast.error("Limite de catálogos atingido", {
-        description: `Seu plano permite até ${MAX_CATALOGS} catálogos.`,
+        description:
+          plan === "gratis"
+            ? "A Conta Grátis permite 1 catálogo com até 2 produtos. Libere 5 catálogos com o Vende Fácil Pro."
+            : `Seu plano permite até ${maxCatalogs} catálogos.`,
       });
       return;
     }
@@ -813,7 +827,10 @@ function AdminProductsPage() {
             );
           })}
           <span className="text-xs text-muted-foreground">
-            {catalogs.length}/{MAX_CATALOGS} catálogos
+            {catalogs.length}/{maxCatalogs} catálogos
+            {maxProductsPerCatalog !== null
+              ? ` · até ${maxProductsPerCatalog} produtos (Conta Grátis)`
+              : " · produtos ilimitados"}
           </span>
         </div>
 
