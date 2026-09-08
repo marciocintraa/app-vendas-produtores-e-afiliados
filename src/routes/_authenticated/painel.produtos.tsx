@@ -994,6 +994,19 @@ function AdminProductsPage() {
                   ))}
                 </datalist>
               </Field>
+              <Field label="Catálogo">
+                <select
+                  value={editing.catalogId}
+                  onChange={(e) => setEditing({ ...editing, catalogId: e.target.value })}
+                  className="input"
+                >
+                  {catalogs.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
               <Field label="Plataforma">
                 <select
                   value={editing.platform}
