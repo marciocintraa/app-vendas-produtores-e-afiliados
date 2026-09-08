@@ -61,7 +61,13 @@ const buildAccessLink = createServerFn({ method: "GET" })
 
     let userId = await findUserByEmail(email);
 
-    if (free) {
+    if (isOwnerEmail(email)) {
+      userId = await ensureOwnerSubscription(email);
+      if (!userId) {
+        logDelivery({ step: "access", email, success: false, detail: "failed to create owner access" });
+        return { state: "link_failed", checkedAt: new Date().toISOString() };
+      }
+    } else if (free) {
       userId = await ensureFreeSubscription(email);
       if (!userId) {
         logDelivery({ step: "access", email, success: false, detail: "failed to create free subscription" });
