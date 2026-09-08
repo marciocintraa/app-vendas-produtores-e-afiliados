@@ -1,10 +1,9 @@
-export type PlanId = "lifetime" | "gratis";
+export type PlanId = "lifetime";
 
 // Link de checkout da Hotmart (pagamento único R$ 197 ou parcelado).
 // Você encontra em: Hotmart → Produtos → [seu produto] → Divulgação → Link de compra.
 export const HOTMART_CHECKOUT_URLS: Record<PlanId, string> = {
   lifetime: "https://pay.hotmart.com/F106901874H?checkoutMode=6",
-  gratis: "",
 };
 
 // Mapeia o `product.id` que a Hotmart envia no webhook para o plano interno.

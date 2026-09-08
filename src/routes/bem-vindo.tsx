@@ -5,12 +5,11 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 export const Route = createFileRoute("/bem-vindo")({
   validateSearch: (search: Record<string, unknown>) => ({
     email: typeof search.email === "string" ? search.email : undefined,
-    free: search.free === true || search.free === "true",
   }),
   beforeLoad: ({ search }) => {
     throw redirect({
       to: "/acesso",
-      search: { email: search.email, free: search.free },
+      search: { email: search.email },
     });
   },
 });
