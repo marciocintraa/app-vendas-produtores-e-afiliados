@@ -136,14 +136,22 @@ import {
   Image as ImageIcon,
   RotateCcw,
   Undo,
+  FolderPlus,
+  FolderOpen,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { type Product } from "@/lib/catalog-data";
 import {
   useProducts,
+  useCatalogs,
   saveProduct,
   deleteProduct,
+  saveCatalog,
+  deleteCatalog,
+  MAX_CATALOGS,
+  DEFAULT_CATALOG_ID,
+  type Catalog,
   slugify,
   makeCoverPlaceholder,
 } from "@/lib/catalog-store";
@@ -176,14 +184,16 @@ type Draft = {
   gallery: string[];
   highlights: string;
   published: boolean;
+  catalogId: string;
 };
 
 const PLATFORMS: Product["platform"][] = ["Hotmart", "Kiwify", "Eduzz", "Monetizze"];
 const MAX_GALLERY = 8;
 
-function emptyDraft(): Draft {
+function emptyDraft(catalogId: string = DEFAULT_CATALOG_ID): Draft {
   return {
     id: "",
+    catalogId,
     title: "",
     tagline: "",
     description: "",
@@ -214,6 +224,7 @@ function productToDraft(p: Product): Draft {
     gallery: p.gallery ?? [],
     highlights: p.highlights.join("\n"),
     published: p.published !== false,
+    catalogId: p.catalogId ?? DEFAULT_CATALOG_ID,
   };
 }
 
@@ -240,6 +251,12 @@ type ConfirmState = {
 
 function AdminProductsPage() {
   const products = useProducts();
+  const catalogs = useCatalogs();
+  const [activeCatalogId, setActiveCatalogId] = useState(DEFAULT_CATALOG_ID);
+  const [catalogModal, setCatalogModal] = useState<{ id: string | null; name: string } | null>(
+    null,
+  );
+  const [catalogError, setCatalogError] = useState<string | null>(null);
   const [editing, setEditing] = useState<Draft | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
