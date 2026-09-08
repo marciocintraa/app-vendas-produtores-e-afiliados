@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, Star, ArrowRight, Sparkles, Settings } from "lucide-react";
-import { useProducts } from "@/lib/catalog-store";
+import { useProducts, useCatalogs, DEFAULT_CATALOG } from "@/lib/catalog-store";
 
 
 export const Route = createFileRoute("/catalogo")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    c: typeof search.c === "string" ? search.c : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Catálogo — Vende Fácil Pro" },
