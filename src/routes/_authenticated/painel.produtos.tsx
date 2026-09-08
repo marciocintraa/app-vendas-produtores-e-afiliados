@@ -193,6 +193,7 @@ function emptyDraft(): Draft {
     tagline: "",
     description: "",
     category: "",
+    catalogId: DEFAULT_CATALOG.id,
     platform: "Hotmart",
     price: "",
     originalPrice: "",
