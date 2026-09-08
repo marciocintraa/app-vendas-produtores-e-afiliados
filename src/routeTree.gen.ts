@@ -22,10 +22,15 @@ import { Route as AuthenticatedPainelIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedPainelVendasRouteImport } from './routes/_authenticated/painel.vendas'
 import { Route as AuthenticatedPainelRelatoriosRouteImport } from './routes/_authenticated/painel.relatorios'
 import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
+import { Route as AuthenticatedPainelPlanoRouteImport } from './routes/_authenticated/painel.plano'
+import { Route as AuthenticatedPainelPersonalizarRouteImport } from './routes/_authenticated/painel.personalizar'
+import { Route as AuthenticatedPainelNotificacoesRouteImport } from './routes/_authenticated/painel.notificacoes'
+import { Route as AuthenticatedPainelLinksRouteImport } from './routes/_authenticated/painel.links'
 import { Route as AuthenticatedPainelIaRouteImport } from './routes/_authenticated/painel.ia'
 import { Route as AuthenticatedPainelFinanceiroRouteImport } from './routes/_authenticated/painel.financeiro'
 import { Route as AuthenticatedPainelClientesRouteImport } from './routes/_authenticated/painel.clientes'
 import { Route as AuthenticatedPainelCatalogoRouteImport } from './routes/_authenticated/painel.catalogo'
+import { Route as AuthenticatedPainelBibliotecaRouteImport } from './routes/_authenticated/painel.biblioteca'
 import { Route as ApiPublicHotmartWebhookRouteImport } from './routes/api/public/hotmart/webhook'
 
 const CatalogoRoute = CatalogoRouteImport.update({
@@ -96,6 +101,30 @@ const AuthenticatedPainelProdutosRoute =
     path: '/painel/produtos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPainelPlanoRoute =
+  AuthenticatedPainelPlanoRouteImport.update({
+    id: '/painel/plano',
+    path: '/painel/plano',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPainelPersonalizarRoute =
+  AuthenticatedPainelPersonalizarRouteImport.update({
+    id: '/painel/personalizar',
+    path: '/painel/personalizar',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPainelNotificacoesRoute =
+  AuthenticatedPainelNotificacoesRouteImport.update({
+    id: '/painel/notificacoes',
+    path: '/painel/notificacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPainelLinksRoute =
+  AuthenticatedPainelLinksRouteImport.update({
+    id: '/painel/links',
+    path: '/painel/links',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPainelIaRoute = AuthenticatedPainelIaRouteImport.update({
   id: '/painel/ia',
   path: '/painel/ia',
@@ -119,6 +148,12 @@ const AuthenticatedPainelCatalogoRoute =
     path: '/painel/catalogo',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPainelBibliotecaRoute =
+  AuthenticatedPainelBibliotecaRouteImport.update({
+    id: '/painel/biblioteca',
+    path: '/painel/biblioteca',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicHotmartWebhookRoute = ApiPublicHotmartWebhookRouteImport.update({
   id: '/api/public/hotmart/webhook',
   path: '/api/public/hotmart/webhook',
@@ -134,10 +169,15 @@ export interface FileRoutesByFullPath {
   '/catalogo': typeof CatalogoRouteWithChildren
   '/app/catalogo': typeof AppCatalogoRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
+  '/painel/biblioteca': typeof AuthenticatedPainelBibliotecaRoute
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/clientes': typeof AuthenticatedPainelClientesRoute
   '/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
   '/painel/ia': typeof AuthenticatedPainelIaRoute
+  '/painel/links': typeof AuthenticatedPainelLinksRoute
+  '/painel/notificacoes': typeof AuthenticatedPainelNotificacoesRoute
+  '/painel/personalizar': typeof AuthenticatedPainelPersonalizarRoute
+  '/painel/plano': typeof AuthenticatedPainelPlanoRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/painel/relatorios': typeof AuthenticatedPainelRelatoriosRoute
   '/painel/vendas': typeof AuthenticatedPainelVendasRoute
@@ -153,10 +193,15 @@ export interface FileRoutesByTo {
   '/catalogo': typeof CatalogoRouteWithChildren
   '/app/catalogo': typeof AppCatalogoRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
+  '/painel/biblioteca': typeof AuthenticatedPainelBibliotecaRoute
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/clientes': typeof AuthenticatedPainelClientesRoute
   '/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
   '/painel/ia': typeof AuthenticatedPainelIaRoute
+  '/painel/links': typeof AuthenticatedPainelLinksRoute
+  '/painel/notificacoes': typeof AuthenticatedPainelNotificacoesRoute
+  '/painel/personalizar': typeof AuthenticatedPainelPersonalizarRoute
+  '/painel/plano': typeof AuthenticatedPainelPlanoRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/painel/relatorios': typeof AuthenticatedPainelRelatoriosRoute
   '/painel/vendas': typeof AuthenticatedPainelVendasRoute
@@ -174,10 +219,15 @@ export interface FileRoutesById {
   '/catalogo': typeof CatalogoRouteWithChildren
   '/app/catalogo': typeof AppCatalogoRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
+  '/_authenticated/painel/biblioteca': typeof AuthenticatedPainelBibliotecaRoute
   '/_authenticated/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/_authenticated/painel/clientes': typeof AuthenticatedPainelClientesRoute
   '/_authenticated/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
   '/_authenticated/painel/ia': typeof AuthenticatedPainelIaRoute
+  '/_authenticated/painel/links': typeof AuthenticatedPainelLinksRoute
+  '/_authenticated/painel/notificacoes': typeof AuthenticatedPainelNotificacoesRoute
+  '/_authenticated/painel/personalizar': typeof AuthenticatedPainelPersonalizarRoute
+  '/_authenticated/painel/plano': typeof AuthenticatedPainelPlanoRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/_authenticated/painel/relatorios': typeof AuthenticatedPainelRelatoriosRoute
   '/_authenticated/painel/vendas': typeof AuthenticatedPainelVendasRoute
@@ -195,10 +245,15 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/app/catalogo'
     | '/catalogo/$productId'
+    | '/painel/biblioteca'
     | '/painel/catalogo'
     | '/painel/clientes'
     | '/painel/financeiro'
     | '/painel/ia'
+    | '/painel/links'
+    | '/painel/notificacoes'
+    | '/painel/personalizar'
+    | '/painel/plano'
     | '/painel/produtos'
     | '/painel/relatorios'
     | '/painel/vendas'
@@ -214,10 +269,15 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/app/catalogo'
     | '/catalogo/$productId'
+    | '/painel/biblioteca'
     | '/painel/catalogo'
     | '/painel/clientes'
     | '/painel/financeiro'
     | '/painel/ia'
+    | '/painel/links'
+    | '/painel/notificacoes'
+    | '/painel/personalizar'
+    | '/painel/plano'
     | '/painel/produtos'
     | '/painel/relatorios'
     | '/painel/vendas'
@@ -234,10 +294,15 @@ export interface FileRouteTypes {
     | '/catalogo'
     | '/app/catalogo'
     | '/catalogo/$productId'
+    | '/_authenticated/painel/biblioteca'
     | '/_authenticated/painel/catalogo'
     | '/_authenticated/painel/clientes'
     | '/_authenticated/painel/financeiro'
     | '/_authenticated/painel/ia'
+    | '/_authenticated/painel/links'
+    | '/_authenticated/painel/notificacoes'
+    | '/_authenticated/painel/personalizar'
+    | '/_authenticated/painel/plano'
     | '/_authenticated/painel/produtos'
     | '/_authenticated/painel/relatorios'
     | '/_authenticated/painel/vendas'
@@ -349,6 +414,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelProdutosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/painel/plano': {
+      id: '/_authenticated/painel/plano'
+      path: '/painel/plano'
+      fullPath: '/painel/plano'
+      preLoaderRoute: typeof AuthenticatedPainelPlanoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/painel/personalizar': {
+      id: '/_authenticated/painel/personalizar'
+      path: '/painel/personalizar'
+      fullPath: '/painel/personalizar'
+      preLoaderRoute: typeof AuthenticatedPainelPersonalizarRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/painel/notificacoes': {
+      id: '/_authenticated/painel/notificacoes'
+      path: '/painel/notificacoes'
+      fullPath: '/painel/notificacoes'
+      preLoaderRoute: typeof AuthenticatedPainelNotificacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/painel/links': {
+      id: '/_authenticated/painel/links'
+      path: '/painel/links'
+      fullPath: '/painel/links'
+      preLoaderRoute: typeof AuthenticatedPainelLinksRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel/ia': {
       id: '/_authenticated/painel/ia'
       path: '/painel/ia'
@@ -377,6 +470,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelCatalogoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/painel/biblioteca': {
+      id: '/_authenticated/painel/biblioteca'
+      path: '/painel/biblioteca'
+      fullPath: '/painel/biblioteca'
+      preLoaderRoute: typeof AuthenticatedPainelBibliotecaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/hotmart/webhook': {
       id: '/api/public/hotmart/webhook'
       path: '/api/public/hotmart/webhook'
@@ -388,10 +488,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPainelBibliotecaRoute: typeof AuthenticatedPainelBibliotecaRoute
   AuthenticatedPainelCatalogoRoute: typeof AuthenticatedPainelCatalogoRoute
   AuthenticatedPainelClientesRoute: typeof AuthenticatedPainelClientesRoute
   AuthenticatedPainelFinanceiroRoute: typeof AuthenticatedPainelFinanceiroRoute
   AuthenticatedPainelIaRoute: typeof AuthenticatedPainelIaRoute
+  AuthenticatedPainelLinksRoute: typeof AuthenticatedPainelLinksRoute
+  AuthenticatedPainelNotificacoesRoute: typeof AuthenticatedPainelNotificacoesRoute
+  AuthenticatedPainelPersonalizarRoute: typeof AuthenticatedPainelPersonalizarRoute
+  AuthenticatedPainelPlanoRoute: typeof AuthenticatedPainelPlanoRoute
   AuthenticatedPainelProdutosRoute: typeof AuthenticatedPainelProdutosRoute
   AuthenticatedPainelRelatoriosRoute: typeof AuthenticatedPainelRelatoriosRoute
   AuthenticatedPainelVendasRoute: typeof AuthenticatedPainelVendasRoute
@@ -399,10 +504,15 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPainelBibliotecaRoute: AuthenticatedPainelBibliotecaRoute,
   AuthenticatedPainelCatalogoRoute: AuthenticatedPainelCatalogoRoute,
   AuthenticatedPainelClientesRoute: AuthenticatedPainelClientesRoute,
   AuthenticatedPainelFinanceiroRoute: AuthenticatedPainelFinanceiroRoute,
   AuthenticatedPainelIaRoute: AuthenticatedPainelIaRoute,
+  AuthenticatedPainelLinksRoute: AuthenticatedPainelLinksRoute,
+  AuthenticatedPainelNotificacoesRoute: AuthenticatedPainelNotificacoesRoute,
+  AuthenticatedPainelPersonalizarRoute: AuthenticatedPainelPersonalizarRoute,
+  AuthenticatedPainelPlanoRoute: AuthenticatedPainelPlanoRoute,
   AuthenticatedPainelProdutosRoute: AuthenticatedPainelProdutosRoute,
   AuthenticatedPainelRelatoriosRoute: AuthenticatedPainelRelatoriosRoute,
   AuthenticatedPainelVendasRoute: AuthenticatedPainelVendasRoute,

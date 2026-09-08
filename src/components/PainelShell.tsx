@@ -9,6 +9,11 @@ import {
   ShoppingCart,
   Wallet,
   BarChart3,
+  BookOpen,
+  Link2,
+  Bell,
+  Palette,
+  Crown,
   LogOut,
   Menu,
   X,
@@ -19,11 +24,16 @@ const NAV = [
   { to: "/painel", label: "Início", icon: Home },
   { to: "/painel/produtos", label: "Produtos", icon: Package },
   { to: "/painel/catalogo", label: "Meu Catálogo", icon: Store },
+  { to: "/painel/personalizar", label: "Personalizar", icon: Palette },
   { to: "/painel/ia", label: "IA VENDE+", icon: Sparkles },
+  { to: "/painel/biblioteca", label: "Biblioteca", icon: BookOpen },
+  { to: "/painel/links", label: "Links", icon: Link2 },
+  { to: "/painel/notificacoes", label: "Avisos", icon: Bell },
   { to: "/painel/clientes", label: "Clientes", icon: Users },
   { to: "/painel/vendas", label: "Vendas", icon: ShoppingCart },
   { to: "/painel/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/painel/relatorios", label: "Relatórios", icon: BarChart3 },
+  { to: "/painel/plano", label: "Meu Plano", icon: Crown },
 ] as const;
 
 export default function PainelShell({ email, children }: { email?: string; children: ReactNode }) {
