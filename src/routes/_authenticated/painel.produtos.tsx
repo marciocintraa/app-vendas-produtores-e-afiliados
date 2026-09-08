@@ -563,6 +563,55 @@ function AdminProductsPage() {
     [products],
   );
 
+  const catalogs = useCatalogs();
+  const [activeCatalog, setActiveCatalog] = useState<string>("all");
+  const [newCatalogName, setNewCatalogName] = useState("");
+  const [addingCatalog, setAddingCatalog] = useState(false);
+  const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+
+  const visibleProducts = useMemo(
+    () =>
+      activeCatalog === "all"
+        ? sorted
+        : sorted.filter((p) => (p.catalogId ?? DEFAULT_CATALOG.id) === activeCatalog),
+    [sorted, activeCatalog],
+  );
+
+  function handleAddCatalog() {
+    const name = newCatalogName.trim();
+    if (!name) return;
+    const base = slugify(name) || `catalogo-${Date.now()}`;
+    let slug = base;
+    let n = 2;
+    while (catalogs.some((c) => c.slug === slug)) slug = `${base}-${n++}`;
+    saveCatalog({ id: `cat-${Date.now()}`, name, slug });
+    setNewCatalogName("");
+    setAddingCatalog(false);
+    toast.success(`Catálogo "${name}" criado`, {
+      description: "Agora você pode vincular produtos a ele.",
+    });
+  }
+
+  function handleDeleteCatalog(id: string, name: string) {
+    if (id === DEFAULT_CATALOG.id) return;
+    if (!window.confirm(`Excluir o catálogo "${name}"? Os produtos dele serão movidos para o Catálogo Principal.`)) return;
+    deleteCatalog(id);
+    if (activeCatalog === id) setActiveCatalog("all");
+    toast.message("Catálogo excluído", { description: "Os produtos foram movidos para o Catálogo Principal." });
+  }
+
+  async function handleCopyCatalogLink(slug: string) {
+    const url = `${window.location.origin}/catalogo?c=${slug}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedSlug(slug);
+      setTimeout(() => setCopiedSlug(null), 2000);
+      toast.success("Link do catálogo copiado", { description: url });
+    } catch {
+      toast.error("Não foi possível copiar o link.");
+    }
+  }
+
   useEffect(() => {
     if (!editing) setError(null);
   }, [editing]);
