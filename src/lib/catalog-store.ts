@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { PRODUCTS, type Product } from "./catalog-data";
+import { type Product } from "./catalog-data";
 import { supabase } from "@/integrations/supabase/client";
 
 const STORAGE_KEY = "dsp:catalog:v1";
@@ -21,8 +21,9 @@ const DEFAULT_CATALOGS: Catalog[] = [
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
+const EMPTY_PRODUCTS: Product[] = [];
 
-let state: Product[] = PRODUCTS;
+let state: Product[] = [];
 let catalogsState: Catalog[] = DEFAULT_CATALOGS;
 let loadStarted = false;
 
@@ -169,7 +170,7 @@ function getSnapshot() {
 }
 
 function getServerSnapshot() {
-  return PRODUCTS;
+  return EMPTY_PRODUCTS;
 }
 
 function getCatalogsSnapshot() {
