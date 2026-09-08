@@ -136,6 +136,8 @@ import {
   Image as ImageIcon,
   RotateCcw,
   Undo,
+  FolderPlus,
+  Link2,
 } from "lucide-react";
 import { toast } from "sonner";
 
