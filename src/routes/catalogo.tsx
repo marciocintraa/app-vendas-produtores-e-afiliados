@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, Star, ArrowRight, Sparkles, Settings } from "lucide-react";
-import { useProducts } from "@/lib/catalog-store";
+import { useProducts, useCatalogs, DEFAULT_CATALOG_ID } from "@/lib/catalog-store";
 
 
 export const Route = createFileRoute("/catalogo")({
@@ -28,8 +28,10 @@ export const Route = createFileRoute("/catalogo")({
 
 function CatalogPage() {
   const allProducts = useProducts();
+  const catalogs = useCatalogs();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
+  const [catalogId, setCatalogId] = useState<string | null>(null);
 
   const categories = useMemo(
     () => Array.from(new Set(allProducts.map((p) => p.category))),
@@ -40,6 +42,7 @@ function CatalogPage() {
     const q = query.trim().toLowerCase();
     return allProducts.filter((p) => {
       if (p.published === false) return false;
+      if (catalogId && (p.catalogId ?? DEFAULT_CATALOG_ID) !== catalogId) return false;
       if (category && p.category !== category) return false;
       if (!q) return true;
       return (
