@@ -33,6 +33,18 @@ function WebAppEntry() {
   const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
   const [isStandalone, setIsStandalone] = useState(false);
   const [freeMode, setFreeMode] = useState(false);
+  const [sessionEmail, setSessionEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    import("@/integrations/supabase/client").then(async ({ supabase }) => {
+      const { data } = await supabase.auth.getUser();
+      if (!cancelled) setSessionEmail(data.user?.email ?? null);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -123,6 +135,20 @@ function WebAppEntry() {
             </div>
           </div>
         </div>
+
+        {sessionEmail && (
+          <div className="mb-6 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-5 text-center">
+            <p className="text-sm text-emerald-100">
+              Você já está conectado como <strong>{sessionEmail}</strong>.
+            </p>
+            <a
+              href="/painel/produtos"
+              className="mt-3 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 font-semibold text-white hover:opacity-90"
+            >
+              Entrar no meu painel <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        )}
 
         {/* Access form */}
         <form
