@@ -1,5 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Package, Store, Sparkles, Users, ShoppingCart, Wallet, BarChart3 } from "lucide-react";
+import {
+  Package,
+  Store,
+  Sparkles,
+  Users,
+  ShoppingCart,
+  Wallet,
+  BarChart3,
+  BookOpen,
+  Link2,
+  Bell,
+  Palette,
+  Crown,
+} from "lucide-react";
 import { useProducts, useCatalogs } from "@/lib/catalog-store";
 import { useCustomers, useSales, formatBRL } from "@/lib/crm-store";
 
