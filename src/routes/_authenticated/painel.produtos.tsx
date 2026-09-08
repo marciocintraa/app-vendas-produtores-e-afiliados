@@ -850,13 +850,13 @@ function AdminProductsPage() {
             <div>Status</div>
             <div className="text-right">Ações</div>
           </div>
-          {sorted.length === 0 ? (
+          {visibleProducts.length === 0 ? (
             <div className="p-10 text-center text-muted-foreground">
-              Nenhum produto cadastrado ainda. Clique em <b>Novo produto</b> para começar.
+              Nenhum produto neste catálogo ainda. Clique em <b>Novo produto</b> para começar.
             </div>
           ) : (
             <ul className="divide-y divide-border/60">
-              {sorted.map((p) => {
+              {visibleProducts.map((p) => {
                 const isPublished = p.published !== false;
                 return (
                   <li
