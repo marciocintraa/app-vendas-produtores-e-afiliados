@@ -97,7 +97,8 @@ function CatalogPage() {
 
       <section className="mx-auto max-w-6xl px-4 pt-12 pb-6">
         <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-surface px-3 py-1 text-xs text-muted-foreground">
-          <Sparkles className="h-3.5 w-3.5 text-primary" /> Catálogo do assinante
+          <Sparkles className="h-3.5 w-3.5 text-primary" />{" "}
+          {activeCatalog ? activeCatalog.name : "Catálogo do assinante"}
         </span>
         <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight md:text-5xl">
           Produtos que convertem, prontos para divulgar.
