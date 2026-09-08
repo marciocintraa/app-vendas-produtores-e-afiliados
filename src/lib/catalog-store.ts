@@ -137,14 +137,20 @@ async function loadFromCloud() {
 /** Envia o conteúdo local (ou o exemplo inicial) para o banco na primeira vez. */
 async function migrateLocalToCloud() {
   try {
+    const { data: session } = await supabase.auth.getSession();
+    // Só quem está conectado pode enviar; visitantes apenas leem.
+    if (!session.session) return;
+
     const catalogRows = catalogsState.map((c) => ({
       id: c.id,
       name: c.name,
       created_at: new Date(c.createdAt || Date.now()).toISOString(),
     }));
-    await supabase.from("catalogs").upsert(catalogRows);
+    const catRes = await supabase.from("catalogs").upsert(catalogRows);
+    if (catRes.error) return;
     if (state.length > 0) {
-      await supabase.from("catalog_products").upsert(state.map(productToRow));
+      const prodRes = await supabase.from("catalog_products").upsert(state.map(productToRow));
+      if (prodRes.error) return;
     }
     if (typeof window !== "undefined") window.localStorage.setItem(MIGRATED_KEY, "1");
     cacheAll();
@@ -153,6 +159,7 @@ async function migrateLocalToCloud() {
     /* ignore */
   }
 }
+
 
 /* ---------------- Snapshots ---------------- */
 
