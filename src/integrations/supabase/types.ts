@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      catalog_products: {
+        Row: {
+          catalog_id: string
+          data: Json
+          id: string
+          published: boolean
+          updated_at: string
+        }
+        Insert: {
+          catalog_id: string
+          data: Json
+          id: string
+          published?: boolean
+          updated_at?: string
+        }
+        Update: {
+          catalog_id?: string
+          data?: Json
+          id?: string
+          published?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      catalogs: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean | null
