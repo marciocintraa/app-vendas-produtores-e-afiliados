@@ -33,6 +33,18 @@ function WebAppEntry() {
   const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
   const [isStandalone, setIsStandalone] = useState(false);
   const [freeMode, setFreeMode] = useState(false);
+  const [sessionEmail, setSessionEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    import("@/integrations/supabase/client").then(async ({ supabase }) => {
+      const { data } = await supabase.auth.getUser();
+      if (!cancelled) setSessionEmail(data.user?.email ?? null);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
