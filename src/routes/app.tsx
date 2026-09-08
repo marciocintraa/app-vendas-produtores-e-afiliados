@@ -122,6 +122,7 @@ function Dashboard({ email }: { email: string }) {
   const products = useProducts();
   const [query, setQuery] = useState("");
   const [shared, setShared] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const firstName = useMemo(() => {
     const raw = email.split("@")[0] || "Administrador";
