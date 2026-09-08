@@ -252,7 +252,7 @@ type ConfirmState = {
 function AdminProductsPage() {
   const products = useProducts();
   const catalogs = useCatalogs();
-  const { plan, maxCatalogs, maxProductsPerCatalog } = usePlan();
+  const { plan, maxCatalogs, maxProductsPerCatalog, loading: planLoading } = usePlan();
   const [activeCatalogId, setActiveCatalogId] = useState(DEFAULT_CATALOG_ID);
   const [catalogModal, setCatalogModal] = useState<{ id: string | null; name: string } | null>(
     null,
@@ -585,6 +585,7 @@ function AdminProductsPage() {
 
   function startCreate() {
     if (
+      !planLoading &&
       maxProductsPerCatalog !== null &&
       sorted.length >= maxProductsPerCatalog
     ) {
@@ -667,7 +668,7 @@ function AdminProductsPage() {
   }
 
   function openCreateCatalog() {
-    if (catalogs.length >= maxCatalogs) {
+    if (!planLoading && catalogs.length >= maxCatalogs) {
       toast.error("Limite de catálogos atingido", {
         description:
           plan === "gratis"
