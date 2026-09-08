@@ -122,6 +122,55 @@ export function deleteProduct(id: string) {
   emit();
 }
 
+// ===================== Catálogos =====================
+
+export function useCatalogs(): Catalog[] {
+  return useSyncExternalStore(subscribe, getCatalogsSnapshot, getCatalogsServerSnapshot);
+}
+
+function getCatalogsSnapshot(): Catalog[] {
+  ensureHydrated();
+  return catalogs;
+}
+
+function getCatalogsServerSnapshot(): Catalog[] {
+  return [DEFAULT_CATALOG];
+}
+
+export function getAllCatalogs(): Catalog[] {
+  ensureHydrated();
+  return catalogs;
+}
+
+export function saveCatalog(catalog: Catalog) {
+  ensureHydrated();
+  const idx = catalogs.findIndex((c) => c.id === catalog.id);
+  if (idx >= 0) {
+    const next = catalogs.slice();
+    next[idx] = catalog;
+    catalogs = next;
+  } else {
+    catalogs = [...catalogs, catalog];
+  }
+  persist();
+  emit();
+}
+
+/** Remove o catálogo e move os produtos dele para o Catálogo Principal. */
+export function deleteCatalog(id: string) {
+  ensureHydrated();
+  if (id === DEFAULT_CATALOG.id) return;
+  catalogs = catalogs.filter((c) => c.id !== id);
+  state = state.map((p) => (p.catalogId === id ? { ...p, catalogId: DEFAULT_CATALOG.id } : p));
+  persist();
+  emit();
+}
+
+export function getCatalogBySlug(slug: string): Catalog | undefined {
+  ensureHydrated();
+  return catalogs.find((c) => c.slug === slug);
+}
+
 export function slugify(input: string): string {
   return input
     .toLowerCase()
