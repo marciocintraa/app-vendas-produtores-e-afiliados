@@ -732,6 +732,116 @@ function AdminProductsPage() {
           </button>
         </div>
 
+        {/* Gerenciador de catálogos */}
+        <div className="mt-8 rounded-2xl border border-border/70 bg-card p-4 shadow-card">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Catálogos:
+            </span>
+            <button
+              type="button"
+              onClick={() => setActiveCatalog("all")}
+              className={`rounded-full border px-3 py-1.5 text-xs transition-colors ${
+                activeCatalog === "all"
+                  ? "border-primary/60 bg-primary/15 text-primary"
+                  : "border-border bg-surface text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Todos ({sorted.length})
+            </button>
+            {catalogs.map((c) => {
+              const count = sorted.filter(
+                (p) => (p.catalogId ?? DEFAULT_CATALOG.id) === c.id,
+              ).length;
+              const isActive = activeCatalog === c.id;
+              return (
+                <span
+                  key={c.id}
+                  className={`inline-flex items-center gap-1 rounded-full border px-3 py-1.5 text-xs transition-colors ${
+                    isActive
+                      ? "border-primary/60 bg-primary/15 text-primary"
+                      : "border-border bg-surface text-muted-foreground"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setActiveCatalog(c.id)}
+                    className="hover:text-foreground"
+                  >
+                    {c.name} ({count})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleCopyCatalogLink(c.slug)}
+                    title="Copiar link público deste catálogo"
+                    className="text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    {copiedSlug === c.slug ? (
+                      <Check className="h-3.5 w-3.5 text-emerald-500" />
+                    ) : (
+                      <Link2 className="h-3.5 w-3.5" />
+                    )}
+                  </button>
+                  {c.id !== DEFAULT_CATALOG.id && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteCatalog(c.id, c.name)}
+                      title="Excluir catálogo (produtos voltam para o Principal)"
+                      className="text-muted-foreground transition-colors hover:text-red-500"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </span>
+              );
+            })}
+            {addingCatalog ? (
+              <span className="inline-flex items-center gap-1.5">
+                <input
+                  autoFocus
+                  value={newCatalogName}
+                  onChange={(e) => setNewCatalogName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddCatalog();
+                    }
+                    if (e.key === "Escape") setAddingCatalog(false);
+                  }}
+                  placeholder="Nome do catálogo"
+                  className="h-8 w-44 rounded-lg border border-border bg-surface px-2.5 text-xs outline-none focus:border-primary/60"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddCatalog}
+                  className="rounded-lg bg-primary px-2.5 py-1.5 text-xs font-semibold text-primary-foreground"
+                >
+                  Criar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAddingCatalog(false)}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setAddingCatalog(true)}
+                className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-primary/50 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
+              >
+                <FolderPlus className="h-3.5 w-3.5" /> Novo catálogo
+              </button>
+            )}
+          </div>
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            Cada catálogo tem um link público próprio (ícone de corrente) para você divulgar
+            separadamente — ex.: um catálogo por nicho.
+          </p>
+        </div>
+
         <div className="mt-8 overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card">
           <div className="grid grid-cols-[1.5fr_1fr_0.8fr_0.8fr_auto] gap-4 border-b border-border/60 bg-surface/60 px-5 py-3 text-xs uppercase tracking-wide text-muted-foreground">
             <div>Produto</div>
