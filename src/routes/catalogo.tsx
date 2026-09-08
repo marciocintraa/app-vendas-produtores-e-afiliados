@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, Star, ArrowRight, Sparkles, Settings } from "lucide-react";
 import { useProducts, useCatalogs, DEFAULT_CATALOG_ID } from "@/lib/catalog-store";
 
