@@ -625,6 +625,7 @@ function AdminProductsPage() {
       price: priceNum,
       originalPrice: originalNum,
       category,
+      catalogId: editing.catalogId || DEFAULT_CATALOG.id,
       platform: editing.platform,
       rating: existing?.rating ?? 5,
       reviews: existing?.reviews ?? 0,
