@@ -21,6 +21,7 @@ import { Route as AppCatalogoRouteImport } from './routes/app.catalogo'
 import { Route as AuthenticatedPainelIndexRouteImport } from './routes/_authenticated/painel.index'
 import { Route as AuthenticatedPainelVendasRouteImport } from './routes/_authenticated/painel.vendas'
 import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
+import { Route as AuthenticatedPainelFinanceiroRouteImport } from './routes/_authenticated/painel.financeiro'
 import { Route as AuthenticatedPainelClientesRouteImport } from './routes/_authenticated/painel.clientes'
 import { Route as AuthenticatedPainelCatalogoRouteImport } from './routes/_authenticated/painel.catalogo'
 import { Route as ApiPublicHotmartWebhookRouteImport } from './routes/api/public/hotmart/webhook'
@@ -87,6 +88,12 @@ const AuthenticatedPainelProdutosRoute =
     path: '/painel/produtos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPainelFinanceiroRoute =
+  AuthenticatedPainelFinanceiroRouteImport.update({
+    id: '/painel/financeiro',
+    path: '/painel/financeiro',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPainelClientesRoute =
   AuthenticatedPainelClientesRouteImport.update({
     id: '/painel/clientes',
@@ -116,6 +123,7 @@ export interface FileRoutesByFullPath {
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/clientes': typeof AuthenticatedPainelClientesRoute
+  '/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/painel/vendas': typeof AuthenticatedPainelVendasRoute
   '/painel/': typeof AuthenticatedPainelIndexRoute
@@ -132,6 +140,7 @@ export interface FileRoutesByTo {
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/clientes': typeof AuthenticatedPainelClientesRoute
+  '/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/painel/vendas': typeof AuthenticatedPainelVendasRoute
   '/painel': typeof AuthenticatedPainelIndexRoute
@@ -150,6 +159,7 @@ export interface FileRoutesById {
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/_authenticated/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/_authenticated/painel/clientes': typeof AuthenticatedPainelClientesRoute
+  '/_authenticated/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/_authenticated/painel/vendas': typeof AuthenticatedPainelVendasRoute
   '/_authenticated/painel/': typeof AuthenticatedPainelIndexRoute
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/catalogo/$productId'
     | '/painel/catalogo'
     | '/painel/clientes'
+    | '/painel/financeiro'
     | '/painel/produtos'
     | '/painel/vendas'
     | '/painel/'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/catalogo/$productId'
     | '/painel/catalogo'
     | '/painel/clientes'
+    | '/painel/financeiro'
     | '/painel/produtos'
     | '/painel/vendas'
     | '/painel'
@@ -201,6 +213,7 @@ export interface FileRouteTypes {
     | '/catalogo/$productId'
     | '/_authenticated/painel/catalogo'
     | '/_authenticated/painel/clientes'
+    | '/_authenticated/painel/financeiro'
     | '/_authenticated/painel/produtos'
     | '/_authenticated/painel/vendas'
     | '/_authenticated/painel/'
@@ -304,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelProdutosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/painel/financeiro': {
+      id: '/_authenticated/painel/financeiro'
+      path: '/painel/financeiro'
+      fullPath: '/painel/financeiro'
+      preLoaderRoute: typeof AuthenticatedPainelFinanceiroRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel/clientes': {
       id: '/_authenticated/painel/clientes'
       path: '/painel/clientes'
@@ -331,6 +351,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedPainelCatalogoRoute: typeof AuthenticatedPainelCatalogoRoute
   AuthenticatedPainelClientesRoute: typeof AuthenticatedPainelClientesRoute
+  AuthenticatedPainelFinanceiroRoute: typeof AuthenticatedPainelFinanceiroRoute
   AuthenticatedPainelProdutosRoute: typeof AuthenticatedPainelProdutosRoute
   AuthenticatedPainelVendasRoute: typeof AuthenticatedPainelVendasRoute
   AuthenticatedPainelIndexRoute: typeof AuthenticatedPainelIndexRoute
@@ -339,6 +360,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPainelCatalogoRoute: AuthenticatedPainelCatalogoRoute,
   AuthenticatedPainelClientesRoute: AuthenticatedPainelClientesRoute,
+  AuthenticatedPainelFinanceiroRoute: AuthenticatedPainelFinanceiroRoute,
   AuthenticatedPainelProdutosRoute: AuthenticatedPainelProdutosRoute,
   AuthenticatedPainelVendasRoute: AuthenticatedPainelVendasRoute,
   AuthenticatedPainelIndexRoute: AuthenticatedPainelIndexRoute,
