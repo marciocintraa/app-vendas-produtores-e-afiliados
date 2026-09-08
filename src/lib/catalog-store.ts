@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { PRODUCTS, type Product } from "./catalog-data";
+import { type Product } from "./catalog-data";
 import { supabase } from "@/integrations/supabase/client";
 
 const STORAGE_KEY = "dsp:catalog:v1";
@@ -21,8 +21,9 @@ const DEFAULT_CATALOGS: Catalog[] = [
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
+const EMPTY_PRODUCTS: Product[] = [];
 
-let state: Product[] = PRODUCTS;
+let state: Product[] = [];
 let catalogsState: Catalog[] = DEFAULT_CATALOGS;
 let loadStarted = false;
 
@@ -110,13 +111,9 @@ async function loadFromCloud() {
     const cloudCatalogs = (catalogsRes.data ?? []) as CatalogRow[];
     const cloudProducts = (productsRes.data ?? []) as unknown as ProductRow[];
 
-    const alreadyMigrated =
-      typeof window !== "undefined" && window.localStorage.getItem(MIGRATED_KEY) === "1";
+    // O banco é a fonte oficial: nada de reenviar cópias antigas do aparelho.
+    if (typeof window !== "undefined") window.localStorage.setItem(MIGRATED_KEY, "1");
 
-    if (cloudProducts.length === 0 && !alreadyMigrated) {
-      await migrateLocalToCloud();
-      return;
-    }
 
     catalogsState =
       cloudCatalogs.length > 0
@@ -169,7 +166,7 @@ function getSnapshot() {
 }
 
 function getServerSnapshot() {
-  return PRODUCTS;
+  return EMPTY_PRODUCTS;
 }
 
 function getCatalogsSnapshot() {
