@@ -6,7 +6,7 @@ export const Route = createFileRoute("/app/catalogo")({
   ssr: false,
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();
-    if (error || !data.user) throw redirect({ to: "/acesso" });
+    if (error || !data.user) throw redirect({ to: "/acesso", search: {} });
   },
   head: () => ({
     meta: [
