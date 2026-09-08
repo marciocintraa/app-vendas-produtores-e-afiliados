@@ -18,6 +18,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatalogoProductIdRouteImport } from './routes/catalogo.$productId'
 import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
+import { Route as AuthenticatedPainelCatalogoRouteImport } from './routes/_authenticated/painel.catalogo'
 import { Route as ApiPublicHotmartWebhookRouteImport } from './routes/api/public/hotmart/webhook'
 
 const CatalogoRoute = CatalogoRouteImport.update({
@@ -65,6 +66,12 @@ const AuthenticatedPainelProdutosRoute =
     path: '/painel/produtos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPainelCatalogoRoute =
+  AuthenticatedPainelCatalogoRouteImport.update({
+    id: '/painel/catalogo',
+    path: '/painel/catalogo',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicHotmartWebhookRoute = ApiPublicHotmartWebhookRouteImport.update({
   id: '/api/public/hotmart/webhook',
   path: '/api/public/hotmart/webhook',
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/bem-vindo': typeof BemVindoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
   '/catalogo/$productId': typeof CatalogoProductIdRoute
+  '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
   '/bem-vindo': typeof BemVindoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
   '/catalogo/$productId': typeof CatalogoProductIdRoute
+  '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
@@ -103,6 +112,7 @@ export interface FileRoutesById {
   '/bem-vindo': typeof BemVindoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
   '/catalogo/$productId': typeof CatalogoProductIdRoute
+  '/_authenticated/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/bem-vindo'
     | '/catalogo'
     | '/catalogo/$productId'
+    | '/painel/catalogo'
     | '/painel/produtos'
     | '/api/public/hotmart/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/bem-vindo'
     | '/catalogo'
     | '/catalogo/$productId'
+    | '/painel/catalogo'
     | '/painel/produtos'
     | '/api/public/hotmart/webhook'
   id:
@@ -139,6 +151,7 @@ export interface FileRouteTypes {
     | '/bem-vindo'
     | '/catalogo'
     | '/catalogo/$productId'
+    | '/_authenticated/painel/catalogo'
     | '/_authenticated/painel/produtos'
     | '/api/public/hotmart/webhook'
   fileRoutesById: FileRoutesById
@@ -219,6 +232,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelProdutosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/painel/catalogo': {
+      id: '/_authenticated/painel/catalogo'
+      path: '/painel/catalogo'
+      fullPath: '/painel/catalogo'
+      preLoaderRoute: typeof AuthenticatedPainelCatalogoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/hotmart/webhook': {
       id: '/api/public/hotmart/webhook'
       path: '/api/public/hotmart/webhook'
@@ -230,10 +250,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPainelCatalogoRoute: typeof AuthenticatedPainelCatalogoRoute
   AuthenticatedPainelProdutosRoute: typeof AuthenticatedPainelProdutosRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPainelCatalogoRoute: AuthenticatedPainelCatalogoRoute,
   AuthenticatedPainelProdutosRoute: AuthenticatedPainelProdutosRoute,
 }
 
