@@ -142,8 +142,12 @@ import { toast } from "sonner";
 import { type Product } from "@/lib/catalog-data";
 import {
   useProducts,
+  useCatalogs,
   saveProduct,
   deleteProduct,
+  saveCatalog,
+  deleteCatalog,
+  DEFAULT_CATALOG,
   slugify,
   makeCoverPlaceholder,
 } from "@/lib/catalog-store";
@@ -168,6 +172,7 @@ type Draft = {
   tagline: string;
   description: string;
   category: string;
+  catalogId: string;
   platform: Product["platform"];
   price: string;
   originalPrice: string;
