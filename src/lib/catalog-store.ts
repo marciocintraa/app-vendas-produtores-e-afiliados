@@ -111,13 +111,9 @@ async function loadFromCloud() {
     const cloudCatalogs = (catalogsRes.data ?? []) as CatalogRow[];
     const cloudProducts = (productsRes.data ?? []) as unknown as ProductRow[];
 
-    const alreadyMigrated =
-      typeof window !== "undefined" && window.localStorage.getItem(MIGRATED_KEY) === "1";
+    // O banco é a fonte oficial: nada de reenviar cópias antigas do aparelho.
+    if (typeof window !== "undefined") window.localStorage.setItem(MIGRATED_KEY, "1");
 
-    if (cloudProducts.length === 0 && !alreadyMigrated) {
-      await migrateLocalToCloud();
-      return;
-    }
 
     catalogsState =
       cloudCatalogs.length > 0
