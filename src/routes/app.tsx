@@ -28,6 +28,8 @@ import {
   Bell,
   Link2,
   Loader2,
+  Menu,
+  X,
 } from "lucide-react";
 import { CHECKOUT_PLANS } from "@/lib/checkout-links";
 import { supabase } from "@/integrations/supabase/client";
@@ -103,7 +105,7 @@ function AppEntry() {
 const MENU = [
   { icon: Home, label: "Início", active: true },
   { icon: Package, label: "Produtos", to: "/painel/produtos" as const },
-  { icon: LayoutGrid, label: "Meu Catálogo", to: "/catalogo" as const },
+  { icon: LayoutGrid, label: "Meus Catálogos", to: "/catalogo" as const },
   { icon: Wand2, label: "IA VENDE+" },
   { icon: Megaphone, label: "VENDE ADS IA" },
   { icon: Rocket, label: "Prompt Master IA" },
@@ -120,6 +122,7 @@ function Dashboard({ email }: { email: string }) {
   const products = useProducts();
   const [query, setQuery] = useState("");
   const [shared, setShared] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const firstName = useMemo(() => {
     const raw = email.split("@")[0] || "Administrador";
@@ -193,12 +196,22 @@ function Dashboard({ email }: { email: string }) {
       <main className="min-w-0 flex-1">
         {/* Topbar */}
         <header className="flex items-center justify-between gap-4 border-b border-white/5 px-6 py-4">
-          <div>
-            <p className="text-sm font-bold tracking-widest text-cyan-400">VENDE FÁCIL PRO</p>
-            <p className="text-sm text-slate-400">{email}</p>
-            <p className="mt-1 text-xs font-semibold tracking-wide text-cyan-300">
-              ADMINISTRADOR · PREMIUM · PRODUTOS ILIMITADOS
-            </p>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="rounded-full border border-white/10 p-2.5 text-slate-300 transition hover:bg-white/5 md:hidden"
+              aria-label="Abrir menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <div>
+              <p className="text-sm font-bold tracking-widest text-cyan-400">VENDE FÁCIL PRO</p>
+              <p className="text-sm text-slate-400">{email}</p>
+              <p className="mt-1 text-xs font-semibold tracking-wide text-cyan-300">
+                ADMINISTRADOR · PREMIUM · PRODUTOS ILIMITADOS
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Link
@@ -217,6 +230,61 @@ function Dashboard({ email }: { email: string }) {
             </button>
           </div>
         </header>
+
+        {/* Menu mobile */}
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-50 md:hidden">
+            <div
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            <div className="absolute left-0 top-0 h-full w-64 border-r border-white/10 bg-[#0A0F22] p-5 shadow-2xl">
+              <div className="mb-6 flex items-center justify-between">
+                <p className="text-sm font-bold tracking-[0.25em] text-cyan-400">MENU</p>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="rounded-full p-2 text-slate-300 transition hover:bg-white/5"
+                  aria-label="Fechar menu"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <nav className="space-y-1">
+                {MENU.map((item) => {
+                  const Icon = item.icon;
+                  const cls = `flex items-center gap-3 rounded-xl px-3 py-3 text-sm transition ${
+                    item.active
+                      ? "bg-cyan-500/10 font-semibold text-cyan-300"
+                      : "text-slate-300 hover:bg-white/5 hover:text-white"
+                  }`;
+                  if (item.to) {
+                    return (
+                      <Link
+                        key={item.label}
+                        to={item.to}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={cls}
+                      >
+                        <Icon className="h-4 w-4" /> {item.label}
+                      </Link>
+                    );
+                  }
+                  return (
+                    <button
+                      key={item.label}
+                      type="button"
+                      title="Em breve"
+                      className={`${cls} w-full cursor-default opacity-70`}
+                    >
+                      <Icon className="h-4 w-4" /> {item.label}
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+          </div>
+        )}
 
         <div className="mx-auto max-w-5xl px-6 py-8">
           <h1 className="text-3xl font-bold">Olá, {firstName} 👋</h1>
