@@ -3,7 +3,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { useEffect, useState, useRef } from "react";
 import { Loader2, Mail, AlertCircle, CheckCircle, RefreshCw } from "lucide-react";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { findUserByEmail, logDelivery, ensureFreeSubscription } from "@/lib/hotmart.server";
+import {
+  findUserByEmail,
+  logDelivery,
+  ensureFreeSubscription,
+  isOwnerEmail,
+  ensureOwnerSubscription,
+} from "@/lib/hotmart.server";
 
 
 
