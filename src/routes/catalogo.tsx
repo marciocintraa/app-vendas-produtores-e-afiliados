@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, Star, ArrowRight, Sparkles, Settings } from "lucide-react";
 import { useProducts, useCatalogs, DEFAULT_CATALOG_ID } from "@/lib/catalog-store";
 
@@ -32,6 +32,13 @@ function CatalogPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
   const [catalogId, setCatalogId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const c = new URLSearchParams(window.location.search).get("c");
+    if (c) setCatalogId(c);
+  }, []);
+
 
   const categories = useMemo(
     () => Array.from(new Set(allProducts.map((p) => p.category))),
