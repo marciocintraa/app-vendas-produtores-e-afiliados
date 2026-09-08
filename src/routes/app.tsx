@@ -28,6 +28,8 @@ import {
   Bell,
   Link2,
   Loader2,
+  Menu,
+  X,
 } from "lucide-react";
 import { CHECKOUT_PLANS } from "@/lib/checkout-links";
 import { supabase } from "@/integrations/supabase/client";
