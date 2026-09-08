@@ -38,6 +38,11 @@ const ATALHOS = [
   { to: "/painel/vendas", label: "Vendas", desc: "Registre e acompanhe cada venda", icon: ShoppingCart },
   { to: "/painel/financeiro", label: "Financeiro", desc: "Recebimentos e comissões", icon: Wallet },
   { to: "/painel/relatorios", label: "Relatórios", desc: "Desempenho do seu catálogo", icon: BarChart3 },
+  { to: "/painel/personalizar", label: "Personalizar", desc: "Sua marca, cores e contatos na vitrine", icon: Palette },
+  { to: "/painel/biblioteca", label: "Biblioteca", desc: "Posts, roteiros e materiais salvos", icon: BookOpen },
+  { to: "/painel/links", label: "Links", desc: "Um link por canal para saber o que vende", icon: Link2 },
+  { to: "/painel/notificacoes", label: "Avisos", desc: "Programe mensagens para sua base", icon: Bell },
+  { to: "/painel/plano", label: "Meu Plano", desc: "Limites e recursos liberados", icon: Crown },
 ] as const;
 
 function PainelHome() {
