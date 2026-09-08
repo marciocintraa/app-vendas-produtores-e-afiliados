@@ -22,6 +22,7 @@ import { Route as AuthenticatedPainelIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedPainelVendasRouteImport } from './routes/_authenticated/painel.vendas'
 import { Route as AuthenticatedPainelRelatoriosRouteImport } from './routes/_authenticated/painel.relatorios'
 import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
+import { Route as AuthenticatedPainelNotificacoesRouteImport } from './routes/_authenticated/painel.notificacoes'
 import { Route as AuthenticatedPainelLinksRouteImport } from './routes/_authenticated/painel.links'
 import { Route as AuthenticatedPainelIaRouteImport } from './routes/_authenticated/painel.ia'
 import { Route as AuthenticatedPainelFinanceiroRouteImport } from './routes/_authenticated/painel.financeiro'
@@ -98,6 +99,12 @@ const AuthenticatedPainelProdutosRoute =
     path: '/painel/produtos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPainelNotificacoesRoute =
+  AuthenticatedPainelNotificacoesRouteImport.update({
+    id: '/painel/notificacoes',
+    path: '/painel/notificacoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPainelLinksRoute =
   AuthenticatedPainelLinksRouteImport.update({
     id: '/painel/links',
@@ -154,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
   '/painel/ia': typeof AuthenticatedPainelIaRoute
   '/painel/links': typeof AuthenticatedPainelLinksRoute
+  '/painel/notificacoes': typeof AuthenticatedPainelNotificacoesRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/painel/relatorios': typeof AuthenticatedPainelRelatoriosRoute
   '/painel/vendas': typeof AuthenticatedPainelVendasRoute
@@ -175,6 +183,7 @@ export interface FileRoutesByTo {
   '/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
   '/painel/ia': typeof AuthenticatedPainelIaRoute
   '/painel/links': typeof AuthenticatedPainelLinksRoute
+  '/painel/notificacoes': typeof AuthenticatedPainelNotificacoesRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/painel/relatorios': typeof AuthenticatedPainelRelatoriosRoute
   '/painel/vendas': typeof AuthenticatedPainelVendasRoute
@@ -198,6 +207,7 @@ export interface FileRoutesById {
   '/_authenticated/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
   '/_authenticated/painel/ia': typeof AuthenticatedPainelIaRoute
   '/_authenticated/painel/links': typeof AuthenticatedPainelLinksRoute
+  '/_authenticated/painel/notificacoes': typeof AuthenticatedPainelNotificacoesRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/_authenticated/painel/relatorios': typeof AuthenticatedPainelRelatoriosRoute
   '/_authenticated/painel/vendas': typeof AuthenticatedPainelVendasRoute
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/painel/financeiro'
     | '/painel/ia'
     | '/painel/links'
+    | '/painel/notificacoes'
     | '/painel/produtos'
     | '/painel/relatorios'
     | '/painel/vendas'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/painel/financeiro'
     | '/painel/ia'
     | '/painel/links'
+    | '/painel/notificacoes'
     | '/painel/produtos'
     | '/painel/relatorios'
     | '/painel/vendas'
@@ -264,6 +276,7 @@ export interface FileRouteTypes {
     | '/_authenticated/painel/financeiro'
     | '/_authenticated/painel/ia'
     | '/_authenticated/painel/links'
+    | '/_authenticated/painel/notificacoes'
     | '/_authenticated/painel/produtos'
     | '/_authenticated/painel/relatorios'
     | '/_authenticated/painel/vendas'
@@ -375,6 +388,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelProdutosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/painel/notificacoes': {
+      id: '/_authenticated/painel/notificacoes'
+      path: '/painel/notificacoes'
+      fullPath: '/painel/notificacoes'
+      preLoaderRoute: typeof AuthenticatedPainelNotificacoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel/links': {
       id: '/_authenticated/painel/links'
       path: '/painel/links'
@@ -434,6 +454,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPainelFinanceiroRoute: typeof AuthenticatedPainelFinanceiroRoute
   AuthenticatedPainelIaRoute: typeof AuthenticatedPainelIaRoute
   AuthenticatedPainelLinksRoute: typeof AuthenticatedPainelLinksRoute
+  AuthenticatedPainelNotificacoesRoute: typeof AuthenticatedPainelNotificacoesRoute
   AuthenticatedPainelProdutosRoute: typeof AuthenticatedPainelProdutosRoute
   AuthenticatedPainelRelatoriosRoute: typeof AuthenticatedPainelRelatoriosRoute
   AuthenticatedPainelVendasRoute: typeof AuthenticatedPainelVendasRoute
@@ -447,6 +468,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPainelFinanceiroRoute: AuthenticatedPainelFinanceiroRoute,
   AuthenticatedPainelIaRoute: AuthenticatedPainelIaRoute,
   AuthenticatedPainelLinksRoute: AuthenticatedPainelLinksRoute,
+  AuthenticatedPainelNotificacoesRoute: AuthenticatedPainelNotificacoesRoute,
   AuthenticatedPainelProdutosRoute: AuthenticatedPainelProdutosRoute,
   AuthenticatedPainelRelatoriosRoute: AuthenticatedPainelRelatoriosRoute,
   AuthenticatedPainelVendasRoute: AuthenticatedPainelVendasRoute,
