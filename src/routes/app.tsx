@@ -196,12 +196,22 @@ function Dashboard({ email }: { email: string }) {
       <main className="min-w-0 flex-1">
         {/* Topbar */}
         <header className="flex items-center justify-between gap-4 border-b border-white/5 px-6 py-4">
-          <div>
-            <p className="text-sm font-bold tracking-widest text-cyan-400">VENDE FÁCIL PRO</p>
-            <p className="text-sm text-slate-400">{email}</p>
-            <p className="mt-1 text-xs font-semibold tracking-wide text-cyan-300">
-              ADMINISTRADOR · PREMIUM · PRODUTOS ILIMITADOS
-            </p>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="rounded-full border border-white/10 p-2.5 text-slate-300 transition hover:bg-white/5 md:hidden"
+              aria-label="Abrir menu"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <div>
+              <p className="text-sm font-bold tracking-widest text-cyan-400">VENDE FÁCIL PRO</p>
+              <p className="text-sm text-slate-400">{email}</p>
+              <p className="mt-1 text-xs font-semibold tracking-wide text-cyan-300">
+                ADMINISTRADOR · PREMIUM · PRODUTOS ILIMITADOS
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Link
