@@ -33,14 +33,17 @@ export function usePlan(): PlanLimits {
       }
       const { data } = await supabase
         .from("subscriptions")
-        .select("product_id, status")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .select("product_id, status, current_period_end")
+        .eq("user_id", user.id);
       if (cancelled) return;
-      const isFree = !data || data.product_id === "free";
-      setPlan(isFree ? "gratis" : "vitalicio");
+      const now = Date.now();
+      const hasPaid = (data ?? []).some((row) => {
+        if (row.product_id === "free") return false;
+        if (!["active", "trialing", "past_due"].includes(String(row.status))) return false;
+        if (row.current_period_end && new Date(row.current_period_end).getTime() < now) return false;
+        return true;
+      });
+      setPlan(hasPaid ? "vitalicio" : "gratis");
       setLoading(false);
     })();
     return () => {
