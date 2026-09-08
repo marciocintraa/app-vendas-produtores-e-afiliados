@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatalogoProductIdRouteImport } from './routes/catalogo.$productId'
 import { Route as AppCatalogoRouteImport } from './routes/app.catalogo'
 import { Route as AuthenticatedPainelIndexRouteImport } from './routes/_authenticated/painel.index'
+import { Route as AuthenticatedPainelVendasRouteImport } from './routes/_authenticated/painel.vendas'
 import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
 import { Route as AuthenticatedPainelClientesRouteImport } from './routes/_authenticated/painel.clientes'
 import { Route as AuthenticatedPainelCatalogoRouteImport } from './routes/_authenticated/painel.catalogo'
@@ -74,6 +75,12 @@ const AuthenticatedPainelIndexRoute =
     path: '/painel/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPainelVendasRoute =
+  AuthenticatedPainelVendasRouteImport.update({
+    id: '/painel/vendas',
+    path: '/painel/vendas',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPainelProdutosRoute =
   AuthenticatedPainelProdutosRouteImport.update({
     id: '/painel/produtos',
@@ -110,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/clientes': typeof AuthenticatedPainelClientesRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/painel/vendas': typeof AuthenticatedPainelVendasRoute
   '/painel/': typeof AuthenticatedPainelIndexRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
@@ -125,6 +133,7 @@ export interface FileRoutesByTo {
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/clientes': typeof AuthenticatedPainelClientesRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/painel/vendas': typeof AuthenticatedPainelVendasRoute
   '/painel': typeof AuthenticatedPainelIndexRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
@@ -142,6 +151,7 @@ export interface FileRoutesById {
   '/_authenticated/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/_authenticated/painel/clientes': typeof AuthenticatedPainelClientesRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/_authenticated/painel/vendas': typeof AuthenticatedPainelVendasRoute
   '/_authenticated/painel/': typeof AuthenticatedPainelIndexRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
@@ -159,6 +169,7 @@ export interface FileRouteTypes {
     | '/painel/catalogo'
     | '/painel/clientes'
     | '/painel/produtos'
+    | '/painel/vendas'
     | '/painel/'
     | '/api/public/hotmart/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -174,6 +185,7 @@ export interface FileRouteTypes {
     | '/painel/catalogo'
     | '/painel/clientes'
     | '/painel/produtos'
+    | '/painel/vendas'
     | '/painel'
     | '/api/public/hotmart/webhook'
   id:
@@ -190,6 +202,7 @@ export interface FileRouteTypes {
     | '/_authenticated/painel/catalogo'
     | '/_authenticated/painel/clientes'
     | '/_authenticated/painel/produtos'
+    | '/_authenticated/painel/vendas'
     | '/_authenticated/painel/'
     | '/api/public/hotmart/webhook'
   fileRoutesById: FileRoutesById
@@ -277,6 +290,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/painel/vendas': {
+      id: '/_authenticated/painel/vendas'
+      path: '/painel/vendas'
+      fullPath: '/painel/vendas'
+      preLoaderRoute: typeof AuthenticatedPainelVendasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel/produtos': {
       id: '/_authenticated/painel/produtos'
       path: '/painel/produtos'
@@ -312,6 +332,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPainelCatalogoRoute: typeof AuthenticatedPainelCatalogoRoute
   AuthenticatedPainelClientesRoute: typeof AuthenticatedPainelClientesRoute
   AuthenticatedPainelProdutosRoute: typeof AuthenticatedPainelProdutosRoute
+  AuthenticatedPainelVendasRoute: typeof AuthenticatedPainelVendasRoute
   AuthenticatedPainelIndexRoute: typeof AuthenticatedPainelIndexRoute
 }
 
@@ -319,6 +340,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPainelCatalogoRoute: AuthenticatedPainelCatalogoRoute,
   AuthenticatedPainelClientesRoute: AuthenticatedPainelClientesRoute,
   AuthenticatedPainelProdutosRoute: AuthenticatedPainelProdutosRoute,
+  AuthenticatedPainelVendasRoute: AuthenticatedPainelVendasRoute,
   AuthenticatedPainelIndexRoute: AuthenticatedPainelIndexRoute,
 }
 
