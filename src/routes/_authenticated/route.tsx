@@ -81,5 +81,9 @@ function AuthenticatedLayout() {
     );
   }
 
-  return <Outlet />;
+  return (
+    <PainelShell email={user.email ?? undefined}>
+      <Outlet />
+    </PainelShell>
+  );
 }
