@@ -5,8 +5,8 @@ import { useProducts, useCatalogs, DEFAULT_CATALOG } from "@/lib/catalog-store";
 
 
 export const Route = createFileRoute("/catalogo")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    c: typeof search.c === "string" ? search.c : undefined,
+  validateSearch: (search: Record<string, unknown>): { c?: string } => ({
+    c: typeof search.c === "string" && search.c ? search.c : undefined,
   }),
   head: () => ({
     meta: [
