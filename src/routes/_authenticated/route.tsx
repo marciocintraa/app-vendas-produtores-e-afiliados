@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect, Link, useNavigate } from '@tanstack/
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { LogOut, Loader2, AlertCircle } from 'lucide-react';
+import PainelShell from '@/components/PainelShell';
 
 
 export const Route = createFileRoute('/_authenticated')({
@@ -81,5 +82,9 @@ function AuthenticatedLayout() {
     );
   }
 
-  return <Outlet />;
+  return (
+    <PainelShell email={user.email ?? undefined}>
+      <Outlet />
+    </PainelShell>
+  );
 }
