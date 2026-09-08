@@ -136,14 +136,22 @@ import {
   Image as ImageIcon,
   RotateCcw,
   Undo,
+  FolderPlus,
+  FolderOpen,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { type Product } from "@/lib/catalog-data";
 import {
   useProducts,
+  useCatalogs,
   saveProduct,
   deleteProduct,
+  saveCatalog,
+  deleteCatalog,
+  MAX_CATALOGS,
+  DEFAULT_CATALOG_ID,
+  type Catalog,
   slugify,
   makeCoverPlaceholder,
 } from "@/lib/catalog-store";
@@ -176,14 +184,16 @@ type Draft = {
   gallery: string[];
   highlights: string;
   published: boolean;
+  catalogId: string;
 };
 
 const PLATFORMS: Product["platform"][] = ["Hotmart", "Kiwify", "Eduzz", "Monetizze"];
 const MAX_GALLERY = 8;
 
-function emptyDraft(): Draft {
+function emptyDraft(catalogId: string = DEFAULT_CATALOG_ID): Draft {
   return {
     id: "",
+    catalogId,
     title: "",
     tagline: "",
     description: "",
@@ -214,6 +224,7 @@ function productToDraft(p: Product): Draft {
     gallery: p.gallery ?? [],
     highlights: p.highlights.join("\n"),
     published: p.published !== false,
+    catalogId: p.catalogId ?? DEFAULT_CATALOG_ID,
   };
 }
 
@@ -240,6 +251,12 @@ type ConfirmState = {
 
 function AdminProductsPage() {
   const products = useProducts();
+  const catalogs = useCatalogs();
+  const [activeCatalogId, setActiveCatalogId] = useState(DEFAULT_CATALOG_ID);
+  const [catalogModal, setCatalogModal] = useState<{ id: string | null; name: string } | null>(
+    null,
+  );
+  const [catalogError, setCatalogError] = useState<string | null>(null);
   const [editing, setEditing] = useState<Draft | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -551,9 +568,14 @@ function AdminProductsPage() {
     });
   }
 
+  const activeCatalog = catalogs.find((c) => c.id === activeCatalogId) ?? catalogs[0];
+
   const sorted = useMemo(
-    () => [...products].sort((a, b) => a.title.localeCompare(b.title, "pt-BR")),
-    [products],
+    () =>
+      products
+        .filter((p) => (p.catalogId ?? DEFAULT_CATALOG_ID) === activeCatalog.id)
+        .sort((a, b) => a.title.localeCompare(b.title, "pt-BR")),
+    [products, activeCatalog.id],
   );
 
   useEffect(() => {
@@ -561,7 +583,7 @@ function AdminProductsPage() {
   }, [editing]);
 
   function startCreate() {
-    setEditing(emptyDraft());
+    setEditing(emptyDraft(activeCatalog.id));
   }
 
   function startEdit(p: Product) {
@@ -627,10 +649,72 @@ function AdminProductsPage() {
       highlights: highlights.length ? highlights : existing?.highlights ?? [],
       modules: existing?.modules ?? [],
       published: editing.published,
+      catalogId: editing.catalogId || DEFAULT_CATALOG_ID,
     };
 
     saveProduct(product);
     setEditing(null);
+  }
+
+  function openCreateCatalog() {
+    if (catalogs.length >= MAX_CATALOGS) {
+      toast.error("Limite de catálogos atingido", {
+        description: `Seu plano permite até ${MAX_CATALOGS} catálogos.`,
+      });
+      return;
+    }
+    setCatalogError(null);
+    setCatalogModal({ id: null, name: "" });
+  }
+
+  function openRenameCatalog(c: Catalog) {
+    setCatalogError(null);
+    setCatalogModal({ id: c.id, name: c.name });
+  }
+
+  function handleSaveCatalog(e: React.FormEvent) {
+    e.preventDefault();
+    if (!catalogModal) return;
+    const name = catalogModal.name.trim();
+    if (!name) {
+      setCatalogError("Informe o nome do catálogo.");
+      return;
+    }
+    if (catalogModal.id) {
+      const existing = catalogs.find((c) => c.id === catalogModal.id);
+      saveCatalog({ id: catalogModal.id, name, createdAt: existing?.createdAt ?? Date.now() });
+      toast.success("Catálogo renomeado.");
+    } else {
+      let id = slugify(name) || `catalogo-${Date.now()}`;
+      if (catalogs.some((c) => c.id === id)) id = `${id}-${Date.now()}`;
+      saveCatalog({ id, name, createdAt: Date.now() });
+      setActiveCatalogId(id);
+      toast.success("Catálogo criado.", {
+        description: `Agora adicione produtos em "${name}".`,
+      });
+    }
+    setCatalogModal(null);
+  }
+
+  function handleDeleteCatalog(c: Catalog) {
+    if (catalogs.length <= 1) {
+      toast.error("Você precisa manter pelo menos 1 catálogo.");
+      return;
+    }
+    if (
+      typeof window !== "undefined" &&
+      !window.confirm(
+        `Excluir o catálogo "${c.name}"? Os produtos dele serão movidos para outro catálogo.`,
+      )
+    ) {
+      return;
+    }
+    deleteCatalog(c.id);
+    if (activeCatalog.id === c.id) {
+      const remaining = catalogs.find((x) => x.id !== c.id);
+      if (remaining) setActiveCatalogId(remaining.id);
+    }
+    toast.success("Catálogo excluído.");
   }
 
   return (
@@ -664,18 +748,78 @@ function AdminProductsPage() {
               vitrine.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={startCreate}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.01]"
-          >
-            <Plus className="h-4 w-4" /> Novo catálogo
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={openCreateCatalog}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-surface-2"
+            >
+              <FolderPlus className="h-4 w-4" /> Novo catálogo
+            </button>
+            <button
+              type="button"
+              onClick={startCreate}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.01]"
+            >
+              <Plus className="h-4 w-4" /> Novo produto
+            </button>
+          </div>
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card">
+        {/* Seletor de catálogos */}
+        <div className="mt-8 flex flex-wrap items-center gap-2">
+          {catalogs.map((c) => {
+            const count = products.filter(
+              (p) => (p.catalogId ?? DEFAULT_CATALOG_ID) === c.id,
+            ).length;
+            const isActive = c.id === activeCatalog.id;
+            return (
+              <div
+                key={c.id}
+                className={`flex items-center gap-1 rounded-xl border px-3 py-2 text-sm transition-colors ${
+                  isActive
+                    ? "border-primary/60 bg-primary/15 text-primary"
+                    : "border-border bg-surface text-muted-foreground"
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => setActiveCatalogId(c.id)}
+                  className="flex items-center gap-1.5 font-medium"
+                >
+                  <FolderOpen className="h-4 w-4" />
+                  {c.name}
+                  <span className="text-xs opacity-70">({count})</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openRenameCatalog(c)}
+                  className="rounded p-1 opacity-60 transition-opacity hover:opacity-100"
+                  title="Renomear catálogo"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                {catalogs.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteCatalog(c)}
+                    className="rounded p-1 opacity-60 transition-opacity hover:text-destructive hover:opacity-100"
+                    title="Excluir catálogo"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+          <span className="text-xs text-muted-foreground">
+            {catalogs.length}/{MAX_CATALOGS} catálogos
+          </span>
+        </div>
+
+        <div className="mt-4 overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card">
           <div className="grid grid-cols-[1.5fr_1fr_0.8fr_0.8fr_auto] gap-4 border-b border-border/60 bg-surface/60 px-5 py-3 text-xs uppercase tracking-wide text-muted-foreground">
-            <div>Catálogo</div>
+            <div>Produto</div>
             <div>Categoria</div>
             <div>Preço</div>
             <div>Status</div>
@@ -683,7 +827,7 @@ function AdminProductsPage() {
           </div>
           {sorted.length === 0 ? (
             <div className="p-10 text-center text-muted-foreground">
-              Nenhum catálogo criado ainda. Clique em <b>Novo catálogo</b> para começar.
+              Nenhum produto neste catálogo. Clique em <b>Novo produto</b> para começar.
             </div>
           ) : (
             <ul className="divide-y divide-border/60">
@@ -776,10 +920,10 @@ function AdminProductsPage() {
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="font-display text-xl font-semibold">
-                  {editing.id ? "Editar catálogo" : "Novo catálogo"}
+                  {editing.id ? "Editar produto" : "Novo produto"}
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Preencha os campos abaixo e salve para atualizar o catálogo.
+                  Preencha os campos abaixo e salve para atualizar o produto.
                 </p>
               </div>
               <button
@@ -809,6 +953,19 @@ function AdminProductsPage() {
                   className="input"
                   placeholder="Uma frase curta que resume a promessa"
                 />
+              </Field>
+              <Field label="Catálogo">
+                <select
+                  value={editing.catalogId}
+                  onChange={(e) => setEditing({ ...editing, catalogId: e.target.value })}
+                  className="input"
+                >
+                  {catalogs.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
               </Field>
               <Field label="Categoria">
                 <input
@@ -1679,6 +1836,68 @@ function AdminProductsPage() {
             </div>
 
           </div>
+        </div>
+      )}
+
+      {catalogModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
+          <form
+            onSubmit={handleSaveCatalog}
+            className="w-full max-w-sm rounded-2xl border border-border/70 bg-card p-6 shadow-card"
+          >
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="font-display text-xl font-semibold">
+                  {catalogModal.id ? "Renomear catálogo" : "Novo catálogo"}
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {catalogModal.id
+                    ? "Altere o nome do catálogo."
+                    : `Você pode criar até ${MAX_CATALOGS} catálogos.`}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCatalogModal(null)}
+                className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+                aria-label="Fechar"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="mt-4">
+              <Field label="Nome do catálogo">
+                <input
+                  autoFocus
+                  required
+                  value={catalogModal.name}
+                  onChange={(e) =>
+                    setCatalogModal({ ...catalogModal, name: e.target.value })
+                  }
+                  className="input"
+                  placeholder="Ex: Emagrecimento, Renda Extra…"
+                />
+              </Field>
+              {catalogError && (
+                <p className="mt-2 text-sm text-destructive">{catalogError}</p>
+              )}
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setCatalogModal(null)}
+                className="rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-surface-2"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.01]"
+              >
+                <Save className="h-4 w-4" /> Salvar catálogo
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, Star, ArrowRight, Sparkles, Settings } from "lucide-react";
-import { useProducts } from "@/lib/catalog-store";
+import { useProducts, useCatalogs, DEFAULT_CATALOG_ID } from "@/lib/catalog-store";
 
 
 export const Route = createFileRoute("/catalogo")({
@@ -28,8 +28,10 @@ export const Route = createFileRoute("/catalogo")({
 
 function CatalogPage() {
   const allProducts = useProducts();
+  const catalogs = useCatalogs();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
+  const [catalogId, setCatalogId] = useState<string | null>(null);
 
   const categories = useMemo(
     () => Array.from(new Set(allProducts.map((p) => p.category))),
@@ -40,6 +42,7 @@ function CatalogPage() {
     const q = query.trim().toLowerCase();
     return allProducts.filter((p) => {
       if (p.published === false) return false;
+      if (catalogId && (p.catalogId ?? DEFAULT_CATALOG_ID) !== catalogId) return false;
       if (category && p.category !== category) return false;
       if (!q) return true;
       return (
@@ -48,7 +51,7 @@ function CatalogPage() {
         p.category.toLowerCase().includes(q)
       );
     });
-  }, [allProducts, query, category]);
+  }, [allProducts, query, category, catalogId]);
 
 
 
@@ -89,6 +92,34 @@ function CatalogPage() {
           Selecione, personalize e compartilhe. Cada produto abaixo abre uma página completa com
           seu link de afiliado ou de produtor.
         </p>
+
+        {catalogs.length > 1 && (
+          <div className="mt-8 flex flex-wrap gap-2">
+            <button
+              onClick={() => setCatalogId(null)}
+              className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                catalogId === null
+                  ? "border-primary/60 bg-primary/15 text-primary"
+                  : "border-border bg-surface text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Todos os catálogos
+            </button>
+            {catalogs.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setCatalogId(c.id)}
+                className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+                  catalogId === c.id
+                    ? "border-primary/60 bg-primary/15 text-primary"
+                    : "border-border bg-surface text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {c.name}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center">
           <div className="relative flex-1">
