@@ -2,11 +2,25 @@ import { useSyncExternalStore } from "react";
 import { PRODUCTS, type Product } from "./catalog-data";
 
 const STORAGE_KEY = "dsp:catalog:v1";
+const CATALOGS_KEY = "dsp:catalogs:v1";
+
+export type Catalog = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+export const DEFAULT_CATALOG: Catalog = {
+  id: "principal",
+  name: "Catálogo Principal",
+  slug: "principal",
+};
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
 
 let state: Product[] = PRODUCTS;
+let catalogs: Catalog[] = [DEFAULT_CATALOG];
 let hydrated = false;
 
 function loadFromStorage(): Product[] | null {
@@ -22,10 +36,24 @@ function loadFromStorage(): Product[] | null {
   }
 }
 
+function loadCatalogsFromStorage(): Catalog[] | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(CATALOGS_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Catalog[];
+    if (!Array.isArray(parsed) || parsed.length === 0) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 function persist() {
   if (typeof window === "undefined") return;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    window.localStorage.setItem(CATALOGS_KEY, JSON.stringify(catalogs));
   } catch {
     /* ignore */
   }
@@ -34,6 +62,8 @@ function persist() {
 function ensureHydrated() {
   if (hydrated || typeof window === "undefined") return;
   hydrated = true;
+  const loadedCatalogs = loadCatalogsFromStorage();
+  if (loadedCatalogs) catalogs = loadedCatalogs;
   const loaded = loadFromStorage();
   if (loaded) state = loaded;
   else persist();

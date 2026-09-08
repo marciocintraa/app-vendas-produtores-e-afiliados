@@ -15,6 +15,8 @@ export type Product = {
   highlights: string[];
   modules: { title: string; lessons: number }[];
   published?: boolean;
+  /** Catálogo ao qual o produto pertence (id do catálogo). */
+  catalogId?: string;
 };
 
 
