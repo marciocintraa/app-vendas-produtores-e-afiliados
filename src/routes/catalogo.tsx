@@ -1,10 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, Star, ArrowRight, Sparkles, Settings } from "lucide-react";
-import { useProducts } from "@/lib/catalog-store";
+import { useProducts, useCatalogs, DEFAULT_CATALOG } from "@/lib/catalog-store";
 
 
 export const Route = createFileRoute("/catalogo")({
+  validateSearch: (search: Record<string, unknown>): { c?: string } => ({
+    c: typeof search.c === "string" && search.c ? search.c : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Catálogo — Vende Fácil Pro" },
@@ -28,17 +31,31 @@ export const Route = createFileRoute("/catalogo")({
 
 function CatalogPage() {
   const allProducts = useProducts();
+  const catalogs = useCatalogs();
+  const { c: catalogSlug } = Route.useSearch();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
 
+  const activeCatalog = useMemo(
+    () => catalogs.find((cat) => cat.slug === catalogSlug),
+    [catalogs, catalogSlug],
+  );
+
+  const scopedProducts = useMemo(() => {
+    if (!activeCatalog) return allProducts;
+    return allProducts.filter(
+      (p) => (p.catalogId ?? DEFAULT_CATALOG.id) === activeCatalog.id,
+    );
+  }, [allProducts, activeCatalog]);
+
   const categories = useMemo(
-    () => Array.from(new Set(allProducts.map((p) => p.category))),
-    [allProducts],
+    () => Array.from(new Set(scopedProducts.map((p) => p.category))),
+    [scopedProducts],
   );
 
   const products = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return allProducts.filter((p) => {
+    return scopedProducts.filter((p) => {
       if (p.published === false) return false;
       if (category && p.category !== category) return false;
       if (!q) return true;
@@ -48,7 +65,7 @@ function CatalogPage() {
         p.category.toLowerCase().includes(q)
       );
     });
-  }, [allProducts, query, category]);
+  }, [scopedProducts, query, category]);
 
 
 
@@ -80,7 +97,8 @@ function CatalogPage() {
 
       <section className="mx-auto max-w-6xl px-4 pt-12 pb-6">
         <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-surface px-3 py-1 text-xs text-muted-foreground">
-          <Sparkles className="h-3.5 w-3.5 text-primary" /> Catálogo do assinante
+          <Sparkles className="h-3.5 w-3.5 text-primary" />{" "}
+          {activeCatalog ? activeCatalog.name : "Catálogo do assinante"}
         </span>
         <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight md:text-5xl">
           Produtos que convertem, prontos para divulgar.
