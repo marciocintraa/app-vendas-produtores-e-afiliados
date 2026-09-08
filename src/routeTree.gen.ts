@@ -17,6 +17,7 @@ import { Route as AcessoRouteImport } from './routes/acesso'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatalogoProductIdRouteImport } from './routes/catalogo.$productId'
+import { Route as AppCatalogoRouteImport } from './routes/app.catalogo'
 import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
 import { Route as AuthenticatedPainelCatalogoRouteImport } from './routes/_authenticated/painel.catalogo'
 import { Route as ApiPublicHotmartWebhookRouteImport } from './routes/api/public/hotmart/webhook'
@@ -60,6 +61,11 @@ const CatalogoProductIdRoute = CatalogoProductIdRouteImport.update({
   path: '/$productId',
   getParentRoute: () => CatalogoRoute,
 } as any)
+const AppCatalogoRoute = AppCatalogoRouteImport.update({
+  id: '/catalogo',
+  path: '/catalogo',
+  getParentRoute: () => AppRoute,
+} as any)
 const AuthenticatedPainelProdutosRoute =
   AuthenticatedPainelProdutosRouteImport.update({
     id: '/painel/produtos',
@@ -81,10 +87,11 @@ const ApiPublicHotmartWebhookRoute = ApiPublicHotmartWebhookRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/acesso': typeof AcessoRoute
-  '/app': typeof AppRoute
+  '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/bem-vindo': typeof BemVindoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/app/catalogo': typeof AppCatalogoRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
@@ -93,10 +100,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/acesso': typeof AcessoRoute
-  '/app': typeof AppRoute
+  '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/bem-vindo': typeof BemVindoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/app/catalogo': typeof AppCatalogoRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
@@ -107,10 +115,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/acesso': typeof AcessoRoute
-  '/app': typeof AppRoute
+  '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/bem-vindo': typeof BemVindoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/app/catalogo': typeof AppCatalogoRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/_authenticated/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/bem-vindo'
     | '/catalogo'
+    | '/app/catalogo'
     | '/catalogo/$productId'
     | '/painel/catalogo'
     | '/painel/produtos'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/bem-vindo'
     | '/catalogo'
+    | '/app/catalogo'
     | '/catalogo/$productId'
     | '/painel/catalogo'
     | '/painel/produtos'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/bem-vindo'
     | '/catalogo'
+    | '/app/catalogo'
     | '/catalogo/$productId'
     | '/_authenticated/painel/catalogo'
     | '/_authenticated/painel/produtos'
@@ -160,7 +172,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AcessoRoute: typeof AcessoRoute
-  AppRoute: typeof AppRoute
+  AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRoute
   BemVindoRoute: typeof BemVindoRoute
   CatalogoRoute: typeof CatalogoRouteWithChildren
@@ -225,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CatalogoProductIdRouteImport
       parentRoute: typeof CatalogoRoute
     }
+    '/app/catalogo': {
+      id: '/app/catalogo'
+      path: '/catalogo'
+      fullPath: '/app/catalogo'
+      preLoaderRoute: typeof AppCatalogoRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_authenticated/painel/produtos': {
       id: '/_authenticated/painel/produtos'
       path: '/painel/produtos'
@@ -262,6 +281,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AppRouteChildren {
+  AppCatalogoRoute: typeof AppCatalogoRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppCatalogoRoute: AppCatalogoRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 interface CatalogoRouteChildren {
   CatalogoProductIdRoute: typeof CatalogoProductIdRoute
 }
@@ -278,7 +307,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AcessoRoute: AcessoRoute,
-  AppRoute: AppRoute,
+  AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRoute,
   BemVindoRoute: BemVindoRoute,
   CatalogoRoute: CatalogoRouteWithChildren,

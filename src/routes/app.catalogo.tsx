@@ -1,7 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 import MeuCatalogoScreen from "@/components/MeuCatalogoScreen";
 
-export const Route = createFileRoute("/_authenticated/painel/catalogo")({
+export const Route = createFileRoute("/app/catalogo")({
+  ssr: false,
+  beforeLoad: async () => {
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user)
+      throw redirect({ to: "/acesso", search: { email: undefined, free: false } });
+  },
   head: () => ({
     meta: [
       { title: "Meu Catálogo — Vende Fácil Pro" },
