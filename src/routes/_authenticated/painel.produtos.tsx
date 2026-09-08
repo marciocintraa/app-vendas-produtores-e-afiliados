@@ -212,6 +212,7 @@ function productToDraft(p: Product): Draft {
     tagline: p.tagline,
     description: p.description,
     category: p.category,
+    catalogId: p.catalogId ?? DEFAULT_CATALOG.id,
     platform: p.platform,
     price: String(p.price ?? ""),
     originalPrice: p.originalPrice ? String(p.originalPrice) : "",
