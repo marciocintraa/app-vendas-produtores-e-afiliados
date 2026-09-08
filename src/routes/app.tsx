@@ -105,7 +105,7 @@ function AppEntry() {
 const MENU = [
   { icon: Home, label: "Início", active: true },
   { icon: Package, label: "Produtos", to: "/painel/produtos" as const },
-  { icon: LayoutGrid, label: "Meu Catálogo", to: "/catalogo" as const },
+  { icon: LayoutGrid, label: "Meus Catálogos", to: "/catalogo" as const },
   { icon: Wand2, label: "IA VENDE+" },
   { icon: Megaphone, label: "VENDE ADS IA" },
   { icon: Rocket, label: "Prompt Master IA" },
