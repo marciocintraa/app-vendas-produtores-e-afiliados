@@ -1,31 +1,43 @@
 import { useSyncExternalStore } from "react";
-import { type Product } from "./catalog-data";
-import { supabase } from "@/integrations/supabase/client";
+import { PRODUCTS, type Product } from "./catalog-data";
 
 const STORAGE_KEY = "dsp:catalog:v1";
-const CATALOGS_KEY = "dsp:catalogs:v1";
-const MIGRATED_KEY = "dsp:migrated-to-cloud:v1";
-
-export const MAX_CATALOGS = 5;
-export const DEFAULT_CATALOG_ID = "catalogo-principal";
-
-export type Catalog = {
-  id: string;
-  name: string;
-  createdAt: number;
-};
-
-const DEFAULT_CATALOGS: Catalog[] = [
-  { id: DEFAULT_CATALOG_ID, name: "Catálogo principal", createdAt: 0 },
-];
 
 type Listener = () => void;
 const listeners = new Set<Listener>();
-const EMPTY_PRODUCTS: Product[] = [];
 
-let state: Product[] = [];
-let catalogsState: Catalog[] = DEFAULT_CATALOGS;
-let loadStarted = false;
+let state: Product[] = PRODUCTS;
+let hydrated = false;
+
+function loadFromStorage(): Product[] | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Product[];
+    if (!Array.isArray(parsed)) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function persist() {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    /* ignore */
+  }
+}
+
+function ensureHydrated() {
+  if (hydrated || typeof window === "undefined") return;
+  hydrated = true;
+  const loaded = loadFromStorage();
+  if (loaded) state = loaded;
+  else persist();
+}
 
 function emit() {
   for (const l of listeners) l();
@@ -33,157 +45,20 @@ function emit() {
 
 function subscribe(l: Listener) {
   listeners.add(l);
-  ensureLoaded();
   return () => listeners.delete(l);
 }
 
-/* ---------------- localStorage (cache local + migração) ---------------- */
-
-function readLocal<T>(key: string): T | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? (parsed as T) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeLocal(key: string, value: unknown) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    /* ignore */
-  }
-}
-
-function cacheAll() {
-  writeLocal(STORAGE_KEY, state);
-  writeLocal(CATALOGS_KEY, catalogsState);
-}
-
-/* ---------------- Carregamento do banco ---------------- */
-
-type CatalogRow = { id: string; name: string; created_at: string };
-type ProductRow = { id: string; catalog_id: string; data: Product; published: boolean };
-
-function rowToProduct(row: ProductRow): Product {
-  return { ...row.data, id: row.id, catalogId: row.catalog_id, published: row.published };
-}
-
-function productToRow(p: Product) {
-  const { ...data } = p;
-  return {
-    id: p.id,
-    catalog_id: p.catalogId ?? DEFAULT_CATALOG_ID,
-    published: p.published !== false,
-    data,
-    updated_at: new Date().toISOString(),
-  };
-}
-
-function ensureLoaded() {
-  if (loadStarted || typeof window === "undefined") return;
-  loadStarted = true;
-
-  // Mostra imediatamente o que já estava salvo no aparelho.
-  const localProducts = readLocal<Product[]>(STORAGE_KEY);
-  const localCatalogs = readLocal<Catalog[]>(CATALOGS_KEY);
-  if (localProducts) state = localProducts;
-  if (localCatalogs && localCatalogs.length > 0) catalogsState = localCatalogs;
-  emit();
-
-  void loadFromCloud();
-}
-
-async function loadFromCloud() {
-  try {
-    const [catalogsRes, productsRes] = await Promise.all([
-      supabase.from("catalogs").select("id, name, created_at").order("created_at"),
-      supabase.from("catalog_products").select("id, catalog_id, data, published"),
-    ]);
-
-    if (catalogsRes.error || productsRes.error) return;
-
-    const cloudCatalogs = (catalogsRes.data ?? []) as CatalogRow[];
-    const cloudProducts = (productsRes.data ?? []) as unknown as ProductRow[];
-
-    // O banco é a fonte oficial: nada de reenviar cópias antigas do aparelho.
-    if (typeof window !== "undefined") window.localStorage.setItem(MIGRATED_KEY, "1");
-
-
-    catalogsState =
-      cloudCatalogs.length > 0
-        ? cloudCatalogs.map((c) => ({
-            id: c.id,
-            name: c.name,
-            createdAt: new Date(c.created_at).getTime(),
-          }))
-        : DEFAULT_CATALOGS;
-    state = cloudProducts.map(rowToProduct);
-    cacheAll();
-    emit();
-  } catch {
-    /* offline: segue com o cache local */
-  }
-}
-
-/** Envia o conteúdo local (ou o exemplo inicial) para o banco na primeira vez. */
-async function migrateLocalToCloud() {
-  try {
-    const { data: session } = await supabase.auth.getSession();
-    // Só quem está conectado pode enviar; visitantes apenas leem.
-    if (!session.session) return;
-
-    const catalogRows = catalogsState.map((c) => ({
-      id: c.id,
-      name: c.name,
-      created_at: new Date(c.createdAt || Date.now()).toISOString(),
-    }));
-    const catRes = await supabase.from("catalogs").upsert(catalogRows);
-    if (catRes.error) return;
-    if (state.length > 0) {
-      const prodRes = await supabase.from("catalog_products").upsert(state.map(productToRow));
-      if (prodRes.error) return;
-    }
-    if (typeof window !== "undefined") window.localStorage.setItem(MIGRATED_KEY, "1");
-    cacheAll();
-    emit();
-  } catch {
-    /* ignore */
-  }
-}
-
-
-/* ---------------- Snapshots ---------------- */
-
 function getSnapshot() {
-  ensureLoaded();
+  ensureHydrated();
   return state;
 }
 
 function getServerSnapshot() {
-  return EMPTY_PRODUCTS;
-}
-
-function getCatalogsSnapshot() {
-  ensureLoaded();
-  return catalogsState;
-}
-
-function getServerCatalogsSnapshot(): Catalog[] {
-  return DEFAULT_CATALOGS;
+  return PRODUCTS;
 }
 
 export function useProducts() {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-}
-
-export function useCatalogs() {
-  return useSyncExternalStore(subscribe, getCatalogsSnapshot, getServerCatalogsSnapshot);
 }
 
 export function useProduct(id: string): Product | undefined {
@@ -192,19 +67,12 @@ export function useProduct(id: string): Product | undefined {
 }
 
 export function getAllProducts(): Product[] {
-  ensureLoaded();
+  ensureHydrated();
   return state;
 }
 
-export function getAllCatalogs(): Catalog[] {
-  ensureLoaded();
-  return catalogsState;
-}
-
-/* ---------------- Escritas (otimistas + banco) ---------------- */
-
 export function saveProduct(product: Product) {
-  ensureLoaded();
+  ensureHydrated();
   const idx = state.findIndex((p) => p.id === product.id);
   if (idx >= 0) {
     const next = state.slice();
@@ -213,62 +81,15 @@ export function saveProduct(product: Product) {
   } else {
     state = [product, ...state];
   }
-  cacheAll();
+  persist();
   emit();
-  void supabase.from("catalog_products").upsert(productToRow(product));
 }
 
 export function deleteProduct(id: string) {
-  ensureLoaded();
+  ensureHydrated();
   state = state.filter((p) => p.id !== id);
-  cacheAll();
+  persist();
   emit();
-  void supabase.from("catalog_products").delete().eq("id", id);
-}
-
-export function saveCatalog(catalog: Catalog) {
-  ensureLoaded();
-  const idx = catalogsState.findIndex((c) => c.id === catalog.id);
-  if (idx >= 0) {
-    const next = catalogsState.slice();
-    next[idx] = catalog;
-    catalogsState = next;
-  } else {
-    catalogsState = [...catalogsState, catalog];
-  }
-  cacheAll();
-  emit();
-  void supabase.from("catalogs").upsert({
-    id: catalog.id,
-    name: catalog.name,
-    created_at: new Date(catalog.createdAt || Date.now()).toISOString(),
-  });
-}
-
-export function deleteCatalog(id: string) {
-  ensureLoaded();
-  const remaining = catalogsState.filter((c) => c.id !== id);
-  if (remaining.length === 0) {
-    remaining.push({ id: DEFAULT_CATALOG_ID, name: "Catálogo principal", createdAt: Date.now() });
-  }
-  catalogsState = remaining;
-  const fallbackId = remaining[0].id;
-  const moved: Product[] = [];
-  state = state.map((p) => {
-    if ((p.catalogId ?? DEFAULT_CATALOG_ID) !== id) return p;
-    const next = { ...p, catalogId: fallbackId };
-    moved.push(next);
-    return next;
-  });
-  cacheAll();
-  emit();
-
-  void (async () => {
-    if (moved.length > 0) {
-      await supabase.from("catalog_products").upsert(moved.map(productToRow));
-    }
-    await supabase.from("catalogs").delete().eq("id", id);
-  })();
 }
 
 export function slugify(input: string): string {

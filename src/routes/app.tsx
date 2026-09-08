@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Mail, Smartphone, Monitor, Download, ArrowRight, CheckCircle2, Check, ShoppingCart, Sparkles, FolderOpen, Infinity } from "lucide-react";
+import { Mail, Smartphone, Monitor, Download, ArrowRight, CheckCircle2, Check, ShoppingCart, Sparkles } from "lucide-react";
 import { CHECKOUT_PLANS } from "@/lib/checkout-links";
 
 
@@ -33,18 +33,6 @@ function WebAppEntry() {
   const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
   const [isStandalone, setIsStandalone] = useState(false);
   const [freeMode, setFreeMode] = useState(false);
-  const [sessionEmail, setSessionEmail] = useState<string | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    import("@/integrations/supabase/client").then(async ({ supabase }) => {
-      const { data } = await supabase.auth.getUser();
-      if (!cancelled) setSessionEmail(data.user?.email ?? null);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -98,58 +86,6 @@ function WebAppEntry() {
           </p>
         </div>
 
-        {/* Destaque do recurso: catálogos */}
-        <div className="mb-10 overflow-hidden rounded-2xl border border-amber-400/30 bg-gradient-to-br from-amber-500/15 via-purple-600/15 to-pink-500/15 p-1 shadow-2xl">
-          <div className="rounded-xl bg-black/20 p-6 backdrop-blur-sm sm:p-8">
-            <div className="flex flex-col items-center gap-4 text-center md:flex-row md:text-left">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-pink-500 text-black shadow-lg">
-                <FolderOpen className="h-8 w-8" />
-              </div>
-              <div className="flex-1">
-                <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-200">
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Recurso em destaque
-                </span>
-                <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
-                  Organize seus produtos em{" "}
-                  <span className="bg-gradient-to-r from-amber-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
-                    até 5 catálogos
-                  </span>
-                </h2>
-                <p className="mt-2 max-w-xl text-slate-200">
-                  No plano pago você cria <strong>5 catálogos completos</strong> com{" "}
-                  <strong>produtos ilimitados</strong> em cada um. No grátis, comece com{" "}
-                  <strong>1 catálogo e 2 produtos</strong> para testar tudo.
-                </p>
-                <div className="mt-4 flex flex-wrap items-center justify-center gap-4 md:justify-start">
-                  <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2">
-                    <FolderOpen className="h-4 w-4 text-amber-300" />
-                    <span className="text-sm font-semibold">5 catálogos</span>
-                  </div>
-                  <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2">
-                    <Infinity className="h-4 w-4 text-pink-300" />
-                    <span className="text-sm font-semibold">Produtos ilimitados</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {sessionEmail && (
-          <div className="mb-6 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 p-5 text-center">
-            <p className="text-sm text-emerald-100">
-              Você já está conectado como <strong>{sessionEmail}</strong>.
-            </p>
-            <a
-              href="/painel/produtos"
-              className="mt-3 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-3 font-semibold text-white hover:opacity-90"
-            >
-              Entrar no meu painel <ArrowRight className="h-4 w-4" />
-            </a>
-          </div>
-        )}
-
         {/* Access form */}
         <form
           id="form-acesso"
@@ -181,7 +117,7 @@ function WebAppEntry() {
           </div>
           <p className="mt-3 text-xs text-slate-400">
             {freeMode
-              ? "Crie sua conta grátis com 1 catálogo e até 2 produtos. Enviamos um link mágico — não precisa de senha."
+              ? "Crie sua conta grátis com até 2 produtos. Enviamos um link mágico — não precisa de senha."
               : "Enviamos um link mágico automaticamente. Não precisa de senha."}
           </p>
         </form>
@@ -207,7 +143,7 @@ function WebAppEntry() {
               <p className="mx-auto mt-2 max-w-md text-sm text-slate-200">
                 {plan.id === "vitalicio"
                   ? "Invista no seu app profissional. Pague uma única vez e use para sempre — sem mensalidades, sem taxas escondidas."
-                  : "Comece sem pagar nada. Ideal para testar e começar a divulgar seus primeiros catálogos."}
+                  : "Comece sem pagar nada. Ideal para testar e começar a divulgar seus primeiros produtos."}
               </p>
 
               <div className="mt-5">
