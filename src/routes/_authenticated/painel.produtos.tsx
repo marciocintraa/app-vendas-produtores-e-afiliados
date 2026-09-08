@@ -150,7 +150,6 @@ import {
   deleteProduct,
   saveCatalog,
   deleteCatalog,
-  MAX_CATALOGS,
   DEFAULT_CATALOG_ID,
   type Catalog,
   slugify,
@@ -1870,7 +1869,7 @@ function AdminProductsPage() {
                 <p className="mt-1 text-sm text-muted-foreground">
                   {catalogModal.id
                     ? "Altere o nome do catálogo."
-                    : `Você pode criar até ${MAX_CATALOGS} catálogos.`}
+                    : `Você pode criar até ${maxCatalogs} catálogos.`}
                 </p>
               </div>
               <button
