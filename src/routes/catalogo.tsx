@@ -31,17 +31,31 @@ export const Route = createFileRoute("/catalogo")({
 
 function CatalogPage() {
   const allProducts = useProducts();
+  const catalogs = useCatalogs();
+  const { c: catalogSlug } = Route.useSearch();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
 
+  const activeCatalog = useMemo(
+    () => catalogs.find((cat) => cat.slug === catalogSlug),
+    [catalogs, catalogSlug],
+  );
+
+  const scopedProducts = useMemo(() => {
+    if (!activeCatalog) return allProducts;
+    return allProducts.filter(
+      (p) => (p.catalogId ?? DEFAULT_CATALOG.id) === activeCatalog.id,
+    );
+  }, [allProducts, activeCatalog]);
+
   const categories = useMemo(
-    () => Array.from(new Set(allProducts.map((p) => p.category))),
-    [allProducts],
+    () => Array.from(new Set(scopedProducts.map((p) => p.category))),
+    [scopedProducts],
   );
 
   const products = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return allProducts.filter((p) => {
+    return scopedProducts.filter((p) => {
       if (p.published === false) return false;
       if (category && p.category !== category) return false;
       if (!q) return true;
@@ -51,7 +65,7 @@ function CatalogPage() {
         p.category.toLowerCase().includes(q)
       );
     });
-  }, [allProducts, query, category]);
+  }, [scopedProducts, query, category]);
 
 
 
