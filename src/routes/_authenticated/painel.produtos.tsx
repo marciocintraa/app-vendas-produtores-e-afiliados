@@ -763,7 +763,14 @@ function AdminProductsPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            <Link
+              to="/painel/catalogo"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-surface-2"
+            >
+              Meu Catálogo
+            </Link>
             <button
+
               type="button"
               onClick={openCreateCatalog}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-surface-2"
