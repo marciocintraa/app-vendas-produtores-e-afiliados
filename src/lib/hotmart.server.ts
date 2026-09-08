@@ -168,6 +168,50 @@ export async function ensureFreeSubscription(email: string): Promise<string | nu
   return userId;
 }
 
+/** E-mails do dono do app: recebem acesso vitalício completo automaticamente. */
+export const OWNER_EMAILS = [
+  "marciohcintra@gmail.com",
+  "projecaodigitalloficial@gmail.com",
+];
+
+export function isOwnerEmail(email: string): boolean {
+  return OWNER_EMAILS.includes(email.trim().toLowerCase());
+}
+
+/** Cria (ou reativa) o acesso vitalício pago para um e-mail de dono. */
+export async function ensureOwnerSubscription(email: string): Promise<string | null> {
+  const normalized = email.trim().toLowerCase();
+  const userId = await ensureUser(normalized);
+  if (!userId) {
+    logDelivery({ step: "ensureOwnerSubscription", email: normalized, success: false, detail: "failed to create/find user" });
+    return null;
+  }
+
+  const { error } = await supabaseAdmin.from("subscriptions").upsert(
+    {
+      user_id: userId,
+      stripe_subscription_id: `owner_${userId}`,
+      stripe_customer_id: normalized,
+      product_id: "8200482",
+      price_id: "lifetime",
+      status: "active",
+      current_period_end: "2099-12-31T23:59:59Z",
+      cancel_at_period_end: false,
+      environment: "hotmart",
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "stripe_subscription_id" },
+  );
+
+  if (error) {
+    logDelivery({ step: "ensureOwnerSubscription", email: normalized, success: false, detail: error.message });
+    return null;
+  }
+
+  logDelivery({ step: "ensureOwnerSubscription", email: normalized, success: true, detail: "lifetime access" });
+  return userId;
+}
+
 export async function upsertActiveSubscription(
   payload: HotmartWebhookPayload,
 ): Promise<DeliveryLog[]> {

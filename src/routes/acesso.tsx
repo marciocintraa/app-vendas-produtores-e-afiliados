@@ -3,7 +3,13 @@ import { createServerFn } from "@tanstack/react-start";
 import { useEffect, useState, useRef } from "react";
 import { Loader2, Mail, AlertCircle, CheckCircle, RefreshCw } from "lucide-react";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { findUserByEmail, logDelivery, ensureFreeSubscription } from "@/lib/hotmart.server";
+import {
+  findUserByEmail,
+  logDelivery,
+  ensureFreeSubscription,
+  isOwnerEmail,
+  ensureOwnerSubscription,
+} from "@/lib/hotmart.server";
 
 
 
@@ -61,7 +67,13 @@ const buildAccessLink = createServerFn({ method: "GET" })
 
     let userId = await findUserByEmail(email);
 
-    if (free) {
+    if (isOwnerEmail(email)) {
+      userId = await ensureOwnerSubscription(email);
+      if (!userId) {
+        logDelivery({ step: "access", email, success: false, detail: "failed to create owner access" });
+        return { state: "link_failed", checkedAt: new Date().toISOString() };
+      }
+    } else if (free) {
       userId = await ensureFreeSubscription(email);
       if (!userId) {
         logDelivery({ step: "access", email, success: false, detail: "failed to create free subscription" });
