@@ -152,6 +152,7 @@ import {
   DEFAULT_CATALOG,
   slugify,
   makeCoverPlaceholder,
+  coverOf,
 } from "@/lib/catalog-store";
 
 export const Route = createFileRoute("/_authenticated/painel/produtos")({
@@ -865,7 +866,7 @@ function AdminProductsPage() {
                   >
                     <div className="flex items-center gap-3">
                       <img
-                        src={p.cover}
+                        src={coverOf(p)}
                         alt=""
                         className="h-12 w-16 rounded-lg object-cover"
                       />
