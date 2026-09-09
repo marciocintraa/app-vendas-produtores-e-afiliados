@@ -246,7 +246,7 @@ function AppPreview() {
           <div className="space-y-3">
             <div className="rounded-xl border border-border bg-background/50 p-4">
               <p className="text-xs text-muted-foreground">Seu painel</p>
-              <p className="mt-1 font-display text-lg font-bold">Bem-vindo de volta 👋</p>
+              <p className="mt-1 font-display text-lg font-bold">Bem-vindo de volta</p>
               <div className="mt-3 grid grid-cols-3 gap-2">
                 {[
                   { k: "Produtos", v: "12" },
