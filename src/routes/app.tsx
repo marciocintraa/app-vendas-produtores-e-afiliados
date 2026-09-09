@@ -4,7 +4,7 @@ import {
   Mail, Smartphone, Monitor, Download, ArrowRight, CheckCircle2, Check,
   ShoppingCart, Sparkles, Home, Package, LayoutGrid, Wand2, Megaphone,
   Rocket, Users, TrendingUp, Wallet, BarChart3, UserCircle, Settings,
-  LogOut, Share2, Search, Bell, Link2, Loader2, Menu, X, Plus,
+  LogOut, Share2, Search, Bell, Link2, Loader2, Menu, X, Plus, ShieldCheck,
 } from "lucide-react";
 import { CHECKOUT_PLANS } from "@/lib/checkout-links";
 import { supabase } from "@/integrations/supabase/client";
