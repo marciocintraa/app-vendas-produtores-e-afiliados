@@ -30,10 +30,11 @@ import {
   Loader2,
   Menu,
   X,
+  Plus,
 } from "lucide-react";
 import { CHECKOUT_PLANS } from "@/lib/checkout-links";
 import { supabase } from "@/integrations/supabase/client";
-import { useProducts } from "@/lib/catalog-store";
+import { useProducts, useCatalogs, saveCatalog, slugify } from "@/lib/catalog-store";
 
 export const Route = createFileRoute("/app")({
   head: () => ({
