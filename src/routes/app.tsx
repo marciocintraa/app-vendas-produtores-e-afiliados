@@ -9,6 +9,7 @@ import {
 import { CHECKOUT_PLANS } from "@/lib/checkout-links";
 import { supabase } from "@/integrations/supabase/client";
 import { useProducts, useCatalogs, saveCatalog, slugify, coverOf } from "@/lib/catalog-store";
+import { usePlan, PLAN_LABEL } from "@/lib/plan";
 
 export const Route = createFileRoute("/app")({
   head: () => ({ meta: [
@@ -67,12 +68,21 @@ function Dashboard({ email }: { email: string }) {
   const [shared, setShared] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const catalogs = useCatalogs();
+  const { plan, catalogLimit, productLimit } = usePlan();
   const [newCatalogOpen, setNewCatalogOpen] = useState(false);
   const [newCatalogName, setNewCatalogName] = useState("");
 
   function handleCreateCatalog() {
     const name = newCatalogName.trim();
     if (!name) return;
+    if (catalogs.length >= catalogLimit) {
+      window.alert(
+        plan === "free"
+          ? `O Plano Grátis permite ${catalogLimit} catálogo. Conheça o PRO para criar até 5.`
+          : `Seu plano permite até ${catalogLimit} catálogos.`,
+      );
+      return;
+    }
     const base = slugify(name) || `catalogo-${Date.now()}`;
     let slug = base;
     let n = 2;
@@ -111,7 +121,7 @@ function Dashboard({ email }: { email: string }) {
           <div className="flex items-center gap-2"><button type="button" onClick={handleShare} className="hidden items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-white/5 sm:flex">{shared ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}{shared ? "Link copiado" : "Compartilhar catálogo"}</button><button type="button" className="rounded-full border border-white/10 p-2.5 text-slate-300 hover:bg-white/5"><Bell className="h-4 w-4" /></button><button type="button" onClick={handleSignOut} className="rounded-full border border-white/10 p-2.5 text-slate-300 hover:bg-white/5" title="Sair"><LogOut className="h-4 w-4" /></button></div>
         </header>
         <div className="mx-auto max-w-7xl space-y-7 p-6 lg:p-8">
-          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><div className="rounded-2xl border border-white/5 bg-[#0A0F22] p-5"><p className="text-sm text-slate-400">Produtos</p><p className="mt-2 text-3xl font-bold">{products.length}</p></div><div className="rounded-2xl border border-white/5 bg-[#0A0F22] p-5"><p className="text-sm text-slate-400">Publicados</p><p className="mt-2 text-3xl font-bold">{published.length}</p></div><div className="rounded-2xl border border-white/5 bg-[#0A0F22] p-5"><p className="text-sm text-slate-400">Categorias</p><p className="mt-2 text-3xl font-bold">{categories}</p></div><div className="rounded-2xl border border-white/5 bg-[#0A0F22] p-5"><p className="text-sm text-slate-400">Catálogos</p><p className="mt-2 text-3xl font-bold">{catalogs.length}</p></div></section>
+          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><div className="rounded-2xl border border-white/5 bg-[#0A0F22] p-5"><p className="text-sm text-slate-400">Produtos</p><p className="mt-2 text-3xl font-bold">{products.length}{productLimit !== null && <span className="text-base font-semibold text-slate-500"> / {productLimit}</span>}</p><p className="mt-1 text-xs text-slate-500">{PLAN_LABEL[plan]}</p></div><div className="rounded-2xl border border-white/5 bg-[#0A0F22] p-5"><p className="text-sm text-slate-400">Publicados</p><p className="mt-2 text-3xl font-bold">{published.length}</p></div><div className="rounded-2xl border border-white/5 bg-[#0A0F22] p-5"><p className="text-sm text-slate-400">Categorias</p><p className="mt-2 text-3xl font-bold">{categories}</p></div><div className="rounded-2xl border border-white/5 bg-[#0A0F22] p-5"><p className="text-sm text-slate-400">Catálogos</p><p className="mt-2 text-3xl font-bold">{catalogs.length}</p></div></section>
           <section className="rounded-2xl border border-white/5 bg-[#0A0F22] p-6"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-bold">Seus produtos</h2><p className="mt-1 text-sm text-slate-400">Gerencie e organize os produtos do seu catálogo.</p></div><Link to="/painel/produtos" className="inline-flex items-center justify-center gap-2 rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-bold text-[#06101A] hover:opacity-90"><Plus className="h-4 w-4" /> Adicionar produto</Link></div><div className="relative mt-5"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" /><input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Buscar produto..." className="h-11 w-full rounded-xl border border-white/10 bg-[#070B18] pl-10 pr-4 text-sm outline-none placeholder:text-slate-600 focus:border-cyan-400/50" /></div><div className="mt-5 space-y-2">{filtered.slice(0, 8).map((p) => <div key={p.id} className="flex items-center justify-between gap-4 rounded-xl border border-white/5 bg-[#070B18] p-3"><div className="flex min-w-0 items-center gap-3"><img src={coverOf(p)} alt="" className="h-12 w-16 rounded-lg object-cover" /><div className="min-w-0"><p className="truncate font-semibold">{p.title}</p><p className="text-xs text-slate-500">{p.category}</p></div></div><span className="shrink-0 text-sm font-semibold">R$ {p.price.toFixed(0)}</span></div>)}{filtered.length === 0 && <p className="py-8 text-center text-sm text-slate-500">Nenhum produto encontrado.</p>}</div></section>
         </div>
       </main>

@@ -1,6 +1,7 @@
-import { createFileRoute, Outlet, redirect, Link, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { supabase } from '@/integrations/supabase/client';
 import { usePlan } from '@/lib/plan';
+import { CHECKOUT_PLANS } from '@/lib/checkout-links';
 import { LogOut, Loader2, Sparkles } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated')({
@@ -41,13 +42,14 @@ function AuthenticatedLayout() {
             </span>
           </p>
           <div className="flex items-center gap-3">
-            <Link
-              to="/app"
-              hash="pro"
+            <a
+              href={CHECKOUT_PLANS[0].url}
+              target="_blank"
+              rel="noopener noreferrer"
               className="rounded-lg bg-cyan-400 px-3 py-1.5 text-xs font-bold text-[#06101A] hover:opacity-90"
             >
               Conhecer o PRO
-            </Link>
+            </a>
             <button
               onClick={handleSignOut}
               className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white"
