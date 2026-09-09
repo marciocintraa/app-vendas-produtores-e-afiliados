@@ -274,5 +274,5 @@ function Dashboard({ email }: { email: string }) {
 }
 
 function WebAppEntry() {
-  return <div className="min-h-screen bg-[#070B18] text-white flex items-center justify-center p-6"><div className="max-w-md text-center"><Sparkles className="mx-auto h-10 w-10 text-cyan-400" /><h1 className="mt-5 text-2xl font-bold">Acesso ao Vende Fácil Pro</h1><p className="mt-2 text-slate-400">Faça login para acessar seu painel.</p><Link to="/acesso" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-cyan-400 px-5 py-3 font-bold text-[#06101A]">Entrar <ArrowRight className="h-4 w-4" /></Link></div></div>;
+  return <div className="min-h-screen bg-[#070B18] text-white flex items-center justify-center p-6"><div className="max-w-md text-center"><Sparkles className="mx-auto h-10 w-10 text-cyan-400" /><h1 className="mt-5 text-2xl font-bold">Acesso ao Vende Fácil Pro</h1><p className="mt-2 text-slate-400">Faça login para acessar seu painel.</p><Link to="/acesso" search={{ email: undefined }} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-cyan-400 px-5 py-3 font-bold text-[#06101A]">Entrar <ArrowRight className="h-4 w-4" /></Link></div></div>;
 }
