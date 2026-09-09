@@ -141,7 +141,7 @@ export const PRODUCTS: Product[] = [
     rating: 4.9,
     reviews: 1120,
     affiliateUrl: "https://kiwify.com.br/",
-    cover: grad("#10b981", "#22d3ee", "ChatGPT para Negocios"),
+    cover: grad("#10b981", "#22d3ee", "ChatGPT para Negócios"),
     highlights: [
       "100+ prompts prontos",
       "Automação de atendimento",
