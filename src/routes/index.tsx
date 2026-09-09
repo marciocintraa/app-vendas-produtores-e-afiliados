@@ -510,9 +510,9 @@ function FAQ() {
   const items = [
     {
       id: "planos",
-      question: "Quantos produtos posso cadastrar em cada plano?",
+      question: "Quantos produtos posso cadastrar?",
       answer:
-        "O plano Individual permite até 2 produtos, o Familiar até 5 produtos, e o Premium é ilimitado. Você pode trocar de plano a qualquer momento conforme seu catálogo cresce.",
+        "No Acesso Grátis Limitado você cadastra até 2 produtos, sem pagar nada. Com o acesso vitalício de R$ 197,00 (pagamento único, ou parcelado) os produtos são ilimitados e todos os recursos ficam liberados para sempre.",
     },
     {
       id: "produtos",
@@ -542,13 +542,13 @@ function FAQ() {
       id: "personalizacao",
       question: "Posso personalizar cores, logo e domínio?",
       answer:
-        "Sim. Nos planos Familiar e Premium você pode alterar cores, tipografia, logotipo e ícone. No Premium também é possível usar domínio próprio e configurações white label completas.",
+        "Sim. Com o acesso vitalício você altera cores, tipografia, logotipo e ícone, além de usar domínio próprio e as configurações de marca própria completas.",
     },
     {
-      id: "cancelamento",
-      question: "Posso cancelar a assinatura a qualquer momento?",
+      id: "mensalidade",
+      question: "Tem mensalidade ou preciso renovar?",
       answer:
-        "Sim. A assinatura é mensal e pode ser cancelada quando você quiser, sem taxas extras. Você mantém o acesso até o final do período já pago.",
+        "Não. O valor de R$ 197,00 é pagamento único e o acesso é vitalício, no navegador e no aplicativo Android. Se preferir testar antes, comece pelo Acesso Grátis Limitado com até 2 produtos.",
     },
   ];
 
