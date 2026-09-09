@@ -112,7 +112,7 @@ function VendeMaisPage() {
               produtos ilimitados e até 5 catálogos. Seu Plano Grátis continua funcionando normalmente.
             </p>
             <a
-              href={CHECKOUT_PLANS[0]?.checkoutUrl}
+              href={CHECKOUT_PLANS[0]?.url}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-5 inline-flex items-center gap-2 rounded-xl bg-cyan-400 px-5 py-3 text-sm font-bold text-[#06101A] hover:opacity-90"
