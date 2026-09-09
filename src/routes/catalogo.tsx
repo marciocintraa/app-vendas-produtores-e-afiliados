@@ -81,16 +81,16 @@ function CatalogPage() {
 
       <section className="mx-auto max-w-6xl px-4 pt-12 pb-6">
         <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-surface px-3 py-1 text-xs text-muted-foreground">
-          <Sparkles className="h-3.5 w-3.5 text-primary" />{" "}
-          {activeCatalog ? activeCatalog.name : "Catálogo público"}
+          <Sparkles className="h-3.5 w-3.5 text-primary" /> Vitrine pública
         </span>
         <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight md:text-5xl">
-          Produtos que convertem, prontos para divulgar.
+          {activeCatalog ? activeCatalog.name : "Catálogo público"}
         </h1>
         <p className="mt-3 max-w-2xl text-muted-foreground">
-          Selecione, personalize e compartilhe. Cada produto abaixo abre uma página completa com
-          seu link de afiliado ou de produtor.
+          {products.length} {products.length === 1 ? "produto disponível" : "produtos disponíveis"} nesta
+          vitrine. Toque em um produto para ver todos os detalhes.
         </p>
+
 
         <div className="mt-8 flex flex-col gap-4 md:flex-row md:items-center">
           <div className="relative flex-1">
