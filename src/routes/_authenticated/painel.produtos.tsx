@@ -748,6 +748,22 @@ function AdminProductsPage() {
             <Plus className="h-4 w-4" /> Novo produto
           </button>
         </div>
+        {productLimit !== null && products.length >= productLimit && (
+          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-200">
+            <span>
+              Você atingiu o limite de {productLimit} produtos do Plano Grátis.
+            </span>
+            <a
+              href="https://pay.hotmart.com/F106901874H?checkoutMode=6"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg bg-amber-300 px-3 py-1.5 text-xs font-bold text-[#241a00] hover:opacity-90"
+            >
+              Conhecer o PRO
+            </a>
+          </div>
+        )}
+        </div>
 
         {/* Gerenciador de catálogos */}
         <div className="mt-8 rounded-2xl border border-border/70 bg-card p-4 shadow-card">
