@@ -186,6 +186,15 @@ export function getCatalogBySlug(slug: string) { ensureHydrated(); return catalo
 export function slugify(input: string) { return input.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60); }
 export function makeCoverPlaceholder(title: string) {
   const label = (title || "Novo produto").replace(/[<>&]/g, "");
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='#7c3aed'/><stop offset='1' stop-color='#22d3ee'/></linearGradient></defs><rect width='600' height='400' fill='url(%23g)'/><text x='50%' y='52%' font-family='Inter,sans-serif' font-size='30' font-weight='700' fill='white' text-anchor='middle'>${label}</text></svg>`;
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 400'><defs><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='#7c3aed'/><stop offset='1' stop-color='#22d3ee'/></linearGradient></defs><rect width='600' height='400' fill='url(#g)'/><text x='50%' y='52%' font-family='Inter,sans-serif' font-size='30' font-weight='700' fill='white' text-anchor='middle'>${label}</text></svg>`;
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+/** Capa efetiva do produto: usa a capa enviada e, se for apenas o placeholder, cai para a 1ª imagem da galeria. */
+export function coverOf(p: { cover?: string; gallery?: string[]; title?: string }) {
+  const gallery = (p.gallery ?? []).filter(Boolean);
+  const cover = (p.cover ?? "").trim();
+  const isPlaceholder = cover === "" || cover.startsWith("data:image/svg+xml");
+  if (isPlaceholder && gallery[0]) return gallery[0];
+  return cover || makeCoverPlaceholder(p.title ?? "");
 }
