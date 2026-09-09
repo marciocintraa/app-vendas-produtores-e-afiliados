@@ -19,16 +19,16 @@ function NotFoundComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Página não encontrada</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          A página que você procura não existe ou foi movida.
         </p>
         <div className="mt-6">
           <Link
             to="/"
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Go home
+            Voltar ao início
           </Link>
         </div>
       </div>
@@ -47,10 +47,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
+          Esta página não carregou
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Algo deu errado do nosso lado. Você pode tentar recarregar ou voltar ao início.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
@@ -60,13 +60,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Try again
+            Tentar novamente
           </button>
           <a
             href="/"
             className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
-            Go home
+            Voltar ao início
           </a>
         </div>
       </div>
@@ -79,11 +79,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Vende Fácil Pro — App Android para Produtos Digitais" },
+      { title: "Vende Fácil Pro — Aplicativo para Produtos Digitais" },
       {
         name: "description",
         content:
-          "Transforme seu catálogo de infoprodutos em um app profissional para Android. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
+          "Transforme seu catálogo de infoprodutos em um aplicativo profissional para Android. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais.",
       },
       { name: "author", content: "Vende Fácil Pro" },
       { name: "theme-color", content: "#8B5CF6" },
@@ -93,10 +93,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-title", content: "Vende Fácil Pro" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { property: "og:title", content: "Vende Fácil Pro — App Builder para Produtos Digitais" },
-      { name: "twitter:title", content: "Vende Fácil Pro — App Builder para Produtos Digitais" },
-      { property: "og:description", content: "Transforme seu catálogo de infoprodutos em um app profissional. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais." },
-      { name: "twitter:description", content: "Transforme seu catálogo de infoprodutos em um app profissional. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais." },
+      { property: "og:title", content: "Vende Fácil Pro — Aplicativo para Produtos Digitais" },
+      { name: "twitter:title", content: "Vende Fácil Pro — Aplicativo para Produtos Digitais" },
+      { property: "og:description", content: "Transforme seu catálogo de infoprodutos em um aplicativo profissional. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais." },
+      { name: "twitter:description", content: "Transforme seu catálogo de infoprodutos em um aplicativo profissional. Ideal para produtores, afiliados e criadores da Hotmart, Kiwify, Eduzz e mais." },
       { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/OCHVuUZ4KwYgyIwNrW7Fe5QlrKA3/social-images/social-1785133673630-Capturar.webp" },
       { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/OCHVuUZ4KwYgyIwNrW7Fe5QlrKA3/social-images/social-1785133673630-Capturar.webp" },
     ],
@@ -121,7 +121,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>
@@ -138,7 +138,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+      {/* Obrigatório: as rotas aninhadas renderizam aqui. Remover <Outlet /> quebra todas as rotas filhas. */}
       <Outlet />
       <Toaster richColors position="top-right" />
     </QueryClientProvider>
