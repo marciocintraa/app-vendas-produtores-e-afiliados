@@ -50,7 +50,7 @@ function isActive(sub: { status: string; current_period_end: string | null } | n
 }
 
 const buildAccessLink = createServerFn({ method: "GET" })
-  .validator((d: { email: string }) => d)
+  .validator((d: { email: string; origin?: string }) => d)
   .handler(async ({ data }): Promise<AccessResult> => {
     const email = data.email.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -75,11 +75,13 @@ const buildAccessLink = createServerFn({ method: "GET" })
       return { state: "inactive", checkedAt: new Date().toISOString() };
     }
 
-    const url = new URL(process.env.SUPABASE_URL!);
     const origin =
-      process.env.SITE_URL ??
-      `https://${new URL("https://" + (process.env.SITE_HOSTNAME ?? url.host)).host}`;
+      data.origin?.startsWith("http")
+        ? data.origin
+        : (process.env.SITE_URL ?? `https://${process.env.SITE_HOSTNAME ?? "vendefacillapp.com.br"}`);
     const redirectTo = `${origin.replace(/\/+$/, "")}/painel/produtos`;
+
+
 
     const { data: link, error } = await supabaseAdmin.auth.admin.generateLink({
       type: "magiclink",
@@ -116,7 +118,9 @@ export const Route = createFileRoute("/acesso")({
   loader: async ({ location }) => {
     const email = (location.search as { email?: string }).email;
     if (!email) return { state: "missing" as const, email: "" };
-    const res = await buildAccessLink({ data: { email } });
+    const origin = typeof window !== "undefined" ? window.location.origin : undefined;
+    const res = await buildAccessLink({ data: { email, origin } });
+
     if (res.state === "ok" && res.url) throw redirect({ href: res.url });
     return { state: res.state, email };
   },
@@ -149,7 +153,7 @@ function AccessPage() {
       setPollCount(count);
       setChecking(true);
       try {
-        const res = await buildAccessLink({ data: { email } });
+        const res = await buildAccessLink({ data: { email, origin: window.location.origin } });
         if (res.state === "ok" && res.url) {
           window.location.href = res.url;
           return;
@@ -176,7 +180,7 @@ function AccessPage() {
   const handleRetry = async () => {
     setChecking(true);
     try {
-      const res = await buildAccessLink({ data: { email } });
+      const res = await buildAccessLink({ data: { email, origin: window.location.origin } });
       if (res.state === "ok" && res.url) {
         window.location.href = res.url;
         return;
