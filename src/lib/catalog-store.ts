@@ -41,40 +41,108 @@ function ensureHydrated() {
   void loadCloud();
 }
 
-type CatalogRow = { id: string; name: string; slug: string; created_at?: string };
-type ProductRow = { id: string; catalog_id: string; data: Product; published?: boolean };
+type CatalogRow = { id: string; name: string; slug: string; created_at?: string; user_id?: string | null };
+type ProductRow = { id: string; catalog_id: string; data: Product; published?: boolean; user_id?: string | null };
+
+let currentUserId: string | null = null;
+let authWatch = false;
+
+function watchAuth() {
+  if (authWatch || typeof window === "undefined") return;
+  authWatch = true;
+  supabase.auth.onAuthStateChange((event) => {
+    if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
+      cloudLoadStarted = false;
+      void loadCloud();
+    }
+  });
+}
+
+function mine<T extends { user_id?: string | null }>(rows: T[]) {
+  if (!currentUserId) return rows;
+  return rows.filter((r) => !r.user_id || r.user_id === currentUserId);
+}
 
 async function loadCloud() {
   if (cloudLoadStarted) return;
   cloudLoadStarted = true;
+  watchAuth();
   try {
+    const { data: auth } = await supabase.auth.getSession();
+    currentUserId = auth.session?.user.id ?? null;
+
     const [c, p] = await Promise.all([
-      supabase.from("catalogs").select("id,name,slug,created_at").order("created_at"),
-      supabase.from("catalog_products").select("id,catalog_id,data,published"),
+      supabase.from("catalogs").select("id,name,slug,created_at,user_id").order("created_at"),
+      supabase.from("catalog_products").select("id,catalog_id,data,published,user_id"),
     ]);
     if (c.error || p.error) return;
-    const cloudCatalogs = (c.data ?? []) as CatalogRow[];
-    const cloudProducts = (p.data ?? []) as ProductRow[];
-    const migrated = typeof window !== "undefined" && window.localStorage.getItem(MIGRATED_KEY) === "1";
-    if (!cloudCatalogs.length && !cloudProducts.length && !migrated) {
-      const { data: auth } = await supabase.auth.getSession();
-      if (auth.session) {
-        await supabase.from("catalogs").upsert(catalogs.map((x) => ({ id: x.id, name: x.name, slug: x.slug })));
-        if (state.length) await supabase.from("catalog_products").upsert(state.map(toRow));
-        window.localStorage.setItem(MIGRATED_KEY, "1");
+
+    const cloudCatalogs = mine((c.data ?? []) as CatalogRow[]);
+    const cloudProducts = mine((p.data ?? []) as ProductRow[]);
+
+    let nextCatalogs: Catalog[] = cloudCatalogs.length
+      ? cloudCatalogs.map((x) => ({ id: x.id, name: x.name, slug: x.slug ?? slugify(x.name) }))
+      : catalogs;
+
+    // catálogos locais que ainda não existem na nuvem (ignora o padrão vazio)
+    const localExtraCatalogs = cloudCatalogs.length
+      ? catalogs.filter(
+          (l) => l.id !== DEFAULT_CATALOG_ID && !nextCatalogs.some((n) => n.id === l.id),
+        )
+      : [];
+    nextCatalogs = [...nextCatalogs, ...localExtraCatalogs];
+
+    const fallbackCatalogId = nextCatalogs[0]?.id ?? DEFAULT_CATALOG_ID;
+    const knownCatalog = (id?: string) =>
+      id && nextCatalogs.some((n) => n.id === id) ? id : fallbackCatalogId;
+
+    const cloudProductList: Product[] = cloudProducts.map((x) => ({
+      ...x.data,
+      id: x.id,
+      catalogId: x.catalog_id,
+      published: x.published ?? x.data.published,
+    }));
+
+    const localOnly = state
+      .filter((s) => !cloudProductList.some((x) => x.id === s.id))
+      .map((s) => ({ ...s, catalogId: knownCatalog(s.catalogId) }));
+
+    catalogs = nextCatalogs;
+    state = [...localOnly, ...cloudProductList];
+    persist();
+    emit();
+
+    // envia para a nuvem tudo que só existe localmente (somente autenticado)
+    if (currentUserId) {
+      const catalogsToPush = catalogs.filter((x) => !cloudCatalogs.some((r) => r.id === x.id));
+      if (catalogsToPush.length) {
+        await supabase
+          .from("catalogs")
+          .upsert(
+            catalogsToPush.map((x) => ({ id: x.id, name: x.name, slug: x.slug, user_id: currentUserId })),
+          );
       }
-      return;
+      if (localOnly.length) {
+        await supabase.from("catalog_products").upsert(localOnly.map(toRow));
+      }
+      if (typeof window !== "undefined") window.localStorage.setItem(MIGRATED_KEY, "1");
     }
-    if (cloudCatalogs.length) catalogs = cloudCatalogs.map((x) => ({ id: x.id, name: x.name, slug: x.slug }));
-    if (cloudProducts.length) state = cloudProducts.map((x) => ({ ...x.data, id: x.id, catalogId: x.catalog_id, published: x.published ?? x.data.published }));
-    persist(); emit();
   } catch { /* mantém cache local */ }
 }
 
 function toRow(p: Product) {
   const { catalogId, ...data } = p;
-  return { id: p.id, catalog_id: catalogId ?? DEFAULT_CATALOG_ID, data, published: p.published !== false, updated_at: new Date().toISOString() };
+  const row: Record<string, unknown> = {
+    id: p.id,
+    catalog_id: catalogId ?? DEFAULT_CATALOG_ID,
+    data,
+    published: p.published !== false,
+    updated_at: new Date().toISOString(),
+  };
+  if (currentUserId) row.user_id = currentUserId;
+  return row as { id: string; catalog_id: string; data: Product; published: boolean; updated_at: string };
 }
+
 
 function getSnapshot() { ensureHydrated(); return state; }
 function getServerSnapshot() { return PRODUCTS; }
@@ -104,7 +172,7 @@ export function saveCatalog(catalog: Catalog) {
   const i = catalogs.findIndex((c) => c.id === catalog.id);
   catalogs = i >= 0 ? catalogs.map((c, n) => n === i ? catalog : c) : [...catalogs, catalog];
   persist(); emit();
-  void supabase.from("catalogs").upsert({ id: catalog.id, name: catalog.name, slug: catalog.slug });
+  void supabase.from("catalogs").upsert({ id: catalog.id, name: catalog.name, slug: catalog.slug, ...(currentUserId ? { user_id: currentUserId } : {}) });
 }
 export function deleteCatalog(id: string) {
   ensureHydrated();
