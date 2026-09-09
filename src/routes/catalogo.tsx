@@ -73,7 +73,7 @@ function CatalogPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/60 bg-surface/40 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <Link to="/" className="flex items-center gap-2 font-display text-lg font-semibold">
+          <Link to="/app" className="flex items-center gap-2 font-display text-lg font-semibold">
             <Sparkles className="h-5 w-5 text-primary" />
             Vende Fácil Pro
           </Link>
@@ -85,10 +85,10 @@ function CatalogPage() {
               <Settings className="h-4 w-4" /> Gerenciar
             </Link>
             <Link
-              to="/"
+              to="/app"
               className="text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
-              ← Voltar ao site
+              ← Voltar ao painel
             </Link>
           </div>
 
