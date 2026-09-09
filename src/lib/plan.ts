@@ -78,3 +78,30 @@ export function usePlan(): PlanState {
   const limits = PLAN_LIMITS[plan];
   return { plan, loading, isPro: plan === "pro", productLimit: limits.products, catalogLimit: limits.catalogs };
 }
+
+/** true quando a conta autenticada tem a função de administrador. */
+export function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    async function resolve() {
+      const { data: auth } = await supabase.auth.getUser();
+      const userId = auth.user?.id;
+      if (!userId) { if (active) { setIsAdmin(false); setLoading(false); } return; }
+      const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+      if (!active) return;
+      setIsAdmin(data === true);
+      setLoading(false);
+    }
+    void resolve();
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") void resolve();
+    });
+    return () => { active = false; sub.subscription.unsubscribe(); };
+  }, []);
+
+  return { isAdmin, loading };
+}
+
