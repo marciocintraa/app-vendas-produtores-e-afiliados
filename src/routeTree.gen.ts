@@ -21,6 +21,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatalogoProductIdRouteImport } from './routes/catalogo.$productId'
 import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
 import { Route as AuthenticatedPainelCatalogoRouteImport } from './routes/_authenticated/painel.catalogo'
+import { Route as AuthenticatedPainelAdminRouteImport } from './routes/_authenticated/painel.admin'
 import { Route as ApiPublicHotmartWebhookRouteImport } from './routes/api/public/hotmart/webhook'
 
 const TermosRoute = TermosRouteImport.update({
@@ -84,6 +85,12 @@ const AuthenticatedPainelCatalogoRoute =
     path: '/painel/catalogo',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPainelAdminRoute =
+  AuthenticatedPainelAdminRouteImport.update({
+    id: '/painel/admin',
+    path: '/painel/admin',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ApiPublicHotmartWebhookRoute = ApiPublicHotmartWebhookRouteImport.update({
   id: '/api/public/hotmart/webhook',
   path: '/api/public/hotmart/webhook',
@@ -100,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/privacidade': typeof PrivacidadeRoute
   '/termos': typeof TermosRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
+  '/painel/admin': typeof AuthenticatedPainelAdminRoute
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
@@ -114,6 +122,7 @@ export interface FileRoutesByTo {
   '/privacidade': typeof PrivacidadeRoute
   '/termos': typeof TermosRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
+  '/painel/admin': typeof AuthenticatedPainelAdminRoute
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
@@ -130,6 +139,7 @@ export interface FileRoutesById {
   '/privacidade': typeof PrivacidadeRoute
   '/termos': typeof TermosRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
+  '/_authenticated/painel/admin': typeof AuthenticatedPainelAdminRoute
   '/_authenticated/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/termos'
     | '/catalogo/$productId'
+    | '/painel/admin'
     | '/painel/catalogo'
     | '/painel/produtos'
     | '/api/public/hotmart/webhook'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/termos'
     | '/catalogo/$productId'
+    | '/painel/admin'
     | '/painel/catalogo'
     | '/painel/produtos'
     | '/api/public/hotmart/webhook'
@@ -175,6 +187,7 @@ export interface FileRouteTypes {
     | '/privacidade'
     | '/termos'
     | '/catalogo/$productId'
+    | '/_authenticated/painel/admin'
     | '/_authenticated/painel/catalogo'
     | '/_authenticated/painel/produtos'
     | '/api/public/hotmart/webhook'
@@ -279,6 +292,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelCatalogoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/painel/admin': {
+      id: '/_authenticated/painel/admin'
+      path: '/painel/admin'
+      fullPath: '/painel/admin'
+      preLoaderRoute: typeof AuthenticatedPainelAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/api/public/hotmart/webhook': {
       id: '/api/public/hotmart/webhook'
       path: '/api/public/hotmart/webhook'
@@ -290,11 +310,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPainelAdminRoute: typeof AuthenticatedPainelAdminRoute
   AuthenticatedPainelCatalogoRoute: typeof AuthenticatedPainelCatalogoRoute
   AuthenticatedPainelProdutosRoute: typeof AuthenticatedPainelProdutosRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPainelAdminRoute: AuthenticatedPainelAdminRoute,
   AuthenticatedPainelCatalogoRoute: AuthenticatedPainelCatalogoRoute,
   AuthenticatedPainelProdutosRoute: AuthenticatedPainelProdutosRoute,
 }
