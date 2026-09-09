@@ -154,6 +154,7 @@ import {
   makeCoverPlaceholder,
   coverOf,
 } from "@/lib/catalog-store";
+import { usePlan } from "@/lib/plan";
 
 export const Route = createFileRoute("/_authenticated/painel/produtos")({
   head: () => ({
@@ -567,6 +568,7 @@ function AdminProductsPage() {
   );
 
   const catalogs = useCatalogs();
+  const { plan, productLimit, catalogLimit } = usePlan();
   const [activeCatalog, setActiveCatalog] = useState<string>("all");
   const [newCatalogName, setNewCatalogName] = useState("");
   const [addingCatalog, setAddingCatalog] = useState(false);
@@ -583,6 +585,14 @@ function AdminProductsPage() {
   function handleAddCatalog() {
     const name = newCatalogName.trim();
     if (!name) return;
+    if (catalogs.length >= catalogLimit) {
+      toast.error(
+        plan === "free"
+          ? `O Plano Grátis permite ${catalogLimit} catálogo. Conheça o PRO para criar até 5.`
+          : `Seu plano permite até ${catalogLimit} catálogos.`,
+      );
+      return;
+    }
     const base = slugify(name) || `catalogo-${Date.now()}`;
     let slug = base;
     let n = 2;
@@ -620,6 +630,12 @@ function AdminProductsPage() {
   }, [editing]);
 
   function startCreate() {
+    if (productLimit !== null && products.length >= productLimit) {
+      toast.error(`O Plano Grátis permite ${productLimit} produtos.`, {
+        description: "Conheça o PRO para cadastrar produtos ilimitados.",
+      });
+      return;
+    }
     setEditing(emptyDraft());
   }
 
