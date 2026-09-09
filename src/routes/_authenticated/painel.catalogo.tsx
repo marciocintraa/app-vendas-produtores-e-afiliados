@@ -18,11 +18,11 @@ import {
   useCatalogs,
   useProducts,
   DEFAULT_CATALOG_ID,
-  MAX_CATALOGS,
   saveCatalog,
   deleteCatalog,
   slugify,
 } from "@/lib/catalog-store";
+import { usePlan } from "@/lib/plan";
 
 export const Route = createFileRoute("/_authenticated/painel/catalogo")({
   head: () => ({
@@ -40,6 +40,7 @@ export const Route = createFileRoute("/_authenticated/painel/catalogo")({
 
 function CatalogosPage() {
   const catalogs = useCatalogs();
+  const { plan, catalogLimit } = usePlan();
   const products = useProducts();
   const [selectedId, setSelectedId] = useState(DEFAULT_CATALOG_ID);
   const [origin, setOrigin] = useState("");
@@ -78,8 +79,12 @@ function CatalogosPage() {
   function createCatalog() {
     const name = newName.trim();
     if (!name) return;
-    if (catalogs.length >= MAX_CATALOGS) {
-      toast.error(`Seu plano permite até ${MAX_CATALOGS} catálogos.`);
+    if (catalogs.length >= catalogLimit) {
+      toast.error(
+        plan === "free"
+          ? `O Plano Grátis permite ${catalogLimit} catálogo. Conheça o PRO para criar até 5.`
+          : `Seu plano permite até ${catalogLimit} catálogos.`,
+      );
       return;
     }
     const base = slugify(name) || `catalogo-${Date.now()}`;
@@ -156,11 +161,11 @@ function CatalogosPage() {
               </button>
             );
           })}
-          {catalogs.length < MAX_CATALOGS && (
+          {catalogs.length < catalogLimit && (
             <button type="button" onClick={() => setCreating(true)} className="min-h-[150px] rounded-2xl border border-dashed border-white/15 bg-[#0A0F22]/60 p-5 text-left text-slate-300 transition hover:border-cyan-400/40 hover:bg-cyan-400/5">
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/5 text-cyan-300"><Plus className="h-5 w-5" /></span>
               <p className="mt-4 font-semibold">Novo catálogo</p>
-              <p className="mt-1 text-sm text-slate-500">Você pode criar mais {MAX_CATALOGS - catalogs.length}.</p>
+              <p className="mt-1 text-sm text-slate-500">Você pode criar mais {catalogLimit - catalogs.length}.</p>
             </button>
           )}
         </section>

@@ -1,8 +1,8 @@
-import { createFileRoute, Outlet, redirect, Link, useNavigate } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { createFileRoute, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { supabase } from '@/integrations/supabase/client';
-import { LogOut, Loader2, AlertCircle } from 'lucide-react';
-
+import { usePlan } from '@/lib/plan';
+import { CHECKOUT_PLANS } from '@/lib/checkout-links';
+import { LogOut, Loader2, Sparkles } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated')({
   ssr: false,
@@ -15,37 +15,15 @@ export const Route = createFileRoute('/_authenticated')({
 });
 
 function AuthenticatedLayout() {
-  const { user } = Route.useRouteContext();
   const navigate = useNavigate();
-  const [subStatus, setSubStatus] = useState<'checking' | 'active' | 'none'>('checking');
-
-  useEffect(() => {
-    supabase
-      .from('subscriptions')
-      .select('status,current_period_end,cancel_at_period_end')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (!data) return setSubStatus('none');
-        const active =
-          (['active', 'trialing', 'past_due'].includes(data.status as string) &&
-            (!data.current_period_end || new Date(data.current_period_end as string) > new Date())) ||
-          (data.status === 'canceled' &&
-            data.current_period_end &&
-            new Date(data.current_period_end as string) > new Date());
-        setSubStatus(active ? 'active' : 'none');
-      });
-  }, [user.id, user.email]);
-
+  const { plan, loading, catalogLimit, productLimit } = usePlan();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate({ to: '/auth', replace: true });
   };
 
-  if (subStatus === 'checking') {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -53,33 +31,35 @@ function AuthenticatedLayout() {
     );
   }
 
-  if (subStatus === 'none') {
-    return (
-      <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-6">
-        <div className="max-w-md w-full rounded-2xl border border-border/50 bg-card p-8 text-center shadow-2xl">
-          <AlertCircle className="w-14 h-14 mx-auto text-amber-500" />
-          <h1 className="text-2xl font-bold mt-4">Nenhum plano ativo</h1>
-          <p className="text-muted-foreground mt-2">
-            Você entrou com <strong className="text-foreground">{user.email}</strong>, mas não encontramos uma assinatura
-            ativa nesta conta. Escolha um plano para liberar o app.
+  return (
+    <div className="min-h-screen">
+      {plan === 'free' && (
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#0A0F22] px-4 py-2.5 text-sm text-slate-200">
+          <p className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-cyan-300" />
+            <span>
+              <b className="text-cyan-300">Plano Grátis</b> · até {productLimit} produtos e {catalogLimit} catálogo
+            </span>
           </p>
-          <Link
-            to="/"
-            hash="planos"
-            className="mt-6 inline-block px-6 py-3 rounded-lg bg-gradient-to-r from-primary to-accent text-white font-semibold hover:opacity-90"
-          >
-            Ver planos
-          </Link>
-          <button
-            onClick={handleSignOut}
-            className="mt-4 flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mx-auto"
-          >
-            <LogOut className="w-4 h-4" /> Sair
-          </button>
+          <div className="flex items-center gap-3">
+            <a
+              href={CHECKOUT_PLANS[0].url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg bg-cyan-400 px-3 py-1.5 text-xs font-bold text-[#06101A] hover:opacity-90"
+            >
+              Conhecer o PRO
+            </a>
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white"
+            >
+              <LogOut className="h-3.5 w-3.5" /> Sair
+            </button>
+          </div>
         </div>
-      </div>
-    );
-  }
-
-  return <Outlet />;
+      )}
+      <Outlet />
+    </div>
+  );
 }

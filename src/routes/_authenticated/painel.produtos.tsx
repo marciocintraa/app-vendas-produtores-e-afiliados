@@ -154,6 +154,7 @@ import {
   makeCoverPlaceholder,
   coverOf,
 } from "@/lib/catalog-store";
+import { usePlan } from "@/lib/plan";
 
 export const Route = createFileRoute("/_authenticated/painel/produtos")({
   head: () => ({
@@ -567,6 +568,7 @@ function AdminProductsPage() {
   );
 
   const catalogs = useCatalogs();
+  const { plan, productLimit, catalogLimit } = usePlan();
   const [activeCatalog, setActiveCatalog] = useState<string>("all");
   const [newCatalogName, setNewCatalogName] = useState("");
   const [addingCatalog, setAddingCatalog] = useState(false);
@@ -583,6 +585,14 @@ function AdminProductsPage() {
   function handleAddCatalog() {
     const name = newCatalogName.trim();
     if (!name) return;
+    if (catalogs.length >= catalogLimit) {
+      toast.error(
+        plan === "free"
+          ? `O Plano Grátis permite ${catalogLimit} catálogo. Conheça o PRO para criar até 5.`
+          : `Seu plano permite até ${catalogLimit} catálogos.`,
+      );
+      return;
+    }
     const base = slugify(name) || `catalogo-${Date.now()}`;
     let slug = base;
     let n = 2;
@@ -620,6 +630,12 @@ function AdminProductsPage() {
   }, [editing]);
 
   function startCreate() {
+    if (productLimit !== null && products.length >= productLimit) {
+      toast.error(`O Plano Grátis permite ${productLimit} produtos.`, {
+        description: "Conheça o PRO para cadastrar produtos ilimitados.",
+      });
+      return;
+    }
     setEditing(emptyDraft());
   }
 
@@ -732,6 +748,21 @@ function AdminProductsPage() {
             <Plus className="h-4 w-4" /> Novo produto
           </button>
         </div>
+        {productLimit !== null && products.length >= productLimit && (
+          <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-200">
+            <span>
+              Você atingiu o limite de {productLimit} produtos do Plano Grátis.
+            </span>
+            <a
+              href="https://pay.hotmart.com/F106901874H?checkoutMode=6"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg bg-amber-300 px-3 py-1.5 text-xs font-bold text-[#241a00] hover:opacity-90"
+            >
+              Conhecer o PRO
+            </a>
+          </div>
+        )}
 
         {/* Gerenciador de catálogos */}
         <div className="mt-8 rounded-2xl border border-border/70 bg-card p-4 shadow-card">
