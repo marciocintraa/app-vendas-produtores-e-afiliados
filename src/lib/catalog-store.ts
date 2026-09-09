@@ -113,13 +113,14 @@ async function loadCloud() {
     emit();
 
     // envia para a nuvem tudo que só existe localmente (somente autenticado)
-    if (currentUserId) {
+    const ownerId = currentUserId;
+    if (ownerId) {
       const catalogsToPush = catalogs.filter((x) => !cloudCatalogs.some((r) => r.id === x.id));
       if (catalogsToPush.length) {
         await supabase
           .from("catalogs")
           .upsert(
-            catalogsToPush.map((x) => ({ id: x.id, name: x.name, slug: x.slug, user_id: currentUserId })),
+            catalogsToPush.map((x) => ({ id: x.id, name: x.name, slug: x.slug, user_id: ownerId })),
           );
       }
       if (localOnly.length) {
