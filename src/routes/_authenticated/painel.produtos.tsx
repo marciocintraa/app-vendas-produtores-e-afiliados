@@ -865,7 +865,7 @@ function AdminProductsPage() {
                   >
                     <div className="flex items-center gap-3">
                       <img
-                        src={p.cover}
+                        src={coverOf(p)}
                         alt=""
                         className="h-12 w-16 rounded-lg object-cover"
                       />

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowLeft, Check, ExternalLink, Sparkles, Star, BookOpen, Share2 } from "lucide-react";
 import { type Product } from "@/lib/catalog-data";
-import { useProduct, useProducts } from "@/lib/catalog-store";
+import { useProduct, useProducts, coverOf } from "@/lib/catalog-store";
 
 export const Route = createFileRoute("/catalogo/$productId")({
   head: ({ params }) => {
@@ -44,7 +44,7 @@ function ProductPage() {
   const product = useProduct(productId);
   const allProducts = useProducts();
   const images = useMemo(
-    () => (product ? [product.cover, ...(product.gallery ?? [])].filter(Boolean) : []),
+    () => (product ? [coverOf(product), ...(product.gallery ?? [])].filter(Boolean) : []),
     [product],
   );
   const [activeImage, setActiveImage] = useState(0);
@@ -56,7 +56,7 @@ function ProductPage() {
   const discount = product.originalPrice
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : 0;
-  const currentImage = images[activeImage] ?? product.cover;
+  const currentImage = images[activeImage] ?? coverOf(product);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -231,7 +231,7 @@ function ProductPage() {
                   className="group overflow-hidden rounded-2xl border border-border/70 bg-card shadow-card transition-all hover:-translate-y-0.5 hover:border-primary/50"
                 >
                   <img
-                    src={p.cover}
+                    src={coverOf(p)}
                     alt={`Capa de ${p.title}`}
                     className="aspect-[3/2] w-full object-cover transition-transform group-hover:scale-105"
                     loading="lazy"

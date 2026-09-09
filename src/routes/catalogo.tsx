@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, Star, ArrowRight, Sparkles } from "lucide-react";
-import { useProducts, useCatalogs, DEFAULT_CATALOG } from "@/lib/catalog-store";
+import { useProducts, useCatalogs, DEFAULT_CATALOG, coverOf } from "@/lib/catalog-store";
 
 export const Route = createFileRoute("/catalogo")({
   validateSearch: (search: Record<string, unknown>): { c?: string; public?: string } => ({
@@ -146,7 +146,7 @@ function CatalogPage() {
               >
                 <div className="relative aspect-[3/2] overflow-hidden">
                   <img
-                    src={p.cover}
+                    src={coverOf(p)}
                     alt={`Capa de ${p.title}`}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
