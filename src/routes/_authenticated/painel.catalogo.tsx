@@ -59,8 +59,8 @@ function CatalogosPage() {
 
   const selected = catalogs.find((c) => c.id === selectedId) ?? catalogs[0];
   const publicUrl = origin
-    ? `${origin}/catalogo?c=${selected?.slug ?? "principal"}`
-    : `/catalogo?c=${selected?.slug ?? "principal"}`;
+    ? `${origin}/catalogo?c=${selected?.slug ?? "principal"}&public=1`
+    : `/catalogo?c=${selected?.slug ?? "principal"}&public=1`;
 
   const stats = useMemo(() => {
     const inCatalog = products.filter(
@@ -134,10 +134,7 @@ function CatalogosPage() {
             <h1 className="mt-1 text-2xl font-bold">Meus Catálogos</h1>
             <p className="mt-1 text-sm text-slate-400">Organize seus produtos e compartilhe cada catálogo com um link próprio.</p>
           </div>
-          <Link
-            to="/painel/produtos"
-            className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-white/5"
-          >
+          <Link to="/painel/produtos" className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold text-slate-200 hover:bg-white/5">
             <Settings className="h-4 w-4" /> Gerenciar produtos
           </Link>
         </div>
@@ -149,16 +146,9 @@ function CatalogosPage() {
             const count = products.filter((p) => (p.catalogId ?? DEFAULT_CATALOG_ID) === catalog.id).length;
             const active = catalog.id === selected?.id;
             return (
-              <button
-                key={catalog.id}
-                type="button"
-                onClick={() => setSelectedId(catalog.id)}
-                className={`rounded-2xl border p-5 text-left transition ${active ? "border-cyan-400/50 bg-cyan-400/10" : "border-white/10 bg-[#0A0F22] hover:border-white/20"}`}
-              >
+              <button key={catalog.id} type="button" onClick={() => setSelectedId(catalog.id)} className={`rounded-2xl border p-5 text-left transition ${active ? "border-cyan-400/50 bg-cyan-400/10" : "border-white/10 bg-[#0A0F22] hover:border-white/20"}`}>
                 <div className="flex items-center justify-between gap-3">
-                  <span className={`grid h-10 w-10 place-items-center rounded-xl ${active ? "bg-cyan-400/15 text-cyan-300" : "bg-white/5 text-slate-400"}`}>
-                    <LayoutGrid className="h-5 w-5" />
-                  </span>
+                  <span className={`grid h-10 w-10 place-items-center rounded-xl ${active ? "bg-cyan-400/15 text-cyan-300" : "bg-white/5 text-slate-400"}`}><LayoutGrid className="h-5 w-5" /></span>
                   {active && <span className="text-xs font-semibold text-cyan-300">Selecionado</span>}
                 </div>
                 <h2 className="mt-4 truncate font-semibold">{catalog.name}</h2>
@@ -167,11 +157,7 @@ function CatalogosPage() {
             );
           })}
           {catalogs.length < MAX_CATALOGS && (
-            <button
-              type="button"
-              onClick={() => setCreating(true)}
-              className="min-h-[150px] rounded-2xl border border-dashed border-white/15 bg-[#0A0F22]/60 p-5 text-left text-slate-300 transition hover:border-cyan-400/40 hover:bg-cyan-400/5"
-            >
+            <button type="button" onClick={() => setCreating(true)} className="min-h-[150px] rounded-2xl border border-dashed border-white/15 bg-[#0A0F22]/60 p-5 text-left text-slate-300 transition hover:border-cyan-400/40 hover:bg-cyan-400/5">
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/5 text-cyan-300"><Plus className="h-5 w-5" /></span>
               <p className="mt-4 font-semibold">Novo catálogo</p>
               <p className="mt-1 text-sm text-slate-500">Você pode criar mais {MAX_CATALOGS - catalogs.length}.</p>
@@ -183,14 +169,7 @@ function CatalogosPage() {
           <section className="rounded-2xl border border-cyan-400/20 bg-[#0A0F22] p-5">
             <p className="font-semibold">Criar novo catálogo</p>
             <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-              <input
-                autoFocus
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && createCatalog()}
-                placeholder="Ex.: Catálogo Fitness"
-                className="h-11 flex-1 rounded-xl border border-white/10 bg-[#070B18] px-4 text-sm outline-none placeholder:text-slate-600 focus:border-cyan-400/50"
-              />
+              <input autoFocus value={newName} onChange={(e) => setNewName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && createCatalog()} placeholder="Ex.: Catálogo Fitness" className="h-11 flex-1 rounded-xl border border-white/10 bg-[#070B18] px-4 text-sm outline-none placeholder:text-slate-600 focus:border-cyan-400/50" />
               <button type="button" onClick={createCatalog} className="rounded-xl bg-cyan-400 px-5 py-2.5 text-sm font-bold text-[#06101A] hover:opacity-90">Criar catálogo</button>
               <button type="button" onClick={() => { setCreating(false); setNewName(""); }} className="rounded-xl border border-white/10 px-5 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/5">Cancelar</button>
             </div>
@@ -204,18 +183,13 @@ function CatalogosPage() {
                 <div>
                   <div className="flex items-center gap-3">
                     <span className="grid h-12 w-12 place-items-center rounded-xl bg-cyan-400/10 text-cyan-300"><Share2 className="h-6 w-6" /></span>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Catálogo selecionado</p>
-                      <h2 className="text-xl font-bold">{selected.name}</h2>
-                    </div>
+                    <div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Catálogo selecionado</p><h2 className="text-xl font-bold">{selected.name}</h2></div>
                   </div>
                   <p className="mt-5 text-sm text-slate-400">Link público para divulgar seu catálogo:</p>
                   <div className="mt-2 break-all rounded-xl border border-white/10 bg-[#070B18] px-4 py-3 text-sm text-slate-200">{publicUrl}</div>
                 </div>
                 <div className="flex flex-wrap gap-2 lg:max-w-sm lg:justify-end">
-                  <button type="button" onClick={copyLink} className="inline-flex items-center gap-2 rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-bold text-[#06101A] hover:opacity-90">
-                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}{copied ? "Copiado" : "Copiar link"}
-                  </button>
+                  <button type="button" onClick={copyLink} className="inline-flex items-center gap-2 rounded-xl bg-cyan-400 px-4 py-2.5 text-sm font-bold text-[#06101A] hover:opacity-90">{copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}{copied ? "Copiado" : "Copiar link"}</button>
                   <button type="button" onClick={shareCatalog} className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold hover:bg-white/5"><Share2 className="h-4 w-4" /> Compartilhar</button>
                   <a href={publicUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold hover:bg-white/5"><ExternalLink className="h-4 w-4" /> Visualizar</a>
                   {selected.id !== DEFAULT_CATALOG_ID && <button type="button" onClick={removeSelected} className="inline-flex items-center gap-2 rounded-xl border border-red-400/20 px-4 py-2.5 text-sm font-semibold text-red-300 hover:bg-red-400/5"><Trash2 className="h-4 w-4" /> Excluir</button>}
