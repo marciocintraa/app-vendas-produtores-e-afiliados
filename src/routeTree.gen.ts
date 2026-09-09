@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermosRouteImport } from './routes/termos'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as CatalogoRouteImport } from './routes/catalogo'
 import { Route as BemVindoRouteImport } from './routes/bem-vindo'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -21,6 +23,16 @@ import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authe
 import { Route as AuthenticatedPainelCatalogoRouteImport } from './routes/_authenticated/painel.catalogo'
 import { Route as ApiPublicHotmartWebhookRouteImport } from './routes/api/public/hotmart/webhook'
 
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CatalogoRoute = CatalogoRouteImport.update({
   id: '/catalogo',
   path: '/catalogo',
@@ -85,6 +97,8 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/bem-vindo': typeof BemVindoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
@@ -97,6 +111,8 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/bem-vindo': typeof BemVindoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
@@ -111,6 +127,8 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/bem-vindo': typeof BemVindoRoute
   '/catalogo': typeof CatalogoRouteWithChildren
+  '/privacidade': typeof PrivacidadeRoute
+  '/termos': typeof TermosRoute
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/_authenticated/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
@@ -125,6 +143,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/bem-vindo'
     | '/catalogo'
+    | '/privacidade'
+    | '/termos'
     | '/catalogo/$productId'
     | '/painel/catalogo'
     | '/painel/produtos'
@@ -137,6 +157,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/bem-vindo'
     | '/catalogo'
+    | '/privacidade'
+    | '/termos'
     | '/catalogo/$productId'
     | '/painel/catalogo'
     | '/painel/produtos'
@@ -150,6 +172,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/bem-vindo'
     | '/catalogo'
+    | '/privacidade'
+    | '/termos'
     | '/catalogo/$productId'
     | '/_authenticated/painel/catalogo'
     | '/_authenticated/painel/produtos'
@@ -164,11 +188,27 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BemVindoRoute: typeof BemVindoRoute
   CatalogoRoute: typeof CatalogoRouteWithChildren
+  PrivacidadeRoute: typeof PrivacidadeRoute
+  TermosRoute: typeof TermosRoute
   ApiPublicHotmartWebhookRoute: typeof ApiPublicHotmartWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/catalogo': {
       id: '/catalogo'
       path: '/catalogo'
@@ -282,6 +322,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BemVindoRoute: BemVindoRoute,
   CatalogoRoute: CatalogoRouteWithChildren,
+  PrivacidadeRoute: PrivacidadeRoute,
+  TermosRoute: TermosRoute,
   ApiPublicHotmartWebhookRoute: ApiPublicHotmartWebhookRoute,
 }
 export const routeTree = rootRouteImport
