@@ -172,7 +172,7 @@ export function saveCatalog(catalog: Catalog) {
   const i = catalogs.findIndex((c) => c.id === catalog.id);
   catalogs = i >= 0 ? catalogs.map((c, n) => n === i ? catalog : c) : [...catalogs, catalog];
   persist(); emit();
-  void supabase.from("catalogs").upsert({ id: catalog.id, name: catalog.name, slug: catalog.slug });
+  void supabase.from("catalogs").upsert({ id: catalog.id, name: catalog.name, slug: catalog.slug, ...(currentUserId ? { user_id: currentUserId } : {}) });
 }
 export function deleteCatalog(id: string) {
   ensureHydrated();
