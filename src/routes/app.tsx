@@ -9,7 +9,7 @@ import {
 import { CHECKOUT_PLANS } from "@/lib/checkout-links";
 import { supabase } from "@/integrations/supabase/client";
 import { useProducts, useCatalogs, saveCatalog, slugify, coverOf } from "@/lib/catalog-store";
-import { usePlan, PLAN_LABEL } from "@/lib/plan";
+import { usePlan, PLAN_LABEL, useIsAdmin } from "@/lib/plan";
 
 export const Route = createFileRoute("/app")({
   head: () => ({ meta: [
