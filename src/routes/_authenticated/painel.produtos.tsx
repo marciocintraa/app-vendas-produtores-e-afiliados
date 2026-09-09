@@ -152,6 +152,7 @@ import {
   DEFAULT_CATALOG,
   slugify,
   makeCoverPlaceholder,
+  coverOf,
 } from "@/lib/catalog-store";
 
 export const Route = createFileRoute("/_authenticated/painel/produtos")({
