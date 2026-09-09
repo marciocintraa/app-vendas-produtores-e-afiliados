@@ -52,7 +52,7 @@ const MENU = [
   { icon: LayoutGrid, label: "Meus Catálogos", to: "/painel/catalogo" as const },
   { icon: Wand2, label: "IA VENDE+", to: "/painel/ia-vende-mais" as const },
   { icon: Megaphone, label: "VENDE ADS IA", to: "/painel/vende-ads" as const },
-  { icon: Rocket, label: "Prompt Master IA" },
+  { icon: Rocket, label: "Prompt Master IA", to: "/painel/prompt-master" as const },
   { icon: Users, label: "Clientes" },
   { icon: TrendingUp, label: "Vendas" },
   { icon: Wallet, label: "Financeiro" },

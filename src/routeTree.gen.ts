@@ -20,6 +20,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatalogoProductIdRouteImport } from './routes/catalogo.$productId'
 import { Route as AuthenticatedPainelVendeAdsRouteImport } from './routes/_authenticated/painel.vende-ads'
+import { Route as AuthenticatedPainelPromptMasterRouteImport } from './routes/_authenticated/painel.prompt-master'
 import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
 import { Route as AuthenticatedPainelIaVendeMaisRouteImport } from './routes/_authenticated/painel.ia-vende-mais'
 import { Route as AuthenticatedPainelCatalogoRouteImport } from './routes/_authenticated/painel.catalogo'
@@ -81,6 +82,12 @@ const AuthenticatedPainelVendeAdsRoute =
     path: '/painel/vende-ads',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPainelPromptMasterRoute =
+  AuthenticatedPainelPromptMasterRouteImport.update({
+    id: '/painel/prompt-master',
+    path: '/painel/prompt-master',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPainelProdutosRoute =
   AuthenticatedPainelProdutosRouteImport.update({
     id: '/painel/produtos',
@@ -125,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/ia-vende-mais': typeof AuthenticatedPainelIaVendeMaisRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/painel/prompt-master': typeof AuthenticatedPainelPromptMasterRoute
   '/painel/vende-ads': typeof AuthenticatedPainelVendeAdsRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
@@ -142,6 +150,7 @@ export interface FileRoutesByTo {
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/ia-vende-mais': typeof AuthenticatedPainelIaVendeMaisRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/painel/prompt-master': typeof AuthenticatedPainelPromptMasterRoute
   '/painel/vende-ads': typeof AuthenticatedPainelVendeAdsRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
@@ -161,6 +170,7 @@ export interface FileRoutesById {
   '/_authenticated/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/_authenticated/painel/ia-vende-mais': typeof AuthenticatedPainelIaVendeMaisRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/_authenticated/painel/prompt-master': typeof AuthenticatedPainelPromptMasterRoute
   '/_authenticated/painel/vende-ads': typeof AuthenticatedPainelVendeAdsRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/painel/catalogo'
     | '/painel/ia-vende-mais'
     | '/painel/produtos'
+    | '/painel/prompt-master'
     | '/painel/vende-ads'
     | '/api/public/hotmart/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/painel/catalogo'
     | '/painel/ia-vende-mais'
     | '/painel/produtos'
+    | '/painel/prompt-master'
     | '/painel/vende-ads'
     | '/api/public/hotmart/webhook'
   id:
@@ -215,6 +227,7 @@ export interface FileRouteTypes {
     | '/_authenticated/painel/catalogo'
     | '/_authenticated/painel/ia-vende-mais'
     | '/_authenticated/painel/produtos'
+    | '/_authenticated/painel/prompt-master'
     | '/_authenticated/painel/vende-ads'
     | '/api/public/hotmart/webhook'
   fileRoutesById: FileRoutesById
@@ -311,6 +324,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelVendeAdsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/painel/prompt-master': {
+      id: '/_authenticated/painel/prompt-master'
+      path: '/painel/prompt-master'
+      fullPath: '/painel/prompt-master'
+      preLoaderRoute: typeof AuthenticatedPainelPromptMasterRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel/produtos': {
       id: '/_authenticated/painel/produtos'
       path: '/painel/produtos'
@@ -354,6 +374,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPainelCatalogoRoute: typeof AuthenticatedPainelCatalogoRoute
   AuthenticatedPainelIaVendeMaisRoute: typeof AuthenticatedPainelIaVendeMaisRoute
   AuthenticatedPainelProdutosRoute: typeof AuthenticatedPainelProdutosRoute
+  AuthenticatedPainelPromptMasterRoute: typeof AuthenticatedPainelPromptMasterRoute
   AuthenticatedPainelVendeAdsRoute: typeof AuthenticatedPainelVendeAdsRoute
 }
 
@@ -362,6 +383,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPainelCatalogoRoute: AuthenticatedPainelCatalogoRoute,
   AuthenticatedPainelIaVendeMaisRoute: AuthenticatedPainelIaVendeMaisRoute,
   AuthenticatedPainelProdutosRoute: AuthenticatedPainelProdutosRoute,
+  AuthenticatedPainelPromptMasterRoute: AuthenticatedPainelPromptMasterRoute,
   AuthenticatedPainelVendeAdsRoute: AuthenticatedPainelVendeAdsRoute,
 }
 
