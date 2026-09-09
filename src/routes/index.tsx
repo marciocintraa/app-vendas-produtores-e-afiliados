@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { LANDING_CHECKOUT_URLS, type LandingPlanId } from "@/lib/landing-checkout";
+import { CHECKOUT_PLANS } from "@/lib/checkout-links";
 import {
   Sparkles,
   Store,
@@ -404,116 +404,88 @@ function Testimonials() {
 }
 
 function Pricing() {
-  const plans = [
-    {
-      name: "Individual",
-      price: "R$ 37",
-      per: "/mês",
-      desc: "Para começar a vender com um catálogo enxuto.",
-      features: [
-        "Até 2 produtos",
-        "Cole seus links de afiliado ou de produtor no catálogo e divulgue produtos sem criar páginas de vendas, vídeos ou materiais extras",
-        "Categorias básicas",
-        "Tema padrão",
-        "Estatísticas básicas",
-      ],
-      cta: "Assinar Individual",
-      priceId: "starter_monthly" as LandingPlanId,
-      highlight: false,
-    },
-    {
-      name: "Familiar",
-      price: "R$ 57",
-      per: "/mês",
-      desc: "Para produtores em crescimento que querem escalar.",
-      features: [
-        "Até 5 produtos",
-        "Cole seus links de afiliado ou de produtor no catálogo e divulgue produtos sem criar páginas de vendas, vídeos ou materiais extras",
-        "Categorias ilimitadas",
-        "Personalização visual",
-        "Notificações push",
-        "Estatísticas completas",
-      ],
-      cta: "Assinar Familiar",
-      priceId: "pro_monthly" as LandingPlanId,
-      highlight: true,
-    },
-    {
-      name: "Premium",
-      price: "R$ 97",
-      per: "/mês",
-      desc: "Para operações profissionais com marca própria.",
-      features: [
-        "Produtos ilimitados",
-        "Cole seus links de afiliado ou de produtor no catálogo e divulgue produtos sem criar páginas de vendas, vídeos ou materiais extras",
-        "IA completa",
-        "Tema e domínio personalizados",
-        "Analytics avançado",
-        "Exportação de dados",
-        "Suporte prioritário",
-      ],
-      cta: "Assinar Premium",
-      priceId: "premium_monthly" as LandingPlanId,
-      highlight: false,
-    },
-  ];
+  const offer = CHECKOUT_PLANS[0];
 
   return (
     <section id="planos" className="py-24">
       <div className="container-page">
         <div className="max-w-2xl mx-auto text-center">
-          <span className="text-xs uppercase tracking-widest text-accent font-semibold">
-            Planos
+          <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-accent">
+            <Sparkles className="w-3.5 h-3.5" />
+            Oferta imperdível
           </span>
           <h2 className="mt-3 text-3xl md:text-5xl font-bold">
-            Assinatura simples, app Android liberado.
+            Pagamento único. <span className="text-gradient">Acesso vitalício.</span>
           </h2>
           <p className="mt-4 text-muted-foreground text-lg">
-            Escolha o plano que acompanha o crescimento do seu catálogo. Pagamento e entrega são
-            feitos pela Hotmart — após a aprovação, você recebe por e-mail o link direto do arquivo
-            <span className="font-semibold text-foreground"> vende-facil-pro-release.apk</span> para
-            instalar no Android sem passar pela tela de aviso do Drive.
+            Comece grátis com até 2 produtos e libere tudo quando quiser. Pagamento e entrega são
+            feitos pela Hotmart — após a aprovação você recebe por e-mail o acesso Web e o link
+            direto do app Android.
           </p>
         </div>
 
-        <div className="mt-14 grid md:grid-cols-3 gap-5">
-          {plans.map((p) => (
-            <div
-              key={p.name}
-              className={`card-glass p-8 relative ${
-                p.highlight ? "ring-2 ring-brand/60 shadow-[var(--shadow-glow)]" : ""
-              }`}
-            >
-              {p.highlight && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-semibold px-3 py-1 rounded-full bg-gradient-to-r from-brand to-brand-2 text-primary-foreground">
-                  Mais popular
-                </span>
-              )}
-              <h3 className="text-xl font-bold">{p.name}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{p.desc}</p>
-              <div className="mt-6 flex items-baseline gap-1">
-                <span className="text-4xl font-bold font-display">{p.price}</span>
-                <span className="text-muted-foreground text-sm">{p.per}</span>
-              </div>
-              <ul className="mt-6 space-y-3 text-sm">
-                {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-accent mt-0.5 shrink-0" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <a
-                href={LANDING_CHECKOUT_URLS[p.priceId]}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`mt-8 w-full inline-flex items-center justify-center gap-2 ${p.highlight ? "btn-primary" : "btn-ghost"}`}
-              >
-                {p.cta}
-                <ArrowRight className="w-4 h-4" />
-              </a>
+        <div className="mt-14 grid md:grid-cols-2 gap-5 max-w-4xl mx-auto">
+          <div className="card-glass p-8">
+            <h3 className="text-xl font-bold">Acesso Grátis Limitado</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Monte seu catálogo e teste o app sem pagar nada.
+            </p>
+            <div className="mt-6 flex items-baseline gap-1">
+              <span className="text-4xl font-bold font-display">R$ 0</span>
+              <span className="text-muted-foreground text-sm">/para sempre</span>
             </div>
-          ))}
+            <ul className="mt-6 space-y-3 text-sm">
+              {[
+                "Até 2 produtos no catálogo",
+                "Cole seus links de afiliado ou de produtor e divulgue sem criar páginas de vendas",
+                "Catálogo com link para compartilhar",
+                "Acesso pelo navegador",
+              ].map((f) => (
+                <li key={f} className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <a href="/app" className="mt-8 w-full btn-ghost inline-flex items-center justify-center gap-2">
+              Começar grátis
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+
+          <div className="card-glass p-8 relative ring-2 ring-brand/60 shadow-[var(--shadow-glow)]">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-semibold px-3 py-1 rounded-full bg-gradient-to-r from-brand to-brand-2 text-primary-foreground whitespace-nowrap">
+              Oferta imperdível
+            </span>
+            <h3 className="text-xl font-bold">{offer.name} — Vitalício</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Tudo liberado, sem mensalidade e sem limite de produtos.
+            </p>
+            <div className="mt-6 flex items-baseline gap-2">
+              <span className="text-4xl font-bold font-display">{offer.price}</span>
+              <span className="text-muted-foreground text-sm">pagamento único</span>
+            </div>
+            {offer.installmentPrice && (
+              <p className="mt-1 text-sm text-accent font-medium">{offer.installmentPrice}</p>
+            )}
+            <ul className="mt-6 space-y-3 text-sm">
+              {offer.features.map((f) => (
+                <li key={f} className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <a
+              href={offer.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-8 w-full btn-primary inline-flex items-center justify-center gap-2"
+            >
+              Quero o acesso vitalício
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
         </div>
 
         <p className="mt-8 text-center text-xs text-muted-foreground flex items-center justify-center gap-1.5">
@@ -524,6 +496,7 @@ function Pricing() {
     </section>
   );
 }
+
 
 
 
