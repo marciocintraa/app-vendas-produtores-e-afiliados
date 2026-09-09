@@ -1,10 +1,20 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowLeft, Loader2, ShieldCheck } from "lucide-react";
 import { listAccounts } from "@/lib/admin.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/painel/admin")({
+  // Somente administradores. Usuários não autenticados já são barrados
+  // pelo layout _authenticated; aqui checamos a função de administrador.
+  beforeLoad: async () => {
+    const { data: auth } = await supabase.auth.getUser();
+    const userId = auth.user?.id;
+    if (!userId) throw redirect({ to: "/acesso", search: { email: undefined } });
+    const { data: isAdmin } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
+    if (isAdmin !== true) throw redirect({ to: "/app" });
+  },
   component: AdminPage,
   head: () => ({
     meta: [
@@ -17,6 +27,7 @@ export const Route = createFileRoute("/_authenticated/painel/admin")({
     ],
   }),
 });
+
 
 function formatDate(value: string | null) {
   if (!value) return "—";
