@@ -1,21 +1,13 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, Star, ArrowRight, Sparkles, Settings } from "lucide-react";
+import { Search, Star, ArrowRight, Sparkles } from "lucide-react";
 import { useProducts, useCatalogs, DEFAULT_CATALOG } from "@/lib/catalog-store";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/catalogo")({
   validateSearch: (search: Record<string, unknown>): { c?: string; public?: string } => ({
     c: typeof search.c === "string" && search.c ? search.c : undefined,
     public: typeof search.public === "string" ? search.public : undefined,
   }),
-  beforeLoad: async ({ search }) => {
-    if (search.public === "1") return;
-    const { data } = await supabase.auth.getSession();
-    if (data.session) {
-      throw redirect({ to: "/painel/catalogo" });
-    }
-  },
   head: () => ({
     meta: [
       { title: "Catálogo — Vende Fácil Pro" },
