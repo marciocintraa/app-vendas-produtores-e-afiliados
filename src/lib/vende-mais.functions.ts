@@ -56,27 +56,9 @@ export const analyzeProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(validate)
   .handler(async ({ data, context }): Promise<VendeMaisResult> => {
-    // Reutiliza as regras de acesso já existentes: PRO (assinatura ativa) ou admin.
-    const { data: isAdmin } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    let allowed = isAdmin === true;
-    if (!allowed) {
-      const { data: sub } = await context.supabase
-        .from("subscriptions")
-        .select("status,current_period_end")
-        .eq("user_id", context.userId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      const end = sub?.current_period_end ? new Date(sub.current_period_end).getTime() : null;
-      const now = Date.now();
-      const status = sub?.status ?? "";
-      allowed =
-        (["active", "trialing", "past_due"].includes(status) && (end === null || end > now)) ||
-        (status === "canceled" && end !== null && end > now);
-    }
+    // Regra comercial única: PRO ativo (qualquer comprador) ou administrador.
+    const { hasProAccess } = await import("@/lib/pro-access.server");
+    const allowed = await hasProAccess(context.supabase, context.userId);
     if (!allowed) throw new Response("Recurso disponível no Plano PRO.", { status: 403 });
 
     const apiKey = process.env["LOVABLE_API_KEY"];
