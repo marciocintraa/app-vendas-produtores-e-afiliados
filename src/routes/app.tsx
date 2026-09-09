@@ -69,6 +69,8 @@ function Dashboard({ email }: { email: string }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const catalogs = useCatalogs();
   const { plan, catalogLimit, productLimit } = usePlan();
+  const { isAdmin } = useIsAdmin();
+
   const [newCatalogOpen, setNewCatalogOpen] = useState(false);
   const [newCatalogName, setNewCatalogName] = useState("");
 
