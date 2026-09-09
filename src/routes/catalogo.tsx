@@ -1,21 +1,13 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Search, Star, ArrowRight, Sparkles, Settings } from "lucide-react";
+import { Search, Star, ArrowRight, Sparkles } from "lucide-react";
 import { useProducts, useCatalogs, DEFAULT_CATALOG } from "@/lib/catalog-store";
-import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/catalogo")({
   validateSearch: (search: Record<string, unknown>): { c?: string; public?: string } => ({
     c: typeof search.c === "string" && search.c ? search.c : undefined,
     public: typeof search.public === "string" ? search.public : undefined,
   }),
-  beforeLoad: async ({ search }) => {
-    if (search.public === "1") return;
-    const { data } = await supabase.auth.getSession();
-    if (data.session) {
-      throw redirect({ to: "/painel/catalogo" });
-    }
-  },
   head: () => ({
     meta: [
       { title: "Catálogo — Vende Fácil Pro" },
@@ -79,31 +71,18 @@ function CatalogPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/60 bg-surface/40 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <Link to="/app" className="flex items-center gap-2 font-display text-lg font-semibold">
+          <span className="flex items-center gap-2 font-display text-lg font-semibold">
             <Sparkles className="h-5 w-5 text-primary" />
             Vende Fácil Pro
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link
-              to="/painel/produtos"
-              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <Settings className="h-4 w-4" /> Gerenciar
-            </Link>
-            <Link
-              to="/app"
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              ← Voltar ao painel
-            </Link>
-          </div>
+          </span>
+          <span className="text-sm text-muted-foreground">Catálogo público</span>
         </div>
       </header>
 
       <section className="mx-auto max-w-6xl px-4 pt-12 pb-6">
         <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-surface px-3 py-1 text-xs text-muted-foreground">
           <Sparkles className="h-3.5 w-3.5 text-primary" />{" "}
-          {activeCatalog ? activeCatalog.name : "Catálogo do assinante"}
+          {activeCatalog ? activeCatalog.name : "Catálogo público"}
         </span>
         <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight md:text-5xl">
           Produtos que convertem, prontos para divulgar.
