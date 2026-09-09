@@ -75,11 +75,19 @@ const buildAccessLink = createServerFn({ method: "GET" })
       return { state: "inactive", checkedAt: new Date().toISOString() };
     }
 
-    const url = new URL(process.env.SUPABASE_URL!);
-    const origin =
-      process.env.SITE_URL ??
-      `https://${new URL("https://" + (process.env.SITE_HOSTNAME ?? url.host)).host}`;
+    let origin = process.env.SITE_URL ?? "";
+    if (!origin) {
+      try {
+        const { getWebRequest } = await import("@tanstack/react-start/server");
+        const req = getWebRequest();
+        if (req?.url) origin = new URL(req.url).origin;
+      } catch {
+        /* ignore */
+      }
+    }
+    if (!origin) origin = `https://${process.env.SITE_HOSTNAME ?? "vendefacillapp.com.br"}`;
     const redirectTo = `${origin.replace(/\/+$/, "")}/painel/produtos`;
+
 
     const { data: link, error } = await supabaseAdmin.auth.admin.generateLink({
       type: "magiclink",
