@@ -71,10 +71,10 @@ function CatalogPage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/60 bg-surface/40 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <Link to="/app" className="flex items-center gap-2 font-display text-lg font-semibold">
+          <span className="flex items-center gap-2 font-display text-lg font-semibold">
             <Sparkles className="h-5 w-5 text-primary" />
             Vende Fácil Pro
-          </Link>
+          </span>
           <span className="text-sm text-muted-foreground">Catálogo público</span>
         </div>
       </header>
