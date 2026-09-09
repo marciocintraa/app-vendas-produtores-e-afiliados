@@ -1,13 +1,21 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, Star, ArrowRight, Sparkles, Settings } from "lucide-react";
 import { useProducts, useCatalogs, DEFAULT_CATALOG } from "@/lib/catalog-store";
-
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/catalogo")({
-  validateSearch: (search: Record<string, unknown>): { c?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { c?: string; public?: string } => ({
     c: typeof search.c === "string" && search.c ? search.c : undefined,
+    public: typeof search.public === "string" ? search.public : undefined,
   }),
+  beforeLoad: async ({ search }) => {
+    if (search.public === "1") return;
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      throw redirect({ to: "/painel/catalogo" });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Catálogo — Vende Fácil Pro" },
@@ -67,8 +75,6 @@ function CatalogPage() {
     });
   }, [scopedProducts, query, category]);
 
-
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/60 bg-surface/40 backdrop-blur">
@@ -91,7 +97,6 @@ function CatalogPage() {
               ← Voltar ao painel
             </Link>
           </div>
-
         </div>
       </header>
 
@@ -137,10 +142,10 @@ function CatalogPage() {
                   category === c
                     ? "border-primary/60 bg-primary/15 text-primary"
                     : "border-border bg-surface text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {c}
-              </button>
+              }`}
+            >
+              {c}
+            </button>
             ))}
           </div>
         </div>
