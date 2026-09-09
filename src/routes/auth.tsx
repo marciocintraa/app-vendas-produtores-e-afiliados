@@ -22,7 +22,7 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: '/painel/produtos', replace: true });
+      if (data.session) navigate({ to: '/app', replace: true });
     });
   }, [navigate]);
 
@@ -32,7 +32,7 @@ function AuthPage() {
     setError(null);
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim().toLowerCase(),
-      options: { emailRedirectTo: `${window.location.origin}/painel/produtos` },
+      options: { emailRedirectTo: `${window.location.origin}/app` },
     });
     if (error) {
       setError(error.message);

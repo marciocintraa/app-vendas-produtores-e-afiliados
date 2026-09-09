@@ -79,7 +79,7 @@ const buildAccessLink = createServerFn({ method: "GET" })
       data.origin?.startsWith("http")
         ? data.origin
         : (process.env.SITE_URL ?? `https://${process.env.SITE_HOSTNAME ?? "vendefacillapp.com.br"}`);
-    const redirectTo = `${origin.replace(/\/+$/, "")}/painel/produtos`;
+    const redirectTo = `${origin.replace(/\/+$/, "")}/app`;
 
 
 
