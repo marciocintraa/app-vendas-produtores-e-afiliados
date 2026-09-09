@@ -40,6 +40,7 @@ export const Route = createFileRoute("/_authenticated/painel/catalogo")({
 
 function CatalogosPage() {
   const catalogs = useCatalogs();
+  const { plan, catalogLimit } = usePlan();
   const products = useProducts();
   const [selectedId, setSelectedId] = useState(DEFAULT_CATALOG_ID);
   const [origin, setOrigin] = useState("");
