@@ -124,6 +124,22 @@ function Dashboard({ email }: { email: string }) {
   const [query, setQuery] = useState("");
   const [shared, setShared] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const catalogs = useCatalogs();
+  const [newCatalogOpen, setNewCatalogOpen] = useState(false);
+  const [newCatalogName, setNewCatalogName] = useState("");
+
+  function handleCreateCatalog() {
+    const name = newCatalogName.trim();
+    if (!name) return;
+    const base = slugify(name) || `catalogo-${Date.now()}`;
+    let slug = base;
+    let n = 2;
+    while (catalogs.some((c) => c.slug === slug)) slug = `${base}-${n++}`;
+    saveCatalog({ id: `cat-${Date.now()}`, name, slug });
+    setNewCatalogName("");
+    setNewCatalogOpen(false);
+  }
+
 
   const firstName = useMemo(() => {
     const raw = email.split("@")[0] || "Administrador";
