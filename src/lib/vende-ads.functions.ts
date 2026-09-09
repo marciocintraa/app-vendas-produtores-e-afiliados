@@ -2,16 +2,17 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /**
- * IA VENDE+ — análise comercial de um produto.
+ * VENDE ADS IA — geração de anúncios para um produto.
  *
- * Usa a integração de IA já disponível no projeto (Lovable AI Gateway,
- * chave LOVABLE_API_KEY no servidor). Nenhuma chave é exposta ao navegador.
- * Acesso: contas PRO (assinatura ativa) e administradores.
+ * Usa a integração de IA já existente (Lovable AI Gateway, LOVABLE_API_KEY no servidor).
+ * Acesso: qualquer usuário com Plano PRO ativo OU administrador. Plano Grátis é bloqueado
+ * também no servidor, então não há como contornar pela URL ou por chamada direta.
  */
 
-export type VendeMaisInput = {
+export type VendeAdsInput = {
   productName: string;
-  category?: string;
+  platform: string;
+  objective?: string;
   audience?: string;
   price?: string;
   offer?: string;
@@ -19,31 +20,33 @@ export type VendeMaisInput = {
   notes?: string;
 };
 
-export type VendeMaisSection = { title: string; items: string[] };
+export type VendeAdsSection = { title: string; items: string[] };
+export type VendeAdsResult = { sections: VendeAdsSection[] };
 
-export type VendeMaisResult = { sections: VendeMaisSection[] };
+export const AD_PLATFORMS = ["Meta Ads (Facebook e Instagram)", "Google Ads", "TikTok Ads", "YouTube Ads"] as const;
 
 const SECTION_TITLES = [
-  "Resumo da oferta",
-  "Público-alvo",
-  "Principal problema identificado",
-  "Principal transformação prometida",
-  "Benefícios",
-  "Diferenciais",
-  "Argumentos de venda",
-  "Objeções e respostas",
-  "Ideias de chamadas",
-  "CTA recomendado",
+  "Títulos (headlines)",
+  "Textos principais do anúncio",
+  "Descrições curtas",
+  "Ganchos de abertura",
+  "Roteiro de vídeo curto",
+  "Segmentação sugerida",
+  "Palavras-chave e interesses",
+  "Chamadas para ação",
+  "Sugestões de criativo",
+  "Cuidados e políticas de anúncio",
 ];
 
-function validate(input: unknown): VendeMaisInput {
+function validate(input: unknown): VendeAdsInput {
   const raw = (input ?? {}) as Record<string, unknown>;
   const str = (v: unknown, max = 600) => (typeof v === "string" ? v.trim().slice(0, max) : "");
   const productName = str(raw.productName, 160);
   if (!productName) throw new Error("Informe o nome do produto.");
   return {
     productName,
-    category: str(raw.category, 80),
+    platform: str(raw.platform, 80) || AD_PLATFORMS[0],
+    objective: str(raw.objective, 80),
     audience: str(raw.audience, 300),
     price: str(raw.price, 60),
     offer: str(raw.offer, 400),
@@ -52,11 +55,10 @@ function validate(input: unknown): VendeMaisInput {
   };
 }
 
-export const analyzeProduct = createServerFn({ method: "POST" })
+export const generateAds = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(validate)
-  .handler(async ({ data, context }): Promise<VendeMaisResult> => {
-    // Regra comercial única: PRO ativo (qualquer comprador) ou administrador.
+  .handler(async ({ data, context }): Promise<VendeAdsResult> => {
     const { hasProAccess } = await import("@/lib/pro-access.server");
     const allowed = await hasProAccess(context.supabase, context.userId);
     if (!allowed) throw new Response("Recurso disponível no Plano PRO.", { status: 403 });
@@ -65,11 +67,12 @@ export const analyzeProduct = createServerFn({ method: "POST" })
     if (!apiKey) throw new Error("A integração de IA não está configurada no servidor.");
 
     const prompt = [
-      "Você é um estrategista de marketing digital brasileiro especializado em produtos digitais e afiliados.",
-      "Analise o produto abaixo e devolva um JSON com a estrutura comercial de venda.",
+      "Você é um especialista brasileiro em tráfego pago para produtos digitais e afiliados.",
+      "Crie um pacote de anúncios prontos para o produto abaixo e devolva em JSON.",
       "",
       `Produto: ${data.productName}`,
-      data.category ? `Categoria: ${data.category}` : "",
+      `Plataforma: ${data.platform}`,
+      data.objective ? `Objetivo da campanha: ${data.objective}` : "",
       data.audience ? `Público informado: ${data.audience}` : "",
       data.price ? `Preço: ${data.price}` : "",
       data.offer ? `Oferta: ${data.offer}` : "",
@@ -77,11 +80,12 @@ export const analyzeProduct = createServerFn({ method: "POST" })
       data.notes ? `Observações: ${data.notes}` : "",
       "",
       "Responda SOMENTE com um objeto JSON no formato:",
-      '{"sections":[{"title":"Resumo da oferta","items":["..."]}]}',
+      '{"sections":[{"title":"Títulos (headlines)","items":["..."]}]}',
       `Use exatamente estas seções, nesta ordem: ${SECTION_TITLES.join(" | ")}.`,
-      "Cada seção deve ter de 1 a 6 itens curtos, em português do Brasil, práticos e específicos.",
-      "Em 'Objeções e respostas', cada item deve trazer a objeção e a resposta na mesma linha.",
-      "Não invente dados verificáveis (números de alunos, prêmios, garantias) que não foram informados.",
+      "Cada seção deve ter de 3 a 6 itens curtos, em português do Brasil, prontos para copiar e colar.",
+      "Respeite os limites e as políticas de anúncio da plataforma informada.",
+      "Não invente dados verificáveis (números de alunos, resultados, garantias) que não foram informados.",
+      "Não prometa ganhos financeiros garantidos.",
     ]
       .filter(Boolean)
       .join("\n");
@@ -102,9 +106,9 @@ export const analyzeProduct = createServerFn({ method: "POST" })
 
     if (!res.ok) {
       const text = await res.text().catch(() => "");
-      if (res.status === 429) throw new Error("Muitas análises seguidas. Aguarde alguns instantes e tente novamente.");
+      if (res.status === 429) throw new Error("Muitas gerações seguidas. Aguarde alguns instantes e tente novamente.");
       if (res.status === 402) throw new Error("Os créditos de IA do aplicativo acabaram. Adicione créditos para continuar.");
-      throw new Error(`Não foi possível gerar a análise agora. (${res.status}) ${text.slice(0, 200)}`);
+      throw new Error(`Não foi possível gerar os anúncios agora. (${res.status}) ${text.slice(0, 200)}`);
     }
 
     const payload = (await res.json()) as { choices?: { message?: { content?: string } }[] };
@@ -114,14 +118,14 @@ export const analyzeProduct = createServerFn({ method: "POST" })
       parsed = JSON.parse(content);
     } catch {
       const match = content.match(/\{[\s\S]*\}/);
-      if (!match) throw new Error("A análise voltou em um formato inesperado. Tente novamente.");
+      if (!match) throw new Error("Os anúncios voltaram em um formato inesperado. Tente novamente.");
       parsed = JSON.parse(match[0]);
     }
 
     const sectionsRaw = (parsed as { sections?: unknown }).sections;
-    if (!Array.isArray(sectionsRaw)) throw new Error("A análise voltou incompleta. Tente novamente.");
+    if (!Array.isArray(sectionsRaw)) throw new Error("A geração voltou incompleta. Tente novamente.");
 
-    const sections: VendeMaisSection[] = sectionsRaw
+    const sections: VendeAdsSection[] = sectionsRaw
       .map((s) => {
         const obj = (s ?? {}) as { title?: unknown; items?: unknown };
         const title = typeof obj.title === "string" ? obj.title : "";
@@ -132,6 +136,6 @@ export const analyzeProduct = createServerFn({ method: "POST" })
       })
       .filter((s) => s.title && s.items.length > 0);
 
-    if (sections.length === 0) throw new Error("A análise voltou vazia. Tente novamente.");
+    if (sections.length === 0) throw new Error("A geração voltou vazia. Tente novamente.");
     return { sections };
   });

@@ -51,7 +51,7 @@ const MENU = [
   { icon: Package, label: "Produtos", to: "/painel/produtos" as const },
   { icon: LayoutGrid, label: "Meus Catálogos", to: "/painel/catalogo" as const },
   { icon: Wand2, label: "IA VENDE+", to: "/painel/ia-vende-mais" as const },
-  { icon: Megaphone, label: "VENDE ADS IA" },
+  { icon: Megaphone, label: "VENDE ADS IA", to: "/painel/vende-ads" as const },
   { icon: Rocket, label: "Prompt Master IA" },
   { icon: Users, label: "Clientes" },
   { icon: TrendingUp, label: "Vendas" },

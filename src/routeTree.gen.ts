@@ -19,6 +19,7 @@ import { Route as AcessoRouteImport } from './routes/acesso'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatalogoProductIdRouteImport } from './routes/catalogo.$productId'
+import { Route as AuthenticatedPainelVendeAdsRouteImport } from './routes/_authenticated/painel.vende-ads'
 import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
 import { Route as AuthenticatedPainelIaVendeMaisRouteImport } from './routes/_authenticated/painel.ia-vende-mais'
 import { Route as AuthenticatedPainelCatalogoRouteImport } from './routes/_authenticated/painel.catalogo'
@@ -74,6 +75,12 @@ const CatalogoProductIdRoute = CatalogoProductIdRouteImport.update({
   path: '/$productId',
   getParentRoute: () => CatalogoRoute,
 } as any)
+const AuthenticatedPainelVendeAdsRoute =
+  AuthenticatedPainelVendeAdsRouteImport.update({
+    id: '/painel/vende-ads',
+    path: '/painel/vende-ads',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPainelProdutosRoute =
   AuthenticatedPainelProdutosRouteImport.update({
     id: '/painel/produtos',
@@ -118,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/ia-vende-mais': typeof AuthenticatedPainelIaVendeMaisRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/painel/vende-ads': typeof AuthenticatedPainelVendeAdsRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -134,6 +142,7 @@ export interface FileRoutesByTo {
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/painel/ia-vende-mais': typeof AuthenticatedPainelIaVendeMaisRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/painel/vende-ads': typeof AuthenticatedPainelVendeAdsRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
 export interface FileRoutesById {
@@ -152,6 +161,7 @@ export interface FileRoutesById {
   '/_authenticated/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
   '/_authenticated/painel/ia-vende-mais': typeof AuthenticatedPainelIaVendeMaisRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
+  '/_authenticated/painel/vende-ads': typeof AuthenticatedPainelVendeAdsRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
 export interface FileRouteTypes {
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/painel/catalogo'
     | '/painel/ia-vende-mais'
     | '/painel/produtos'
+    | '/painel/vende-ads'
     | '/api/public/hotmart/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/painel/catalogo'
     | '/painel/ia-vende-mais'
     | '/painel/produtos'
+    | '/painel/vende-ads'
     | '/api/public/hotmart/webhook'
   id:
     | '__root__'
@@ -203,6 +215,7 @@ export interface FileRouteTypes {
     | '/_authenticated/painel/catalogo'
     | '/_authenticated/painel/ia-vende-mais'
     | '/_authenticated/painel/produtos'
+    | '/_authenticated/painel/vende-ads'
     | '/api/public/hotmart/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -291,6 +304,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CatalogoProductIdRouteImport
       parentRoute: typeof CatalogoRoute
     }
+    '/_authenticated/painel/vende-ads': {
+      id: '/_authenticated/painel/vende-ads'
+      path: '/painel/vende-ads'
+      fullPath: '/painel/vende-ads'
+      preLoaderRoute: typeof AuthenticatedPainelVendeAdsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel/produtos': {
       id: '/_authenticated/painel/produtos'
       path: '/painel/produtos'
@@ -334,6 +354,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPainelCatalogoRoute: typeof AuthenticatedPainelCatalogoRoute
   AuthenticatedPainelIaVendeMaisRoute: typeof AuthenticatedPainelIaVendeMaisRoute
   AuthenticatedPainelProdutosRoute: typeof AuthenticatedPainelProdutosRoute
+  AuthenticatedPainelVendeAdsRoute: typeof AuthenticatedPainelVendeAdsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -341,6 +362,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPainelCatalogoRoute: AuthenticatedPainelCatalogoRoute,
   AuthenticatedPainelIaVendeMaisRoute: AuthenticatedPainelIaVendeMaisRoute,
   AuthenticatedPainelProdutosRoute: AuthenticatedPainelProdutosRoute,
+  AuthenticatedPainelVendeAdsRoute: AuthenticatedPainelVendeAdsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
