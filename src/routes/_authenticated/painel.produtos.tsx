@@ -763,7 +763,6 @@ function AdminProductsPage() {
             </a>
           </div>
         )}
-        </div>
 
         {/* Gerenciador de catálogos */}
         <div className="mt-8 rounded-2xl border border-border/70 bg-card p-4 shadow-card">
