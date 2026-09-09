@@ -20,6 +20,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatalogoProductIdRouteImport } from './routes/catalogo.$productId'
 import { Route as AuthenticatedPainelProdutosRouteImport } from './routes/_authenticated/painel.produtos'
+import { Route as AuthenticatedPainelIaVendeMaisRouteImport } from './routes/_authenticated/painel.ia-vende-mais'
 import { Route as AuthenticatedPainelCatalogoRouteImport } from './routes/_authenticated/painel.catalogo'
 import { Route as AuthenticatedPainelAdminRouteImport } from './routes/_authenticated/painel.admin'
 import { Route as ApiPublicHotmartWebhookRouteImport } from './routes/api/public/hotmart/webhook'
@@ -79,6 +80,12 @@ const AuthenticatedPainelProdutosRoute =
     path: '/painel/produtos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPainelIaVendeMaisRoute =
+  AuthenticatedPainelIaVendeMaisRouteImport.update({
+    id: '/painel/ia-vende-mais',
+    path: '/painel/ia-vende-mais',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPainelCatalogoRoute =
   AuthenticatedPainelCatalogoRouteImport.update({
     id: '/painel/catalogo',
@@ -109,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/admin': typeof AuthenticatedPainelAdminRoute
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
+  '/painel/ia-vende-mais': typeof AuthenticatedPainelIaVendeMaisRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
@@ -124,6 +132,7 @@ export interface FileRoutesByTo {
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/painel/admin': typeof AuthenticatedPainelAdminRoute
   '/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
+  '/painel/ia-vende-mais': typeof AuthenticatedPainelIaVendeMaisRoute
   '/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
@@ -141,6 +150,7 @@ export interface FileRoutesById {
   '/catalogo/$productId': typeof CatalogoProductIdRoute
   '/_authenticated/painel/admin': typeof AuthenticatedPainelAdminRoute
   '/_authenticated/painel/catalogo': typeof AuthenticatedPainelCatalogoRoute
+  '/_authenticated/painel/ia-vende-mais': typeof AuthenticatedPainelIaVendeMaisRoute
   '/_authenticated/painel/produtos': typeof AuthenticatedPainelProdutosRoute
   '/api/public/hotmart/webhook': typeof ApiPublicHotmartWebhookRoute
 }
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/catalogo/$productId'
     | '/painel/admin'
     | '/painel/catalogo'
+    | '/painel/ia-vende-mais'
     | '/painel/produtos'
     | '/api/public/hotmart/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/catalogo/$productId'
     | '/painel/admin'
     | '/painel/catalogo'
+    | '/painel/ia-vende-mais'
     | '/painel/produtos'
     | '/api/public/hotmart/webhook'
   id:
@@ -189,6 +201,7 @@ export interface FileRouteTypes {
     | '/catalogo/$productId'
     | '/_authenticated/painel/admin'
     | '/_authenticated/painel/catalogo'
+    | '/_authenticated/painel/ia-vende-mais'
     | '/_authenticated/painel/produtos'
     | '/api/public/hotmart/webhook'
   fileRoutesById: FileRoutesById
@@ -285,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelProdutosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/painel/ia-vende-mais': {
+      id: '/_authenticated/painel/ia-vende-mais'
+      path: '/painel/ia-vende-mais'
+      fullPath: '/painel/ia-vende-mais'
+      preLoaderRoute: typeof AuthenticatedPainelIaVendeMaisRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/painel/catalogo': {
       id: '/_authenticated/painel/catalogo'
       path: '/painel/catalogo'
@@ -312,12 +332,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedPainelAdminRoute: typeof AuthenticatedPainelAdminRoute
   AuthenticatedPainelCatalogoRoute: typeof AuthenticatedPainelCatalogoRoute
+  AuthenticatedPainelIaVendeMaisRoute: typeof AuthenticatedPainelIaVendeMaisRoute
   AuthenticatedPainelProdutosRoute: typeof AuthenticatedPainelProdutosRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPainelAdminRoute: AuthenticatedPainelAdminRoute,
   AuthenticatedPainelCatalogoRoute: AuthenticatedPainelCatalogoRoute,
+  AuthenticatedPainelIaVendeMaisRoute: AuthenticatedPainelIaVendeMaisRoute,
   AuthenticatedPainelProdutosRoute: AuthenticatedPainelProdutosRoute,
 }
 
