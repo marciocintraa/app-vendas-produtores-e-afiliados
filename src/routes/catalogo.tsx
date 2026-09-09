@@ -197,9 +197,15 @@ function CatalogPage() {
                         R$ {p.price.toFixed(0)}
                       </div>
                     </div>
-                    <span className="inline-flex items-center gap-1 text-sm text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                    <a
+                      href={p.affiliateUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground transition-transform hover:scale-[1.02]"
+                    >
                       Ver <ArrowRight className="h-4 w-4" />
-                    </span>
+                    </a>
                   </div>
                 </div>
               </Link>
