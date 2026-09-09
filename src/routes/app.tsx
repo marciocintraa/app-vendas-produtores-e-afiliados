@@ -290,13 +290,85 @@ function Dashboard({ email }: { email: string }) {
           <h1 className="text-3xl font-bold">Olá, {firstName} 👋</h1>
           <p className="mt-1 text-slate-400">Acompanhe o desempenho do seu catálogo.</p>
 
-          <button
-            onClick={handleShare}
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 px-7 py-3.5 font-bold tracking-wide text-white shadow-lg shadow-cyan-500/20 transition hover:opacity-90"
-          >
-            {shared ? <Check className="h-5 w-5" /> : <Share2 className="h-5 w-5" />}
-            {shared ? "LINK COPIADO!" : "COMPARTILHAR MEU CATÁLOGO"}
-          </button>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <button
+              onClick={handleShare}
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 px-7 py-3.5 font-bold tracking-wide text-white shadow-lg shadow-cyan-500/20 transition hover:opacity-90"
+            >
+              {shared ? <Check className="h-5 w-5" /> : <Share2 className="h-5 w-5" />}
+              {shared ? "LINK COPIADO!" : "COMPARTILHAR MEU CATÁLOGO"}
+            </button>
+            <button
+              onClick={() => {
+                setNewCatalogName("");
+                setNewCatalogOpen(true);
+              }}
+              className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-cyan-400/10 px-7 py-3.5 font-bold tracking-wide text-cyan-300 transition hover:bg-cyan-400/20"
+            >
+              <Plus className="h-5 w-5" /> NOVO CATÁLOGO
+            </button>
+            <Link
+              to="/catalogo"
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 px-7 py-3.5 font-bold tracking-wide text-slate-200 transition hover:bg-white/5"
+            >
+              <LayoutGrid className="h-5 w-5" /> VER CATÁLOGO
+            </Link>
+          </div>
+
+          {/* Meus catálogos */}
+          {catalogs.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {catalogs.map((cat) => (
+                <Link
+                  key={cat.id}
+                  to="/catalogo"
+                  search={{ c: cat.slug }}
+                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs text-slate-300 transition hover:border-cyan-400/40 hover:text-white"
+                >
+                  {cat.name}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {newCatalogOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <div
+                className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                onClick={() => setNewCatalogOpen(false)}
+              />
+              <div className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-[#0D1330] p-6 shadow-2xl">
+                <h3 className="text-lg font-bold">Novo catálogo</h3>
+                <p className="mt-1 text-sm text-slate-400">
+                  Dê um nome para organizar seus produtos.
+                </p>
+                <input
+                  autoFocus
+                  value={newCatalogName}
+                  onChange={(e) => setNewCatalogName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleCreateCatalog();
+                  }}
+                  placeholder="Ex.: Emagrecimento"
+                  className="mt-4 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-cyan-400 focus:outline-none"
+                />
+                <div className="mt-5 flex justify-end gap-2">
+                  <button
+                    onClick={() => setNewCatalogOpen(false)}
+                    className="rounded-full px-5 py-2.5 text-sm text-slate-300 transition hover:bg-white/5"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleCreateCatalog}
+                    className="rounded-full bg-gradient-to-r from-blue-500 to-cyan-400 px-6 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
+                  >
+                    Criar catálogo
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Busca */}
           <div className="relative mt-6">
