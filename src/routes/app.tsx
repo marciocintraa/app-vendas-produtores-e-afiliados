@@ -115,7 +115,9 @@ function Dashboard({ email }: { email: string }) {
     <div className="flex min-h-screen bg-[#070B18] text-white">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-white/5 bg-[#0A0F22] px-4 py-6 md:flex">
         <p className="mb-8 px-2 text-sm font-bold tracking-[0.25em] text-cyan-400">VENDE FÁCIL PRO</p>
-        <nav className="flex-1 space-y-1">{MENU.map((item) => { const Icon = item.icon; const cls = `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${item.active ? "bg-cyan-500/10 font-semibold text-cyan-300" : "text-slate-300 hover:bg-white/5 hover:text-white"}`; if (item.to) return <Link key={item.label} to={item.to} className={cls}><Icon className="h-4 w-4" /> {item.label}</Link>; return <button key={item.label} type="button" title="Em breve" className={`${cls} w-full cursor-default opacity-70`}><Icon className="h-4 w-4" /> {item.label}</button>; })}</nav>
+        <nav className="flex-1 space-y-1">{MENU.map((item) => { const Icon = item.icon; const cls = `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${item.active ? "bg-cyan-500/10 font-semibold text-cyan-300" : "text-slate-300 hover:bg-white/5 hover:text-white"}`; if (item.to) return <Link key={item.label} to={item.to} className={cls}><Icon className="h-4 w-4" /> {item.label}</Link>; return <button key={item.label} type="button" title="Em breve" className={`${cls} w-full cursor-default opacity-70`}><Icon className="h-4 w-4" /> {item.label}</button>; })}
+          {isAdmin && <Link to="/painel/admin" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-cyan-300 transition hover:bg-white/5"><ShieldCheck className="h-4 w-4" /> Administração</Link>}
+        </nav>
       </aside>
       <main className="min-w-0 flex-1">
         <header className="flex items-center justify-between gap-4 border-b border-white/5 px-6 py-4">
