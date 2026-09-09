@@ -21,8 +21,8 @@ export const CHECKOUT_PLANS: CheckoutPlan[] = [
   {
     id: "vitalicio",
     name: "Vende Fácil Pro",
-    price: "R$ 197,00",
-    installmentPrice: "ou 12x de R$ 19,60",
+    price: "R$ 197,00 à vista",
+    installmentPrice: "ou 6 x de R$ 36,96 *",
     productLimit: null,
     limitLabel: "Produtos ilimitados",
     highlight: true,
